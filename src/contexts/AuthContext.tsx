@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase, userSaltService } from '../utils/supabase';
 import { deriveKey, generateSalt, arrayToBase64, base64ToArray } from '../utils/crypto';
+import { storeDerivedKey, getStoredDerivedKey, clearStoredDerivedKey } from '../utils/keyStorage';
 
 interface AuthContextType {
   user: User | null;
@@ -10,7 +11,7 @@ interface AuthContextType {
   isKeyDeriving: boolean;
   keyDerivationError: string | null;
   signOut: () => Promise<void>;
-  deriveEncryptionKey: (masterPassword: string) => Promise<void>;
+  deriveEncryptionKey: (masterPassword: string, rememberMe?: boolean) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -38,7 +39,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Get initial session
     const getInitialSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      setUser(session?.user ?? null);
+      const user = session?.user ?? null;
+      setUser(user);
+      
+      // If user is authenticated, try to load stored key
+      if (user) {
+        try {
+          const storedKey = await getStoredDerivedKey();
+          if (storedKey) {
+            setDerivedKey(storedKey);
+          }
+        } catch (error) {
+          console.error('Failed to load stored key:', error);
+          // Clear potentially corrupted stored key
+          await clearStoredDerivedKey();
+        }
+      }
+      
       setLoading(false);
     };
 
@@ -47,12 +64,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        setUser(session?.user ?? null);
+        const user = session?.user ?? null;
+        const previousUser = user;
+        
+        setUser(user);
+        
         // Clear derived key when user changes
-        if (!session?.user) {
+        if (!user) {
           setDerivedKey(null);
           setKeyDerivationError(null);
+          // Clear stored key on logout
+          await clearStoredDerivedKey();
+        } else if (user && (!previousUser || user.id !== previousUser.id)) {
+          // New user logged in, try to load their stored key
+          try {
+            const storedKey = await getStoredDerivedKey();
+            if (storedKey) {
+              setDerivedKey(storedKey);
+            }
+          } catch (error) {
+            console.error('Failed to load stored key for new user:', error);
+            await clearStoredDerivedKey();
+          }
         }
+        
         setLoading(false);
       }
     );
@@ -64,10 +99,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Clear derived key before signing out
     setDerivedKey(null);
     setKeyDerivationError(null);
+    // Clear stored key on logout
+    await clearStoredDerivedKey();
     await supabase.auth.signOut();
   };
 
-  const deriveEncryptionKey = async (masterPassword: string) => {
+  const deriveEncryptionKey = async (masterPassword: string, rememberMe: boolean = false) => {
     setIsKeyDeriving(true);
     setKeyDerivationError(null);
 
@@ -88,6 +125,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Derive encryption key using Argon2id
       const key = await deriveKey(masterPassword, saltArray);
       
+      // Store key locally if user opted in
+      if (rememberMe) {
+        try {
+          await storeDerivedKey(key);
+        } catch (error) {
+          console.error('Failed to store derived key:', error);
+          // Don't fail the entire operation, just warn the user
+          setKeyDerivationError('Key derived successfully but failed to store locally. You may need to re-enter your password next time.');
+        }
+      }
+      
       setDerivedKey(key);
     } catch (error) {
       console.error('Key derivation failed:', error);
@@ -100,6 +148,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsKeyDeriving(false);
     }
   };
+  
   const value = {
     user,
     loading,
