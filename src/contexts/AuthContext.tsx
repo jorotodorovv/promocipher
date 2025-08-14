@@ -53,10 +53,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           console.error('Failed to load stored key:', error);
           // Clear potentially corrupted stored key
           await clearStoredDerivedKey();
+        } finally {
+          // Always set loading to false, whether key was found or not
+          setLoading(false);
         }
+      } else {
+        setLoading(false);
       }
-      
-      setLoading(false);
     };
 
     getInitialSession();
