@@ -4,7 +4,7 @@ import TerminalCode from './TerminalCode';
 
 const TerminalSection: React.FC = () => {
   return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-neutral-dark">
+    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-background-light dark:bg-background-dark">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left Content */}
@@ -13,11 +13,11 @@ const TerminalSection: React.FC = () => {
               <Terminal className="w-8 h-8 text-white" />
             </div>
             
-            <h2 className="font-pixel text-h2 text-white mb-6 uppercase tracking-wide">
+            <h2 className="font-pixel text-h2 text-neutral-dark dark:text-white mb-6 uppercase tracking-wide">
               Military-Grade Encryption
             </h2>
             
-            <p className="font-sans text-body text-neutral-medium mb-8 leading-relaxed">
+            <p className="font-sans text-body text-neutral-dark dark:text-neutral-medium mb-8 leading-relaxed">
               Watch PromoCipher's encryption engine in action. Every promo code is protected 
               with XChaCha20-Poly1305 encryption and Argon2id key derivation - the same 
               cryptographic standards used by security professionals.
@@ -27,8 +27,8 @@ const TerminalSection: React.FC = () => {
               <div className="flex items-start space-x-3">
                 <div className="w-2 h-2 bg-accent-success rounded-full mt-2 flex-shrink-0" />
                 <div>
-                  <h4 className="font-sans font-medium text-white mb-1">Zero-Knowledge Architecture</h4>
-                  <p className="font-sans text-small text-neutral-medium">
+                  <h4 className="font-sans font-medium text-neutral-dark dark:text-white mb-1">Zero-Knowledge Architecture</h4>
+                  <p className="font-sans text-small text-neutral-dark dark:text-neutral-medium">
                     Your master password never leaves your device
                   </p>
                 </div>
@@ -37,8 +37,8 @@ const TerminalSection: React.FC = () => {
               <div className="flex items-start space-x-3">
                 <div className="w-2 h-2 bg-accent-success rounded-full mt-2 flex-shrink-0" />
                 <div>
-                  <h4 className="font-sans font-medium text-white mb-1">Authenticated Encryption</h4>
-                  <p className="font-sans text-small text-neutral-medium">
+                  <h4 className="font-sans font-medium text-neutral-dark dark:text-white mb-1">Authenticated Encryption</h4>
+                  <p className="font-sans text-small text-neutral-dark dark:text-neutral-medium">
                     Each record includes integrity verification
                   </p>
                 </div>
@@ -47,8 +47,8 @@ const TerminalSection: React.FC = () => {
               <div className="flex items-start space-x-3">
                 <div className="w-2 h-2 bg-accent-success rounded-full mt-2 flex-shrink-0" />
                 <div>
-                  <h4 className="font-sans font-medium text-white mb-1">Unique Nonces</h4>
-                  <p className="font-sans text-small text-neutral-medium">
+                  <h4 className="font-sans font-medium text-neutral-dark dark:text-white mb-1">Unique Nonces</h4>
+                  <p className="font-sans text-small text-neutral-dark dark:text-neutral-medium">
                     Every encryption operation uses a fresh 24-byte nonce
                   </p>
                 </div>
@@ -62,7 +62,7 @@ const TerminalSection: React.FC = () => {
                   Open Source
                 </span>
               </div>
-              <p className="font-sans text-small text-neutral-medium">
+              <p className="font-sans text-small text-neutral-dark dark:text-neutral-medium">
                 Our encryption implementation is open source and audited by security experts. 
                 Transparency builds trust.
               </p>
@@ -98,41 +98,41 @@ const TerminalSection: React.FC = () => {
         {/* Technical Specs */}
         <div className="mt-20 max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <h3 className="font-pixel text-h3 text-white mb-4 uppercase tracking-wide">
+            <h3 className="font-pixel text-h3 text-neutral-dark dark:text-white mb-4 uppercase tracking-wide">
               Technical Specifications
             </h3>
-            <p className="font-sans text-body text-neutral-medium">
+            <p className="font-sans text-body text-neutral-dark dark:text-neutral-medium">
               Built with modern cryptographic primitives for maximum security
             </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white/5 border border-white/10 rounded-lg p-6 text-center">
+            <div className="bg-neutral-light dark:bg-white/5 border border-neutral-medium/20 dark:border-white/10 rounded-lg p-6 text-center">
               <Shield className="w-8 h-8 text-primary-bright mx-auto mb-4" />
-              <h4 className="font-pixel text-small text-white mb-2 uppercase">
+              <h4 className="font-pixel text-small text-neutral-dark dark:text-white mb-2 uppercase">
                 Key Derivation
               </h4>
-              <code className="font-code text-small text-neutral-medium block">
+              <code className="font-code text-small text-neutral-dark dark:text-neutral-medium block">
                 Argon2id(m=64MiB, t=3)
               </code>
             </div>
             
-            <div className="bg-white/5 border border-white/10 rounded-lg p-6 text-center">
+            <div className="bg-neutral-light dark:bg-white/5 border border-neutral-medium/20 dark:border-white/10 rounded-lg p-6 text-center">
               <Code2 className="w-8 h-8 text-primary-bright mx-auto mb-4" />
-              <h4 className="font-pixel text-small text-white mb-2 uppercase">
+              <h4 className="font-pixel text-small text-neutral-dark dark:text-white mb-2 uppercase">
                 Encryption
               </h4>
-              <code className="font-code text-small text-neutral-medium block">
+              <code className="font-code text-small text-neutral-dark dark:text-neutral-medium block">
                 XChaCha20-Poly1305
               </code>
             </div>
             
-            <div className="bg-white/5 border border-white/10 rounded-lg p-6 text-center">
+            <div className="bg-neutral-light dark:bg-white/5 border border-neutral-medium/20 dark:border-white/10 rounded-lg p-6 text-center">
               <Terminal className="w-8 h-8 text-primary-bright mx-auto mb-4" />
-              <h4 className="font-pixel text-small text-white mb-2 uppercase">
+              <h4 className="font-pixel text-small text-neutral-dark dark:text-white mb-2 uppercase">
                 Nonce Size
               </h4>
-              <code className="font-code text-small text-neutral-medium block">
+              <code className="font-code text-small text-neutral-dark dark:text-neutral-medium block">
                 24 bytes (192 bits)
               </code>
             </div>

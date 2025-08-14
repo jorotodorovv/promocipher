@@ -114,22 +114,22 @@ const TerminalCode: React.FC<TerminalCodeProps> = ({ className = "" }) => {
     : "";
 
   return (
-    <div className={`relative rounded-lg border-2 border-primary-bright/70 bg-neutral-dark/90 backdrop-blur-md shadow-hover-dark ${className}`}>
+    <div className={`relative rounded-lg border-2 border-primary-bright/70 bg-white/90 dark:bg-neutral-dark/90 backdrop-blur-md shadow-hover-light dark:shadow-hover-dark ${className}`}>
       <div className="absolute inset-0 bg-gradient-to-br from-primary-bright/10 via-transparent to-accent-success/10 rounded-lg" />
       
       {/* Terminal Header */}
-      <div className="flex items-center gap-2 px-4 py-3 bg-neutral-dark/80 border-b border-primary-bright/30 rounded-t-lg">
+      <div className="flex items-center gap-2 px-4 py-3 bg-white/80 dark:bg-neutral-dark/80 border-b border-primary-bright/30 rounded-t-lg">
         <div className="w-3 h-3 rounded-full bg-accent-error/80" />
         <div className="w-3 h-3 rounded-full bg-accent-warning/80" />
         <div className="w-3 h-3 rounded-full bg-accent-success/80" />
-        <span className="ml-3 font-code text-small text-neutral-medium">
+        <span className="ml-3 font-code text-small text-neutral-dark dark:text-neutral-medium">
           terminal • promocipher
         </span>
       </div>
       
       {/* Terminal Content */}
       <div className="p-6 h-64 md:h-80 overflow-hidden">
-        <pre className="font-code text-small leading-relaxed text-white/90 whitespace-pre">
+        <pre className="font-code text-small leading-relaxed text-neutral-dark/90 dark:text-white/90 whitespace-pre">
           {renderedLines.map((line, index) => (
             <div key={index} className="mb-1">
               <span className="text-primary-bright">{">"}</span>
@@ -138,7 +138,7 @@ const TerminalCode: React.FC<TerminalCodeProps> = ({ className = "" }) => {
           ))}
           <div className="mb-1">
             <span className="text-accent-success">{">"}</span>
-            <span className="ml-2 text-white/95">{currentDisplayLine}</span>
+            <span className="ml-2 text-neutral-dark/95 dark:text-white/95">{currentDisplayLine}</span>
             <span className="inline-block w-2 h-4 bg-primary-bright ml-1 animate-pulse" />
           </div>
         </pre>
