@@ -120,7 +120,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           </div>
         </div>
       )}
-
+Don't
       {/* Google OAuth Button */}
       <div className="mb-6">
         <Button
