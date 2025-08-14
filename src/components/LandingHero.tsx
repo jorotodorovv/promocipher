@@ -28,11 +28,11 @@ const LandingHero: React.FC<LandingHeroProps> = ({ onDashboardAccess }) => {
           </h1>
           
           <p className="font-pixel text-h3 text-primary-bright mb-8 uppercase tracking-wider">
-            Secure Promo Code Vault
+            Never lose another discount code again.
           </p>
           
           <p className="font-sans text-body md:text-xl text-neutral-dark dark:text-neutral-medium max-w-3xl mx-auto leading-relaxed mb-12">
-            Never lose another discount code again. PromoCipher encrypts and organizes your promo codes 
+            We encrypt and organize your promo codes 
             with military-grade security, making them accessible whenever you need them.
           </p>
 
