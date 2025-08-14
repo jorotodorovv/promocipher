@@ -31,8 +31,8 @@ export const promoCodeService = {
           discount,
           expires,
           notes,
-          created_at:metadata_created_at,
-          updated_at:metadata_updated_at
+          created_at,
+          updated_at
         )
       `)
       .order('created_at', { ascending: false });
@@ -54,8 +54,8 @@ export const promoCodeService = {
       discount: item.promo_code_metadata?.discount || '',
       expires: item.promo_code_metadata?.expires || '',
       notes: item.promo_code_metadata?.notes || '',
-      metadata_created_at: item.promo_code_metadata?.metadata_created_at || '',
-      metadata_updated_at: item.promo_code_metadata?.metadata_updated_at || ''
+      metadata_created_at: item.promo_code_metadata?.created_at || '',
+      metadata_updated_at: item.promo_code_metadata?.updated_at || ''
     }));
 
     return transformedData;
