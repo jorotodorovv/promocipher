@@ -1,4 +1,4 @@
-import sodium from 'libsodium-wrappers-sumo';
+import * as sodium from 'libsodium-wrappers-sumo';
 import type { PromoCodeData } from '../types/promoCode';
 
 // Initialize libsodium and export it
