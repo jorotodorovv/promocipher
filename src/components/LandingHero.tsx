@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shield, ArrowRight, Play } from 'lucide-react';
+import { Shield, ArrowRight, Play, Vault } from 'lucide-react';
 import Button from './ui/Button';
 
 interface LandingHeroProps {
@@ -20,7 +20,7 @@ const LandingHero: React.FC<LandingHeroProps> = ({ onDashboardAccess }) => {
       <div className="max-w-7xl mx-auto relative">
         <div className="text-center mb-16 animate-fade-in">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-primary-bright rounded-lg mb-8 shadow-light dark:shadow-dark animate-pulse-glow">
-            <Shield className="w-10 h-10 text-white" />
+            <Vault className="w-10 h-10 text-white" />
           </div>
           
           <h1 className="font-pixel text-h1 md:text-5xl text-neutral-dark dark:text-white mb-6 uppercase tracking-wide">
