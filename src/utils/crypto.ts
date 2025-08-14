@@ -36,6 +36,9 @@ export async function deriveKey(
   masterPassword: string, 
   salt: Uint8Array
 ): Promise<Uint8Array> {
+  // Ensure libsodium is fully initialized
+  await sodium.ready;
+  
   // Use Argon2id for key derivation
   const key = sodium.crypto_pwhash(
     32, // 32 bytes = 256 bits

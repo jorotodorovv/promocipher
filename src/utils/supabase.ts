@@ -79,7 +79,7 @@ export const userSaltService = {
     const { data, error } = await supabase
       .from('user_key_salts')
       .select('*')
-      .single();
+      .maybeSingle();
 
     if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
       throw new Error(`Failed to fetch user salt: ${error.message}`);
