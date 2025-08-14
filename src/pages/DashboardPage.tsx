@@ -1,82 +1,59 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, Plus, Search, Filter, Download, Upload, Settings, LogOut, Eye, EyeOff, Copy, Check, Loader2 } from 'lucide-react';
+import { Shield, Plus, Search, Filter, Download, Upload, Settings, LogOut, Eye, EyeOff, Copy, Check, Loader2, AlertCircle, X } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import type { DisplayPromoCode } from '../types/promoCode';
+import type { DisplayPromoCode, PromoCodeData } from '../types/promoCode';
+import { encrypt } from '../utils/crypto';
+import { promoCodeService } from '../utils/supabase';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
+import Modal from '../components/ui/Modal';
 
 const DashboardPage: React.FC = () => {
-  const { user, signOut } = useAuth();
+  const { user, signOut, derivedKey } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [copiedCodeId, setCopiedCodeId] = useState<string | null>(null);
+  const [showAddCodeModal, setShowAddCodeModal] = useState(false);
+  const [isLoadingCodes, setIsLoadingCodes] = useState(true);
+  const [isAddingCode, setIsAddingCode] = useState(false);
+  const [addCodeError, setAddCodeError] = useState<string | null>(null);
+  
+  // Form state for adding new promo codes
+  const [newCode, setNewCode] = useState({
+    code: '',
+    store: '',
+    discount: '',
+    expires: '',
+    notes: ''
+  });
 
-  // Placeholder data for now - will be replaced with real encrypted promo codes
-  const [promoCodes, setPromoCodes] = useState<DisplayPromoCode[]>([
-    {
-      id: '1',
-      user_id: user?.id || '',
-      encrypted_data: 'mock_encrypted_data_1',
-      nonce: 'mock_nonce_1',
-      tag: 'mock_tag_1',
-      created_at: '2024-01-15T10:00:00Z',
-      updated_at: '2024-01-15T10:00:00Z',
-      decryptedData: {
-        id: '1',
-        code: 'TECH25OFF',
-        store: 'TechMart',
-        discount: '25% off electronics',
-        expires: '2024-03-15',
-        notes: '',
-        userId: user?.id || ''
-      },
-      isRevealed: false,
-      isDecrypting: false,
-      decryptionError: null
-    },
-    {
-      id: '2',
-      user_id: user?.id || '',
-      encrypted_data: 'mock_encrypted_data_2',
-      nonce: 'mock_nonce_2',
-      tag: 'mock_tag_2',
-      created_at: '2024-02-01T10:00:00Z',
-      updated_at: '2024-02-01T10:00:00Z',
-      decryptedData: {
-        id: '2',
-        code: 'FREESHIP2024',
-        store: 'QuickBuy',
-        discount: 'Free shipping',
-        expires: '2024-04-01',
-        notes: '',
-        userId: user?.id || ''
-      },
-      isRevealed: false,
-      isDecrypting: false,
-      decryptionError: null
-    },
-    {
-      id: '3',
-      user_id: user?.id || '',
-      encrypted_data: 'mock_encrypted_data_3',
-      nonce: 'mock_nonce_3',
-      tag: 'mock_tag_3',
-      created_at: '2024-03-15T10:00:00Z',
-      updated_at: '2024-03-15T10:00:00Z',
-      decryptedData: {
-        id: '3',
-        code: 'NEWUSER10',
-        store: 'StyleHub',
-        discount: '$10 off first order',
-        expires: '2024-12-31',
-        notes: '',
-        userId: user?.id || ''
-      },
-      isRevealed: false,
-      isDecrypting: false,
-      decryptionError: null
-    }
-  ]);
+  const [promoCodes, setPromoCodes] = useState<DisplayPromoCode[]>([]);
+
+  // Fetch promo codes from Supabase on component mount
+  useEffect(() => {
+    const fetchPromoCodes = async () => {
+      if (!user || !derivedKey) return;
+      
+      setIsLoadingCodes(true);
+      try {
+        const encryptedCodes = await promoCodeService.getAll();
+        const displayCodes: DisplayPromoCode[] = encryptedCodes.map(code => ({
+          ...code,
+          decryptedData: null,
+          isRevealed: false,
+          isDecrypting: false,
+          decryptionError: null
+        }));
+        setPromoCodes(displayCodes);
+      } catch (error) {
+        console.error('Failed to fetch promo codes:', error);
+      } finally {
+        setIsLoadingCodes(false);
+      }
+    };
+
+    fetchPromoCodes();
+  }, [user, derivedKey]);
 
   // Auto-hide revealed codes after 15 seconds
   useEffect(() => {
@@ -98,6 +75,67 @@ const DashboardPage: React.FC = () => {
       timers.forEach(timer => clearTimeout(timer));
     };
   }, [promoCodes.map(c => c.isRevealed).join(',')]);
+
+  const handleAddPromoCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user || !derivedKey) {
+      setAddCodeError('Authentication required');
+      return;
+    }
+
+    setIsAddingCode(true);
+    setAddCodeError(null);
+
+    try {
+      // Create PromoCodeData object
+      const promoCodeData: PromoCodeData = {
+        id: crypto.randomUUID(),
+        code: newCode.code.trim(),
+        store: newCode.store.trim(),
+        discount: newCode.discount.trim(),
+        expires: newCode.expires,
+        notes: newCode.notes.trim(),
+        userId: user.id
+      };
+
+      // Encrypt the promo code data
+      const encryptionResult = await encrypt(promoCodeData, derivedKey, user.id);
+
+      // Save to Supabase
+      const savedCode = await promoCodeService.create({
+        id: promoCodeData.id,
+        user_id: user.id,
+        encrypted_data: encryptionResult.encryptedData,
+        nonce: encryptionResult.nonce,
+        tag: encryptionResult.tag
+      });
+
+      // Add to local state
+      const newDisplayCode: DisplayPromoCode = {
+        ...savedCode,
+        decryptedData: promoCodeData,
+        isRevealed: false,
+        isDecrypting: false,
+        decryptionError: null
+      };
+
+      setPromoCodes(prevCodes => [newDisplayCode, ...prevCodes]);
+      
+      // Reset form and close modal
+      setNewCode({ code: '', store: '', discount: '', expires: '', notes: '' });
+      setShowAddCodeModal(false);
+    } catch (error) {
+      console.error('Failed to add promo code:', error);
+      setAddCodeError(error instanceof Error ? error.message : 'Failed to add promo code');
+    } finally {
+      setIsAddingCode(false);
+    }
+  };
+
+  const resetAddCodeForm = () => {
+    setNewCode({ code: '', store: '', discount: '', expires: '', notes: '' });
+    setAddCodeError(null);
+  };
 
   const toggleReveal = async (codeId: string) => {
     setPromoCodes(prevCodes => 
@@ -247,19 +285,152 @@ const DashboardPage: React.FC = () => {
               <Download className="w-4 h-4 mr-2" />
               Export
             </Button>
-            <Button variant="primary" size="medium">
+            <Button 
+              variant="primary" 
+              size="medium"
+              onClick={() => {
+                resetAddCodeForm();
+                setShowAddCodeModal(true);
+              }}
+            >
               <Plus className="w-4 h-4 mr-2" />
               Add Code
             </Button>
           </div>
         </div>
 
-        {/* Promo Codes Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Add Code Modal */}
+        <Modal isOpen={showAddCodeModal} onClose={() => setShowAddCodeModal(false)}>
+          <div className="text-center mb-6">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-bright rounded-lg mb-4 shadow-light dark:shadow-dark">
+              <Plus className="w-8 h-8 text-white" />
+            </div>
+            <h2 className="font-pixel text-h3 text-neutral-dark dark:text-white mb-2 uppercase tracking-wide">
+              Add Promo Code
+            </h2>
+            <p className="font-sans text-body text-neutral-dark dark:text-neutral-medium">
+              Your code will be encrypted before being stored
+            </p>
+          </div>
+
+          {addCodeError && (
+            <div className="mb-6 p-4 bg-accent-error/10 border border-accent-error/20 rounded-lg">
+              <div className="flex items-center space-x-2">
+                <AlertCircle className="w-5 h-5 text-accent-error" />
+                <span className="font-sans text-small text-accent-error">{addCodeError}</span>
+              </div>
+            </div>
+          )}
+
+          <form onSubmit={handleAddPromoCode} className="space-y-4">
+            <Input
+              type="text"
+              placeholder="Store name (e.g., Amazon, Target)"
+              value={newCode.store}
+              onChange={(e) => setNewCode(prev => ({ ...prev, store: e.target.value }))}
+              required
+            />
+            
+            <Input
+              type="text"
+              placeholder="Promo code (e.g., SAVE20)"
+              value={newCode.code}
+              onChange={(e) => setNewCode(prev => ({ ...prev, code: e.target.value }))}
+              required
+            />
+            
+            <Input
+              type="text"
+              placeholder="Discount description (e.g., 20% off, Free shipping)"
+              value={newCode.discount}
+              onChange={(e) => setNewCode(prev => ({ ...prev, discount: e.target.value }))}
+              required
+            />
+            
+            <Input
+              type="date"
+              placeholder="Expiration date"
+              value={newCode.expires}
+              onChange={(e) => setNewCode(prev => ({ ...prev, expires: e.target.value }))}
+              required
+            />
+            
+            <Input
+              type="text"
+              placeholder="Notes (optional)"
+              value={newCode.notes}
+              onChange={(e) => setNewCode(prev => ({ ...prev, notes: e.target.value }))}
+            />
+
+            <div className="flex space-x-3 pt-4">
+              <Button
+                variant="secondary"
+                size="large"
+                className="flex-1"
+                type="button"
+                onClick={() => setShowAddCodeModal(false)}
+                disabled={isAddingCode}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="primary"
+                size="large"
+                className="flex-1"
+                type="submit"
+                disabled={isAddingCode || !newCode.code.trim() || !newCode.store.trim()}
+              >
+                {isAddingCode ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Encrypting...
+                  </>
+                ) : (
+                  <>
+                    <Shield className="w-4 h-4 mr-2" />
+                    Add & Encrypt
+                  </>
+                )}
+              </Button>
+            </div>
+          </form>
+
+          {/* Security Notice */}
+          <div className="mt-6 p-4 bg-primary-bright/10 border border-primary-bright/20 rounded-lg text-left">
+            <div className="flex items-start space-x-3">
+              <Shield className="w-5 h-5 text-primary-bright mt-0.5 flex-shrink-0" />
+              <div>
+                <h4 className="font-sans font-medium text-primary-bright mb-2">
+                  Zero-Knowledge Encryption
+                </h4>
+                <p className="font-sans text-small text-neutral-dark dark:text-neutral-medium">
+                  Your promo code will be encrypted on this device before being sent to our servers. 
+                  We cannot see your codes even if we wanted to.
+                </p>
+              </div>
+            </div>
+          </div>
+        </Modal>
+
+        {/* Loading State */}
+        {isLoadingCodes ? (
+          <div className="text-center py-16">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-primary-bright rounded-lg mb-6 animate-pulse-glow">
+              <Loader2 className="w-10 h-10 text-white animate-spin" />
+            </div>
+            <h3 className="font-pixel text-h3 text-neutral-dark dark:text-white mb-4 uppercase tracking-wide">
+              Loading Your Vault
+            </h3>
+            <p className="font-sans text-body text-neutral-dark dark:text-neutral-medium">
+              Fetching your encrypted promo codes...
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {promoCodes
             .filter(code => 
-              code.decryptedData?.store.toLowerCase().includes(searchTerm.toLowerCase()) ||
-              code.decryptedData?.discount.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              (code.decryptedData?.store.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              code.decryptedData?.discount.toLowerCase().includes(searchTerm.toLowerCase())) ||
               searchTerm === ''
             )
             .map((code, index) => (
@@ -271,10 +442,10 @@ const DashboardPage: React.FC = () => {
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <h3 className="font-pixel text-h3 text-neutral-dark dark:text-white mb-2 uppercase tracking-wide">
-                      {code.decryptedData?.store}
+                      {code.decryptedData?.store || 'Encrypted Store'}
                     </h3>
                     <p className="font-sans text-small text-neutral-medium">
-                      {code.decryptedData?.discount}
+                      {code.decryptedData?.discount || 'Encrypted Discount'}
                     </p>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -331,15 +502,16 @@ const DashboardPage: React.FC = () => {
 
                 <div className="flex items-center justify-between text-small">
                   <span className="font-sans text-neutral-medium">
-                    Expires: {code.decryptedData?.expires}
+                    Expires: {code.decryptedData?.expires || 'Hidden'}
                   </span>
                 </div>
               </Card>
             ))}
-        </div>
+          </div>
+        )}
 
         {/* Empty State */}
-        {promoCodes.length === 0 && (
+        {!isLoadingCodes && promoCodes.length === 0 && (
           <div className="text-center py-16">
             <div className="inline-flex items-center justify-center w-20 h-20 bg-neutral-light dark:bg-neutral-medium/20 rounded-lg mb-6">
               <Shield className="w-10 h-10 text-neutral-medium" />
@@ -351,7 +523,11 @@ const DashboardPage: React.FC = () => {
               Start building your secure vault by adding your first promo code. 
               All codes are encrypted with military-grade security.
             </p>
-            <Button variant="primary" size="large">
+            <Button 
+              variant="primary" 
+              size="large"
+              onClick={() => setShowAddCodeModal(true)}
+            >
               <Plus className="w-5 h-5 mr-2" />
               Add Your First Code
             </Button>
