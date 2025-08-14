@@ -1,0 +1,166 @@
+import React, { useState } from 'react';
+import { Plus, Shield, AlertCircle, Loader2 } from 'lucide-react';
+import Modal from '../ui/Modal';
+import Button from '../ui/Button';
+import Input from '../ui/Input';
+import type { NewPromoCodeForm } from '../../types/promoCode';
+
+interface AddCodeModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (formData: NewPromoCodeForm) => Promise<void>;
+  isLoading: boolean;
+  error: string | null;
+}
+
+const AddCodeModal: React.FC<AddCodeModalProps> = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  isLoading,
+  error
+}) => {
+  const [formData, setFormData] = useState<NewPromoCodeForm>({
+    code: '',
+    store: '',
+    discount: '',
+    expires: '',
+    notes: ''
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await onSubmit(formData);
+  };
+
+  const handleClose = () => {
+    setFormData({
+      code: '',
+      store: '',
+      discount: '',
+      expires: '',
+      notes: ''
+    });
+    onClose();
+  };
+
+  const updateField = (field: keyof NewPromoCodeForm, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  return (
+    <Modal isOpen={isOpen} onClose={handleClose}>
+      <div className="text-center mb-6">
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-bright rounded-lg mb-4 shadow-light dark:shadow-dark">
+          <Plus className="w-8 h-8 text-white" />
+        </div>
+        <h2 className="font-pixel text-h3 text-neutral-dark dark:text-white mb-2 uppercase tracking-wide">
+          Add Promo Code
+        </h2>
+        <p className="font-sans text-body text-neutral-dark dark:text-neutral-medium">
+          Your code will be encrypted before being stored
+        </p>
+      </div>
+
+      {error && (
+        <div className="mb-6 p-4 bg-accent-error/10 border border-accent-error/20 rounded-lg">
+          <div className="flex items-center space-x-2">
+            <AlertCircle className="w-5 h-5 text-accent-error" />
+            <span className="font-sans text-small text-accent-error">{error}</span>
+          </div>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <Input
+          type="text"
+          placeholder="Store name (e.g., Amazon, Target)"
+          value={formData.store}
+          onChange={(e) => updateField('store', e.target.value)}
+          required
+        />
+        
+        <Input
+          type="text"
+          placeholder="Promo code (e.g., SAVE20)"
+          value={formData.code}
+          onChange={(e) => updateField('code', e.target.value)}
+          required
+        />
+        
+        <Input
+          type="text"
+          placeholder="Discount description (e.g., 20% off, Free shipping)"
+          value={formData.discount}
+          onChange={(e) => updateField('discount', e.target.value)}
+          required
+        />
+        
+        <Input
+          type="date"
+          placeholder="Expiration date"
+          value={formData.expires}
+          onChange={(e) => updateField('expires', e.target.value)}
+          required
+        />
+        
+        <Input
+          type="text"
+          placeholder="Notes (optional)"
+          value={formData.notes}
+          onChange={(e) => updateField('notes', e.target.value)}
+        />
+
+        <div className="flex space-x-3 pt-4">
+          <Button
+            variant="secondary"
+            size="large"
+            className="flex-1"
+            type="button"
+            onClick={handleClose}
+            disabled={isLoading}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="primary"
+            size="large"
+            className="flex-1"
+            type="submit"
+            disabled={isLoading || !formData.code.trim() || !formData.store.trim()}
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Encrypting...
+              </>
+            ) : (
+              <>
+                <Shield className="w-4 h-4 mr-2" />
+                Add & Encrypt
+              </>
+            )}
+          </Button>
+        </div>
+      </form>
+
+      {/* Security Notice */}
+      <div className="mt-6 p-4 bg-primary-bright/10 border border-primary-bright/20 rounded-lg text-left">
+        <div className="flex items-start space-x-3">
+          <Shield className="w-5 h-5 text-primary-bright mt-0.5 flex-shrink-0" />
+          <div>
+            <h4 className="font-sans font-medium text-primary-bright mb-2">
+              Zero-Knowledge Encryption
+            </h4>
+            <p className="font-sans text-small text-neutral-dark dark:text-neutral-medium">
+              Your promo code will be encrypted on this device before being sent to our servers. 
+              We cannot see your codes even if we wanted to.
+            </p>
+          </div>
+        </div>
+      </div>
+    </Modal>
+  );
+};
+
+export default AddCodeModal;
