@@ -23,7 +23,7 @@ export const CRYPTO_CONFIG = {
   TAG_LENGTH: 16,   // 16 bytes for Poly1305
 } as const;
 
-// Interfaces for the crypto key and encrypted result
+// Interface for the crypto encrypted result (now only for the code)
 export interface EncryptionResult {
   encryptedData: string; // Base64 encoded
   nonce: string;         // Base64 encoded
@@ -52,24 +52,25 @@ export async function deriveKey(
   return key;
 }
 
-// Real implementation using XChaCha20-Poly1305 for authenticated encryption
+// Real implementation using XChaCha20-Poly1305 for authenticated encryption of promo code only
 export async function encrypt(
-  data: PromoCodeData,
+  promoCodeData: PromoCodeData,
   key: Uint8Array,
   userId: string
 ): Promise<EncryptionResult> {
-  // Serialize the promo code data
-  const jsonData = JSON.stringify(data);
+  // Only encrypt the sensitive code field
+  const codeToEncrypt = promoCodeData.code;
   
   // Generate a random nonce (24 bytes for XChaCha20)
   const nonce = sodium.randombytes_buf(CRYPTO_CONFIG.NONCE_LENGTH);
   
-  // Use user_id as Additional Authenticated Data (AAD)
-  const aad = new TextEncoder().encode(userId);
+  // Use user_id and promo_code_id as Additional Authenticated Data (AAD)
+  const aadString = `${userId}:${promoCodeData.id}`;
+  const aad = new TextEncoder().encode(aadString);
   
   // Encrypt using XChaCha20-Poly1305
   const ciphertext = sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(
-    jsonData,
+    codeToEncrypt,
     aad,
     null, // nsec (not used)
     nonce,
@@ -88,20 +89,24 @@ export async function encrypt(
   };
 }
 
-// Real implementation using XChaCha20-Poly1305 for authenticated decryption
+// Real implementation using XChaCha20-Poly1305 for authenticated decryption of promo code only
 export async function decrypt(
   encryptedData: string,
   nonce: string,
   tag: string,
-  aad: string,
+  userId: string,
+  promoCodeId: string,
   key: Uint8Array
-): Promise<PromoCodeData> {
+): Promise<string> {
   try {
     // Decode Base64 strings
     const ciphertextArray = base64ToArray(encryptedData);
     const nonceArray = base64ToArray(nonce);
     const tagArray = base64ToArray(tag);
-    const aadArray = base64ToArray(aad);
+    
+    // Reconstruct AAD from user_id and promo_code_id
+    const aadString = `${userId}:${promoCodeId}`;
+    const aadArray = new TextEncoder().encode(aadString);
     
     // Combine ciphertext and tag for XChaCha20-Poly1305
     const ciphertextWithTag = new Uint8Array(ciphertextArray.length + tagArray.length);
@@ -118,10 +123,10 @@ export async function decrypt(
       'text'
     );
     
-    return JSON.parse(decrypted) as PromoCodeData;
+    return decrypted; // Return the decrypted code string directly
   } catch (error) {
     console.error('Decryption failed:', error);
-    throw new Error('Failed to decrypt promo code. Data may be corrupted or tampered with.');
+    throw new Error('Failed to decrypt promo code. Invalid password or corrupted data.');
   }
 }
 

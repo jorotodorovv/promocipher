@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Shield, Plus, Search, Filter, Download, Upload, Settings, LogOut, Eye, EyeOff, Copy, Check, Loader2, AlertCircle, X } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import type { DisplayPromoCode, PromoCodeData } from '../types/promoCode';
-import { encrypt } from '../utils/crypto';
+import type { DisplayPromoCode, PromoCodeData, NewPromoCodeForm } from '../types/promoCode';
+import { encrypt, decrypt } from '../utils/crypto';
 import { promoCodeService } from '../utils/supabase';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
@@ -19,7 +19,7 @@ const DashboardPage: React.FC = () => {
   const [addCodeError, setAddCodeError] = useState<string | null>(null);
   
   // Form state for adding new promo codes
-  const [newCode, setNewCode] = useState({
+  const [newCode, setNewCode] = useState<NewPromoCodeForm>({
     code: '',
     store: '',
     discount: '',
@@ -36,10 +36,12 @@ const DashboardPage: React.FC = () => {
       
       setIsLoadingCodes(true);
       try {
-        const encryptedCodes = await promoCodeService.getAll();
-        const displayCodes: DisplayPromoCode[] = encryptedCodes.map(code => ({
+        const codesWithMetadata = await promoCodeService.getAll();
+        const displayCodes: DisplayPromoCode[] = codesWithMetadata.map(code => ({
           ...code,
-          decryptedData: null,
+          created_at: code.metadata_created_at,
+          updated_at: code.metadata_updated_at,
+          decryptedCode: null,
           isRevealed: false,
           isDecrypting: false,
           decryptionError: null
@@ -91,29 +93,47 @@ const DashboardPage: React.FC = () => {
       const promoCodeData: PromoCodeData = {
         id: crypto.randomUUID(),
         code: newCode.code.trim(),
-        store: newCode.store.trim(),
-        discount: newCode.discount.trim(),
-        expires: newCode.expires,
-        notes: newCode.notes.trim(),
         userId: user.id
       };
 
       // Encrypt the promo code data
       const encryptionResult = await encrypt(promoCodeData, derivedKey, user.id);
 
-      // Save to Supabase
-      const savedCode = await promoCodeService.create({
+      // Prepare encrypted code data
+      const encryptedCodeData = {
         id: promoCodeData.id,
         user_id: user.id,
         encrypted_data: encryptionResult.encryptedData,
         nonce: encryptionResult.nonce,
         tag: encryptionResult.tag
-      });
+      };
+
+      // Prepare metadata
+      const metadataData = {
+        id: promoCodeData.id,
+        store: newCode.store.trim(),
+        discount: newCode.discount.trim(),
+        expires: newCode.expires,
+        notes: newCode.notes.trim()
+      };
+
+      // Save to Supabase (both tables)
+      const savedCode = await promoCodeService.create(encryptedCodeData, metadataData);
 
       // Add to local state
       const newDisplayCode: DisplayPromoCode = {
-        ...savedCode,
-        decryptedData: promoCodeData,
+        id: savedCode.id,
+        user_id: savedCode.user_id,
+        encrypted_data: savedCode.encrypted_data,
+        nonce: savedCode.nonce,
+        tag: savedCode.tag,
+        store: savedCode.store,
+        discount: savedCode.discount,
+        expires: savedCode.expires,
+        notes: savedCode.notes,
+        created_at: savedCode.metadata_created_at,
+        updated_at: savedCode.metadata_updated_at,
+        decryptedCode: null,
         isRevealed: false,
         isDecrypting: false,
         decryptionError: null
@@ -138,6 +158,9 @@ const DashboardPage: React.FC = () => {
   };
 
   const toggleReveal = async (codeId: string) => {
+    const code = promoCodes.find(c => c.id === codeId);
+    if (!code || !derivedKey) return;
+
     setPromoCodes(prevCodes => 
       prevCodes.map(code => {
         if (code.id === codeId) {
@@ -146,7 +169,7 @@ const DashboardPage: React.FC = () => {
             return {
               ...code,
               isRevealed: false,
-              decryptedData: null,
+              decryptedCode: null,
               decryptionError: null
             };
           } else {
@@ -162,9 +185,18 @@ const DashboardPage: React.FC = () => {
       })
     );
 
-    // Simulate decryption process
-    if (!promoCodes.find(c => c.id === codeId)?.isRevealed) {
-      setTimeout(() => {
+    // Perform actual decryption
+    if (!code.isRevealed) {
+      try {
+        const decryptedCode = await decrypt(
+          code.encrypted_data,
+          code.nonce,
+          code.tag,
+          user!.id,
+          code.id,
+          derivedKey
+        );
+
         setPromoCodes(prevCodes => 
           prevCodes.map(code => {
             if (code.id === codeId) {
@@ -172,18 +204,34 @@ const DashboardPage: React.FC = () => {
                 ...code,
                 isDecrypting: false,
                 isRevealed: true
+                decryptedCode: decryptedCode,
+                decryptionError: null
               };
             }
             return code;
           })
         );
-      }, 600); // Simulate decryption delay
+      } catch (error) {
+        setPromoCodes(prevCodes => 
+          prevCodes.map(code => {
+            if (code.id === codeId) {
+              return {
+                ...code,
+                isDecrypting: false,
+                isRevealed: false,
+                decryptionError: error instanceof Error ? error.message : 'Decryption failed'
+              };
+            }
+            return code;
+          })
+        );
+      }
     }
   };
 
-  const handleCopy = async (code: string, codeId: string) => {
+  const handleCopy = async (codeText: string, codeId: string) => {
     try {
-      await navigator.clipboard.writeText(code);
+      await navigator.clipboard.writeText(codeText);
       setCopiedCodeId(codeId);
       setTimeout(() => setCopiedCodeId(null), 2000);
     } catch (error) {
@@ -429,8 +477,8 @@ const DashboardPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {promoCodes
             .filter(code => 
-              (code.decryptedData?.store.toLowerCase().includes(searchTerm.toLowerCase()) ||
-              code.decryptedData?.discount.toLowerCase().includes(searchTerm.toLowerCase())) ||
+              code.store.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              code.discount.toLowerCase().includes(searchTerm.toLowerCase()) ||
               searchTerm === ''
             )
             .map((code, index) => (
@@ -442,15 +490,15 @@ const DashboardPage: React.FC = () => {
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <h3 className="font-pixel text-h3 text-neutral-dark dark:text-white mb-2 uppercase tracking-wide">
-                      {code.decryptedData?.store || 'Encrypted Store'}
+                      {code.store}
                     </h3>
                     <p className="font-sans text-small text-neutral-medium">
-                      {code.decryptedData?.discount || 'Encrypted Discount'}
+                      {code.discount}
                     </p>
                   </div>
                   <div className="flex items-center space-x-2">
                     <div className={`w-3 h-3 rounded-full ${
-                      code.decryptedData && new Date(code.decryptedData.expires) > new Date() 
+                      new Date(code.expires) > new Date() 
                         ? 'bg-accent-success' 
                         : 'bg-accent-error'
                     }`} />
@@ -464,7 +512,7 @@ const DashboardPage: React.FC = () => {
                   <div className="bg-neutral-light dark:bg-neutral-medium/20 rounded p-3 flex items-center justify-between">
                     <div className="flex-1">
                       <code className="font-code text-code text-neutral-dark dark:text-white font-bold">
-                        {code.isRevealed ? code.decryptedData?.code : '••••••••••••'}
+                        {code.isRevealed ? code.decryptedCode : '••••••••••••'}
                       </code>
                     </div>
                     <div className="flex items-center space-x-2 ml-3">
@@ -485,7 +533,7 @@ const DashboardPage: React.FC = () => {
                       )}
                       {code.isRevealed && (
                         <button
-                          onClick={() => handleCopy(code.decryptedData?.code || '', code.id)}
+                          onClick={() => handleCopy(code.decryptedCode || '', code.id)}
                           className="p-1 hover:bg-neutral-medium/20 rounded transition-colors duration-200"
                           title="Copy code"
                         >
@@ -500,10 +548,25 @@ const DashboardPage: React.FC = () => {
                   </div>
                 </div>
 
+                {/* Show decryption error if any */}
+                {code.decryptionError && (
+                  <div className="mb-4 p-3 bg-accent-error/10 border border-accent-error/20 rounded-lg">
+                    <div className="flex items-center space-x-2">
+                      <AlertCircle className="w-4 h-4 text-accent-error" />
+                      <span className="font-sans text-small text-accent-error">{code.decryptionError}</span>
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex items-center justify-between text-small">
                   <span className="font-sans text-neutral-medium">
-                    Expires: {code.decryptedData?.expires || 'Hidden'}
+                    Expires: {code.expires}
                   </span>
+                  {code.notes && (
+                    <span className="font-sans text-neutral-medium italic">
+                      {code.notes.length > 20 ? `${code.notes.substring(0, 20)}...` : code.notes}
+                    </span>
+                  )}
                 </div>
               </Card>
             ))}
