@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Shield, Chrome, Mail, Lock, AlertCircle } from 'lucide-react';
+import { Shield, Chrome, Mail, Lock, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import Modal from './ui/Modal';
 import Button from './ui/Button';
 import Input from './ui/Input';
@@ -14,6 +14,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [agreeToTerms, setAgreeToTerms] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,6 +42,23 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Additional validation for sign up
+    if (isSignUp) {
+      if (password !== confirmPassword) {
+        setError('Passwords do not match');
+        return;
+      }
+      if (!agreeToTerms) {
+        setError('Please agree to the Terms of Service and Privacy Policy');
+        return;
+      }
+      if (password.length < 8) {
+        setError('Password must be at least 8 characters long');
+        return;
+      }
+    }
+    
     setLoading(true);
     setError(null);
 
@@ -49,6 +69,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           password,
         });
         if (error) throw error;
+        // Show success message for sign up
+        setError(null);
+        alert('Account created successfully! Please check your email to verify your account.');
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
@@ -66,6 +89,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const resetForm = () => {
     setEmail('');
     setPassword('');
+    setConfirmPassword('');
+    setAgreeToTerms(false);
     setError(null);
     setIsSignUp(false);
   };
@@ -81,7 +106,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
         </h2>
         <p className="font-sans text-body text-neutral-dark dark:text-neutral-medium">
           {isSignUp 
-            ? 'Join thousands securing their promo codes' 
+            ? 'Join thousands of users who trust PromoCipher to secure their savings' 
             : 'Sign in to access your encrypted vault'
           }
         </p>
@@ -106,7 +131,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           disabled={loading}
         >
           <Chrome className="w-5 h-5 mr-3" />
-          Continue with Google
+          {isSignUp ? 'Sign up with Google' : 'Continue with Google'}
         </Button>
       </div>
 
@@ -132,22 +157,113 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           icon={<Mail className="w-5 h-5" />}
           required
         />
-        <Input
-          type="password"
-          placeholder="Enter your password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          icon={<Lock className="w-5 h-5" />}
-          required
-        />
+        <div className="relative">
+          <Input
+            type={showPassword ? 'text' : 'password'}
+            placeholder="Enter your password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            icon={<Lock className="w-5 h-5" />}
+            required
+            minLength={8}
+            className="pr-12"
+          />
+          
+          {/* Confirm Password Field - Only for Sign Up */}
+          {isSignUp && (
+            <Input
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Confirm your password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              icon={<Lock className="w-5 h-5" />}
+              required
+              minLength={8}
+              className="pr-12"
+            />
+          )}
+          
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className={`absolute right-3 p-1 hover:bg-neutral-light dark:hover:bg-neutral-medium/20 rounded transition-colors duration-200 ${
+              isSignUp ? 'top-[calc(50%-20px)]' : 'top-1/2 transform -translate-y-1/2'
+            }`}
+          >
+            {showPassword ? (
+              <EyeOff className="w-5 h-5 text-neutral-medium" />
+            ) : (
+              <Eye className="w-5 h-5 text-neutral-medium" />
+            )}
+          </button>
+        </div>
+
+        {/* Password Requirements - Only for Sign Up */}
+        {isSignUp && (
+          <div className="text-left space-y-2">
+            <p className="font-sans text-small text-neutral-medium font-medium">
+              Password Requirements:
+            </p>
+            <ul className="space-y-1 text-small text-neutral-medium">
+              <li className="flex items-center space-x-2">
+                <div className={`w-2 h-2 rounded-full ${password.length >= 8 ? 'bg-accent-success' : 'bg-neutral-medium'}`} />
+                <span>At least 8 characters</span>
+              </li>
+              <li className="flex items-center space-x-2">
+                <div className={`w-2 h-2 rounded-full ${/[A-Z]/.test(password) ? 'bg-accent-success' : 'bg-neutral-medium'}`} />
+                <span>One uppercase letter</span>
+              </li>
+              <li className="flex items-center space-x-2">
+                <div className={`w-2 h-2 rounded-full ${/[0-9]/.test(password) ? 'bg-accent-success' : 'bg-neutral-medium'}`} />
+                <span>One number</span>
+              </li>
+              <li className="flex items-center space-x-2">
+                <div className={`w-2 h-2 rounded-full ${password === confirmPassword && password.length > 0 ? 'bg-accent-success' : 'bg-neutral-medium'}`} />
+                <span>Passwords match</span>
+              </li>
+            </ul>
+          </div>
+        )}
+
+        {/* Terms Agreement - Only for Sign Up */}
+        {isSignUp && (
+          <div className="flex items-start space-x-3">
+            <input
+              type="checkbox"
+              id="terms"
+              checked={agreeToTerms}
+              onChange={(e) => setAgreeToTerms(e.target.checked)}
+              className="mt-1 w-4 h-4 text-primary-bright bg-gray-100 border-gray-300 rounded focus:ring-primary-bright focus:ring-2"
+            />
+            <label htmlFor="terms" className="font-sans text-small text-neutral-dark dark:text-neutral-medium text-left">
+              I agree to the{' '}
+              <a href="#terms" className="text-primary-bright hover:text-primary-deep underline">
+                Terms of Service
+              </a>
+              {' '}and{' '}
+              <a href="#privacy" className="text-primary-bright hover:text-primary-deep underline">
+                Privacy Policy
+              </a>
+            </label>
+          </div>
+        )}
+
         <Button
           variant="primary"
           size="large"
           className="w-full"
           type="submit"
-          disabled={loading}
+          disabled={
+            loading || 
+            password.length < 8 || 
+            (isSignUp && (password !== confirmPassword || !agreeToTerms))
+          }
         >
-          {loading ? 'Please wait...' : (isSignUp ? 'Create Account' : 'Sign In')}
+          {loading ? (
+            isSignUp ? 'Creating account...' : 'Signing in...'
+          ) : (
+            isSignUp ? 'Create Account' : 'Sign In'
+          )}
         </Button>
       </form>
 
@@ -168,16 +284,39 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
         </button>
       </div>
 
+      {/* Additional Info for Sign Up */}
+      {isSignUp && (
+        <div className="mt-6 p-4 bg-accent-success/10 border border-accent-success/20 rounded-lg text-left">
+          <div className="flex items-start space-x-3">
+            <Shield className="w-5 h-5 text-accent-success mt-0.5 flex-shrink-0" />
+            <div>
+              <h4 className="font-sans font-medium text-accent-success mb-2">
+                What happens next?
+              </h4>
+              <ul className="space-y-1 font-sans text-small text-neutral-dark dark:text-neutral-medium">
+                <li>• Account created with military-grade encryption</li>
+                <li>• You'll create a master password to encrypt your vault</li>
+                <li>• Start adding promo codes immediately</li>
+                <li>• Your data is encrypted before it ever leaves your device</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Security Notice */}
-      <div className="mt-8 p-4 bg-primary-bright/10 border border-primary-bright/20 rounded-lg">
+      <div className={`${isSignUp ? 'mt-4' : 'mt-8'} p-4 bg-primary-bright/10 border border-primary-bright/20 rounded-lg text-left`}>
         <div className="flex items-start space-x-3">
           <Shield className="w-5 h-5 text-primary-bright mt-0.5 flex-shrink-0" />
           <div>
-            <h4 className="font-sans font-medium text-primary-bright mb-1">
+            <h4 className="font-sans font-medium text-primary-bright mb-2">
               Zero-Knowledge Security
             </h4>
             <p className="font-sans text-small text-neutral-dark dark:text-neutral-medium">
-              Your master password never leaves your device. We cannot see your promo codes even if we wanted to.
+              {isSignUp 
+                ? 'Your master password will never leave your device. We cannot recover it if you forget it.'
+                : 'Your master password never leaves this device. All encryption happens locally in your browser.'
+              }
             </p>
           </div>
         </div>
