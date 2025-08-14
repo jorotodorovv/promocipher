@@ -120,7 +120,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           </div>
         </div>
       )}
-Don't
+
       {/* Google OAuth Button */}
       <div className="mb-6">
         <Button
@@ -283,26 +283,6 @@ Don't
           }
         </button>
       </div>
-
-      {/* Additional Info for Sign Up */}
-      {isSignUp && (
-        <div className="mt-6 p-4 bg-accent-success/10 border border-accent-success/20 rounded-lg text-left">
-          <div className="flex items-start space-x-3">
-            <Shield className="w-5 h-5 text-accent-success mt-0.5 flex-shrink-0" />
-            <div>
-              <h4 className="font-sans font-medium text-accent-success mb-2">
-                What happens next?
-              </h4>
-              <ul className="space-y-1 font-sans text-small text-neutral-dark dark:text-neutral-medium">
-                <li>• Account created with military-grade encryption</li>
-                <li>• You'll create a master password to encrypt your vault</li>
-                <li>• Start adding promo codes immediately</li>
-                <li>• Your data is encrypted before it ever leaves your device</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Security Notice */}
       <div className={`${isSignUp ? 'mt-4' : 'mt-8'} p-4 bg-primary-bright/10 border border-primary-bright/20 rounded-lg text-left`}>

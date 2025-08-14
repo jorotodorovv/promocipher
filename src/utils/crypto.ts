@@ -46,7 +46,7 @@ export async function deriveKey(
     salt,
     CRYPTO_CONFIG.ARGON2_ITERATIONS,
     CRYPTO_CONFIG.ARGON2_MEMORY,
-    sodium.crypto_pwhash_ALG_ARGON2ID
+    sodium.crypto_pwhash_ALG_ARGON2ID13,
   );
   
   return key;
