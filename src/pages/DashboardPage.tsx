@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, Plus, Search, Filter, Download, Upload, Settings, LogOut } from 'lucide-react';
+import { Shield, Plus, Search, Filter, Download, Upload, Settings, LogOut, Eye, EyeOff, Copy, Check } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import type { DisplayPromoCode } from '../types/promoCode';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
@@ -8,14 +9,112 @@ import Input from '../components/ui/Input';
 const DashboardPage: React.FC = () => {
   const { user, signOut } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
+  const [copiedCodeId, setCopiedCodeId] = useState<string | null>(null);
 
   // Placeholder data for now - will be replaced with real encrypted promo codes
-  const [promoCodes] = useState([
-    { id: '1', store: 'TechMart', code: '****', discount: '25% off electronics', expires: '2024-03-15', isRevealed: false },
-    { id: '2', store: 'QuickBuy', code: '****', discount: 'Free shipping', expires: '2024-04-01', isRevealed: false },
-    { id: '3', store: 'StyleHub', code: '****', discount: '$10 off first order', expires: '2024-12-31', isRevealed: false }
+  const [promoCodes, setPromoCodes] = useState<DisplayPromoCode[]>([
+    {
+      id: '1',
+      user_id: user?.id || '',
+      encrypted_data: 'mock_encrypted_data_1',
+      nonce: 'mock_nonce_1',
+      tag: 'mock_tag_1',
+      created_at: '2024-01-15T10:00:00Z',
+      updated_at: '2024-01-15T10:00:00Z',
+      decryptedData: null,
+      isRevealed: false,
+      isDecrypting: false,
+      decryptionError: null
+    },
+    {
+      id: '2',
+      user_id: user?.id || '',
+      encrypted_data: 'mock_encrypted_data_2',
+      nonce: 'mock_nonce_2',
+      tag: 'mock_tag_2',
+      created_at: '2024-02-01T10:00:00Z',
+      updated_at: '2024-02-01T10:00:00Z',
+      decryptedData: null,
+      isRevealed: false,
+      isDecrypting: false,
+      decryptionError: null
+    },
+    {
+      id: '3',
+      user_id: user?.id || '',
+      encrypted_data: 'mock_encrypted_data_3',
+      nonce: 'mock_nonce_3',
+      tag: 'mock_tag_3',
+      created_at: '2024-03-15T10:00:00Z',
+      updated_at: '2024-03-15T10:00:00Z',
+      decryptedData: null,
+      isRevealed: false,
+      isDecrypting: false,
+      decryptionError: null
+    }
   ]);
 
+  // Mock data for demonstration - will be replaced with actual decryption
+  const mockDecryptedData = {
+    '1': { id: '1', code: 'TECH25OFF', store: 'TechMart', discount: '25% off electronics', expires: '2024-03-15', notes: '', userId: user?.id || '' },
+    '2': { id: '2', code: 'FREESHIP2024', store: 'QuickBuy', discount: 'Free shipping', expires: '2024-04-01', notes: '', userId: user?.id || '' },
+    '3': { id: '3', code: 'NEWUSER10', store: 'StyleHub', discount: '$10 off first order', expires: '2024-12-31', notes: '', userId: user?.id || '' }
+  };
+
+  const toggleReveal = async (codeId: string) => {
+    setPromoCodes(prevCodes => 
+      prevCodes.map(code => {
+        if (code.id === codeId) {
+          if (code.isRevealed) {
+            // Hide the code
+            return {
+              ...code,
+              isRevealed: false,
+              decryptedData: null,
+              decryptionError: null
+            };
+          } else {
+            // Start revealing the code
+            return {
+              ...code,
+              isDecrypting: true,
+              decryptionError: null
+            };
+          }
+        }
+        return code;
+      })
+    );
+
+    // Simulate decryption process (will be replaced with actual decryption)
+    if (!promoCodes.find(c => c.id === codeId)?.isRevealed) {
+      setTimeout(() => {
+        setPromoCodes(prevCodes => 
+          prevCodes.map(code => {
+            if (code.id === codeId) {
+              return {
+                ...code,
+                isDecrypting: false,
+                isRevealed: true,
+                decryptedData: mockDecryptedData[codeId as keyof typeof mockDecryptedData]
+              };
+            }
+            return code;
+          })
+        );
+      }, 800); // Simulate decryption delay
+    }
+  };
+
+  const handleCopy = async (code: string, codeId: string) => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopiedCodeId(codeId);
+      setTimeout(() => setCopiedCodeId(null), 2000);
+    } catch (error) {
+      console.error('Failed to copy code:', error);
+    }
+  };
   const handleSignOut = async () => {
     try {
       await signOut();
@@ -122,8 +221,9 @@ const DashboardPage: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {promoCodes
             .filter(code => 
-              code.store.toLowerCase().includes(searchTerm.toLowerCase()) ||
-              code.discount.toLowerCase().includes(searchTerm.toLowerCase())
+              (code.decryptedData?.store.toLowerCase().includes(searchTerm.toLowerCase())) ||
+              (code.decryptedData?.discount.toLowerCase().includes(searchTerm.toLowerCase())) ||
+              (!code.isRevealed && searchTerm === '')
             )
             .map((code, index) => (
               <Card 
@@ -134,15 +234,15 @@ const DashboardPage: React.FC = () => {
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <h3 className="font-pixel text-h3 text-neutral-dark dark:text-white mb-2 uppercase tracking-wide">
-                      {code.store}
+                      {code.decryptedData?.store || 'Encrypted Store'}
                     </h3>
                     <p className="font-sans text-small text-neutral-medium">
-                      {code.discount}
+                      {code.decryptedData?.discount || 'Hidden discount details'}
                     </p>
                   </div>
                   <div className="flex items-center space-x-2">
                     <div className={`w-3 h-3 rounded-full ${
-                      new Date(code.expires) > new Date() 
+                      code.decryptedData && new Date(code.decryptedData.expires) > new Date() 
                         ? 'bg-accent-success' 
                         : 'bg-accent-error'
                     }`} />
@@ -152,24 +252,50 @@ const DashboardPage: React.FC = () => {
                 <div className="mb-4">
                   <div className="flex items-center justify-between mb-2">
                     <span className="font-sans text-small text-neutral-medium">Promo Code</span>
-                    <button className="p-1 hover:bg-neutral-light dark:hover:bg-neutral-medium/20 rounded transition-colors duration-200">
-                      <Shield className="w-4 h-4 text-primary-bright" />
-                    </button>
                   </div>
-                  <div className="bg-neutral-light dark:bg-neutral-medium/20 rounded p-3">
-                    <code className="font-code text-code text-neutral-dark dark:text-white font-bold">
-                      {code.isRevealed ? code.code : '••••••••'}
-                    </code>
+                  <div className="bg-neutral-light dark:bg-neutral-medium/20 rounded p-3 flex items-center justify-between">
+                    <div className="flex-1">
+                      <code className="font-code text-code text-neutral-dark dark:text-white font-bold">
+                        {code.isRevealed && code.decryptedData ? code.decryptedData.code : '••••••••'}
+                      </code>
+                    </div>
+                    <div className="flex items-center space-x-2 ml-3">
+                      {code.isDecrypting ? (
+                        <Shield className="w-4 h-4 text-primary-bright animate-pulse" />
+                      ) : (
+                        <button
+                          onClick={() => toggleReveal(code.id)}
+                          className="p-1 hover:bg-neutral-medium/20 rounded transition-colors duration-200"
+                          title={code.isRevealed ? 'Hide code' : 'Reveal code'}
+                        >
+                          {code.isRevealed ? (
+                            <EyeOff className="w-4 h-4 text-neutral-dark dark:text-neutral-medium" />
+                          ) : (
+                            <Eye className="w-4 h-4 text-primary-bright" />
+                          )}
+                        </button>
+                      )}
+                      {code.isRevealed && code.decryptedData && (
+                        <button
+                          onClick={() => handleCopy(code.decryptedData!.code, code.id)}
+                          className="p-1 hover:bg-neutral-medium/20 rounded transition-colors duration-200"
+                          title="Copy code"
+                        >
+                          {copiedCodeId === code.id ? (
+                            <Check className="w-4 h-4 text-accent-success" />
+                          ) : (
+                            <Copy className="w-4 h-4 text-primary-bright" />
+                          )}
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
 
                 <div className="flex items-center justify-between text-small">
                   <span className="font-sans text-neutral-medium">
-                    Expires: {code.expires}
+                    Expires: {code.decryptedData?.expires || 'Hidden'}
                   </span>
-                  <Button variant="secondary" size="small">
-                    Reveal & Copy
-                  </Button>
                 </div>
               </Card>
             ))}
