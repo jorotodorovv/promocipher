@@ -2,7 +2,11 @@ import React from 'react';
 import { Shield, ArrowRight, Play } from 'lucide-react';
 import Button from './ui/Button';
 
-const LandingHero: React.FC = () => {
+interface LandingHeroProps {
+  onDashboardAccess: () => void;
+}
+
+const LandingHero: React.FC<LandingHeroProps> = ({ onDashboardAccess }) => {
   return (
     <section className="pt-24 pb-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Background Pattern */}
@@ -33,7 +37,7 @@ const LandingHero: React.FC = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-            <Button variant="primary" size="large" className="w-full sm:w-auto">
+            <Button variant="primary" size="large" className="w-full sm:w-auto" onClick={onDashboardAccess}>
               <Shield className="w-5 h-5 mr-2" />
               Start Securing Codes
               <ArrowRight className="w-5 h-5 ml-2" />

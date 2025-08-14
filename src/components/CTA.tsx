@@ -3,7 +3,11 @@ import { Shield, ArrowRight, Download, Globe,Smartphone } from 'lucide-react';
 import Button from './ui/Button';
 import Card from './ui/Card';
 
-const CTA: React.FC = () => {
+interface CTAProps {
+  onDashboardAccess: () => void;
+}
+
+const CTA: React.FC<CTAProps> = ({ onDashboardAccess }) => {
   return (
     <section className="py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -24,7 +28,7 @@ const CTA: React.FC = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
-              <Button variant="secondary" size="large" className="w-full sm:w-auto bg-white text-primary-bright hover:bg-neutral-light border-white">
+              <Button variant="secondary" size="large" className="w-full sm:w-auto bg-white text-primary-bright hover:bg-neutral-light border-white" onClick={onDashboardAccess}>
                 <Shield className="w-5 h-5 mr-2" />
                 Create Free Account
                 <ArrowRight className="w-5 h-5 ml-2" />

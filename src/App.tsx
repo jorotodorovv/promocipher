@@ -16,10 +16,22 @@ import Footer from './components/Footer';
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const { user, loading, derivedKey, isKeyDeriving, keyDerivationError, deriveEncryptionKey } = useAuth();
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
+  };
+
+  const handleDashboardAccess = () => {
+    if (!user) {
+      setShowAuthModal(true);
+    }
+    // If user is already authenticated, they'll see the dashboard anyway
+  };
+
+  const closeAuthModal = () => {
+    setShowAuthModal(false);
   };
 
   // Show loading state while checking authentication
@@ -42,8 +54,8 @@ function App() {
 
   return (
     <div className={darkMode ? 'dark' : ''}>
-      {/* Authentication Modal for unauthenticated users */}
-      <AuthModal isOpen={!user && !loading} onClose={() => {}} />
+      {/* Authentication Modal - only show when user tries to access dashboard */}
+      <AuthModal isOpen={showAuthModal && !user} onClose={closeAuthModal} />
       
       <div className="min-h-screen bg-background-light dark:bg-background-dark transition-colors duration-300">
         {/* Only show header when user is fully authenticated and has derived key */}
@@ -68,13 +80,13 @@ function App() {
           /* Public Landing Page */
           <>
             <Header darkMode={darkMode} onToggleDarkMode={toggleDarkMode} user={user} />
-            <LandingHero />
+            <LandingHero onDashboardAccess={handleDashboardAccess} />
             <TerminalSection />
             <Features />
             <HowItWorks />
             <Security />
             <Pricing />
-            <CTA />
+            <CTA onDashboardAccess={handleDashboardAccess} />
             <Footer />
           </>
         )}
