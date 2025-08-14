@@ -5,7 +5,7 @@ import Card from './ui/Card';
 import Button from './ui/Button';
 
 interface MasterPasswordInputProps {
-  onPasswordSubmit: (password: string) => Promise<void>;
+  onPasswordSubmit: (password: string, rememberMe?: boolean) => Promise<void>;
   isLoading: boolean;
   error: string | null;
 }
@@ -18,11 +18,13 @@ const MasterPasswordInput: React.FC<MasterPasswordInputProps> = ({
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isFirstTime, setIsFirstTime] = useState(true);
+  const [rememberMe, setRememberMe] = useState(false);
+  const [agreeToRisks, setAgreeToRisks] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password.trim()) {
-      await onPasswordSubmit(password);
+      await onPasswordSubmit(password, rememberMe);
     }
   };
 
@@ -101,12 +103,70 @@ const MasterPasswordInput: React.FC<MasterPasswordInputProps> = ({
               </div>
             )}
 
+            {/* Remember Me Option */}
+            <div className="space-y-4">
+              <div className="flex items-start space-x-3">
+                <input
+                  type="checkbox"
+                  id="rememberMe"
+                  checked={rememberMe}
+                  onChange={(e) => {
+                    setRememberMe(e.target.checked);
+                    if (!e.target.checked) {
+                      setAgreeToRisks(false);
+                    }
+                  }}
+                  className="mt-1 w-4 h-4 text-primary-bright bg-gray-100 border-gray-300 rounded focus:ring-primary-bright focus:ring-2"
+                />
+                <label htmlFor="rememberMe" className="font-sans text-small text-neutral-dark dark:text-neutral-medium">
+                  Remember me on this device
+                </label>
+              </div>
+
+              {/* Security Warning - Only show when Remember Me is checked */}
+              {rememberMe && (
+                <div className="p-4 bg-accent-warning/10 border border-accent-warning/30 rounded-lg">
+                  <div className="flex items-start space-x-3 mb-3">
+                    <TriangleAlert className="w-5 h-5 text-accent-warning mt-0.5 flex-shrink-0" />
+                    <div>
+                      <h4 className="font-sans font-medium text-accent-warning mb-2">
+                        Security Risk Warning
+                      </h4>
+                      <ul className="space-y-1 font-sans text-small text-neutral-dark dark:text-neutral-medium">
+                        <li>• <strong>Compromises zero-knowledge security</strong> on this device</li>
+                        <li>• Your encryption key will be stored in browser's IndexedDB</li>
+                        <li>• Anyone with access to this browser can access your data</li>
+                        <li>• Potential exposure through browser vulnerabilities (XSS attacks)</li>
+                        <li>• Only use on trusted, personal devices</li>
+                      </ul>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start space-x-3">
+                    <input
+                      type="checkbox"
+                      id="agreeToRisks"
+                      checked={agreeToRisks}
+                      onChange={(e) => setAgreeToRisks(e.target.checked)}
+                      className="mt-1 w-4 h-4 text-accent-warning bg-gray-100 border-gray-300 rounded focus:ring-accent-warning focus:ring-2"
+                    />
+                    <label htmlFor="agreeToRisks" className="font-sans text-small text-neutral-dark dark:text-neutral-medium">
+                      <strong>I understand and acknowledge these security risks</strong>
+                    </label>
+                  </div>
+                </div>
+              )}
+            </div>
             <Button
               variant="primary"
               size="large"
               className="w-full"
               type="submit"
-              disabled={isLoading || password.length < 8}
+              disabled={
+                isLoading || 
+                password.length < 8 || 
+                (rememberMe && !agreeToRisks)
+              }
             >
               {isLoading ? (
                 'Deriving encryption key...'
