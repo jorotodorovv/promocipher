@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shield, Code2, Lock } from 'lucide-react';
+import { Shield, Code2, Lock, ShieldEllipsis } from 'lucide-react';
 
 const Footer: React.FC = () => {
   return (
@@ -9,7 +9,7 @@ const Footer: React.FC = () => {
           {/* Brand */}
           <div className="md:col-span-2">
             <div className="flex items-center space-x-4 mb-4">
-              <Shield className="w-8 h-8 text-white" />
+              <ShieldEllipsis className="w-8 h-8 text-white" />
               <h3 className="font-pixel text-small text-white uppercase tracking-wider">
                 PromoCipher
               </h3>
