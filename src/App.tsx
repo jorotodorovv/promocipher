@@ -17,7 +17,7 @@ import Footer from './components/Footer';
 function App() {
   const [darkMode, setDarkMode] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const { user, loading, derivedKey, isKeyDeriving, keyDerivationError, deriveEncryptionKey } = useAuth();
+  const { user, loading, hasCheckedStoredKey, derivedKey, isKeyDeriving, keyDerivationError, deriveEncryptionKey } = useAuth();
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
@@ -68,7 +68,7 @@ function App() {
           derivedKey ? (
             /* Fully authenticated user with encryption key */
             <DashboardPage />
-          ) : isKeyDeriving || keyDerivationError ? (
+          ) : hasCheckedStoredKey ? (
             /* User is authenticated but needs to provide master password */
             <MasterPasswordInput
               onPasswordSubmit={deriveEncryptionKey}
@@ -76,7 +76,7 @@ function App() {
               error={keyDerivationError}
             />
           ) : (
-            /* Loading state - checking for stored key */
+            /* Loading state - checking for stored credentials */
             <div className="min-h-screen bg-background-light dark:bg-background-dark flex items-center justify-center">
               <div className="text-center">
                 <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-bright rounded-lg mb-4 animate-pulse-glow">

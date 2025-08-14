@@ -7,6 +7,7 @@ import { storeDerivedKey, getStoredDerivedKey, clearStoredDerivedKey } from '../
 interface AuthContextType {
   user: User | null;
   loading: boolean;
+  hasCheckedStoredKey: boolean;
   derivedKey: Uint8Array | null;
   isKeyDeriving: boolean;
   keyDerivationError: string | null;
@@ -31,6 +32,7 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [hasCheckedStoredKey, setHasCheckedStoredKey] = useState(false);
   const [derivedKey, setDerivedKey] = useState<Uint8Array | null>(null);
   const [isKeyDeriving, setIsKeyDeriving] = useState(false);
   const [keyDerivationError, setKeyDerivationError] = useState<string | null>(null);
@@ -54,10 +56,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           // Clear potentially corrupted stored key
           await clearStoredDerivedKey();
         } finally {
-          // Always set loading to false, whether key was found or not
+          // Mark that we've checked for stored key and finished loading
+          setHasCheckedStoredKey(true);
           setLoading(false);
         }
       } else {
+        setHasCheckedStoredKey(true);
         setLoading(false);
       }
     };
@@ -75,11 +79,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         // Clear derived key when user changes
         if (!user) {
           setDerivedKey(null);
+          setHasCheckedStoredKey(false);
           setKeyDerivationError(null);
           // Clear stored key on logout
           await clearStoredDerivedKey();
         } else if (user && (!previousUser || user.id !== previousUser.id)) {
           // New user logged in, try to load their stored key
+          setHasCheckedStoredKey(false);
           try {
             const storedKey = await getStoredDerivedKey();
             if (storedKey) {
@@ -88,6 +94,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           } catch (error) {
             console.error('Failed to load stored key for new user:', error);
             await clearStoredDerivedKey();
+          } finally {
+            setHasCheckedStoredKey(true);
           }
         }
         
@@ -101,6 +109,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const signOut = async () => {
     // Clear derived key before signing out
     setDerivedKey(null);
+    setHasCheckedStoredKey(false);
     setKeyDerivationError(null);
     // Clear stored key on logout
     await clearStoredDerivedKey();
@@ -155,6 +164,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const value = {
     user,
     loading,
+    hasCheckedStoredKey,
     derivedKey,
     isKeyDeriving,
     keyDerivationError,
