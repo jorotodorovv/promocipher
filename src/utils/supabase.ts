@@ -24,15 +24,15 @@ export const promoCodeService = {
         encrypted_data,
         nonce,
         tag,
-        created_at as code_created_at,
-        updated_at as code_updated_at,
+        created_at:code_created_at,
+        updated_at:code_updated_at,
         promo_code_metadata (
           store,
           discount,
           expires,
           notes,
-          created_at as metadata_created_at,
-          updated_at as metadata_updated_at
+          created_at:metadata_created_at,
+          updated_at:metadata_updated_at
         )
       `)
       .order('created_at', { ascending: false });
