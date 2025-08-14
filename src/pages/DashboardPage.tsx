@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, Plus, Search, Filter, Download, Upload, Settings, LogOut, Eye, EyeOff, Copy, Check } from 'lucide-react';
+import { Shield, Plus, Search, Filter, Download, Upload, Settings, LogOut, Eye, EyeOff, Copy, Check, Loader2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import type { DisplayPromoCode } from '../types/promoCode';
 import Card from '../components/ui/Card';
@@ -21,7 +21,15 @@ const DashboardPage: React.FC = () => {
       tag: 'mock_tag_1',
       created_at: '2024-01-15T10:00:00Z',
       updated_at: '2024-01-15T10:00:00Z',
-      decryptedData: null,
+      decryptedData: {
+        id: '1',
+        code: 'TECH25OFF',
+        store: 'TechMart',
+        discount: '25% off electronics',
+        expires: '2024-03-15',
+        notes: '',
+        userId: user?.id || ''
+      },
       isRevealed: false,
       isDecrypting: false,
       decryptionError: null
@@ -34,7 +42,15 @@ const DashboardPage: React.FC = () => {
       tag: 'mock_tag_2',
       created_at: '2024-02-01T10:00:00Z',
       updated_at: '2024-02-01T10:00:00Z',
-      decryptedData: null,
+      decryptedData: {
+        id: '2',
+        code: 'FREESHIP2024',
+        store: 'QuickBuy',
+        discount: 'Free shipping',
+        expires: '2024-04-01',
+        notes: '',
+        userId: user?.id || ''
+      },
       isRevealed: false,
       isDecrypting: false,
       decryptionError: null
@@ -47,19 +63,41 @@ const DashboardPage: React.FC = () => {
       tag: 'mock_tag_3',
       created_at: '2024-03-15T10:00:00Z',
       updated_at: '2024-03-15T10:00:00Z',
-      decryptedData: null,
+      decryptedData: {
+        id: '3',
+        code: 'NEWUSER10',
+        store: 'StyleHub',
+        discount: '$10 off first order',
+        expires: '2024-12-31',
+        notes: '',
+        userId: user?.id || ''
+      },
       isRevealed: false,
       isDecrypting: false,
       decryptionError: null
     }
   ]);
 
-  // Mock data for demonstration - will be replaced with actual decryption
-  const mockDecryptedData = {
-    '1': { id: '1', code: 'TECH25OFF', store: 'TechMart', discount: '25% off electronics', expires: '2024-03-15', notes: '', userId: user?.id || '' },
-    '2': { id: '2', code: 'FREESHIP2024', store: 'QuickBuy', discount: 'Free shipping', expires: '2024-04-01', notes: '', userId: user?.id || '' },
-    '3': { id: '3', code: 'NEWUSER10', store: 'StyleHub', discount: '$10 off first order', expires: '2024-12-31', notes: '', userId: user?.id || '' }
-  };
+  // Auto-hide revealed codes after 15 seconds
+  useEffect(() => {
+    const revealedCodes = promoCodes.filter(code => code.isRevealed);
+    
+    const timers = revealedCodes.map(code => {
+      return setTimeout(() => {
+        setPromoCodes(prevCodes => 
+          prevCodes.map(c => 
+            c.id === code.id 
+              ? { ...c, isRevealed: false }
+              : c
+          )
+        );
+      }, 15000); // 15 seconds
+    });
+
+    return () => {
+      timers.forEach(timer => clearTimeout(timer));
+    };
+  }, [promoCodes.map(c => c.isRevealed).join(',')]);
 
   const toggleReveal = async (codeId: string) => {
     setPromoCodes(prevCodes => 
@@ -86,7 +124,7 @@ const DashboardPage: React.FC = () => {
       })
     );
 
-    // Simulate decryption process (will be replaced with actual decryption)
+    // Simulate decryption process
     if (!promoCodes.find(c => c.id === codeId)?.isRevealed) {
       setTimeout(() => {
         setPromoCodes(prevCodes => 
@@ -95,14 +133,13 @@ const DashboardPage: React.FC = () => {
               return {
                 ...code,
                 isDecrypting: false,
-                isRevealed: true,
-                decryptedData: mockDecryptedData[codeId as keyof typeof mockDecryptedData]
+                isRevealed: true
               };
             }
             return code;
           })
         );
-      }, 800); // Simulate decryption delay
+      }, 600); // Simulate decryption delay
     }
   };
 
@@ -221,9 +258,9 @@ const DashboardPage: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {promoCodes
             .filter(code => 
-              (code.decryptedData?.store.toLowerCase().includes(searchTerm.toLowerCase())) ||
-              (code.decryptedData?.discount.toLowerCase().includes(searchTerm.toLowerCase())) ||
-              (!code.isRevealed && searchTerm === '')
+              code.decryptedData?.store.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              code.decryptedData?.discount.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              searchTerm === ''
             )
             .map((code, index) => (
               <Card 
@@ -234,10 +271,10 @@ const DashboardPage: React.FC = () => {
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <h3 className="font-pixel text-h3 text-neutral-dark dark:text-white mb-2 uppercase tracking-wide">
-                      {code.decryptedData?.store || 'Encrypted Store'}
+                      {code.decryptedData?.store}
                     </h3>
                     <p className="font-sans text-small text-neutral-medium">
-                      {code.decryptedData?.discount || 'Hidden discount details'}
+                      {code.decryptedData?.discount}
                     </p>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -256,12 +293,12 @@ const DashboardPage: React.FC = () => {
                   <div className="bg-neutral-light dark:bg-neutral-medium/20 rounded p-3 flex items-center justify-between">
                     <div className="flex-1">
                       <code className="font-code text-code text-neutral-dark dark:text-white font-bold">
-                        {code.isRevealed && code.decryptedData ? code.decryptedData.code : '••••••••'}
+                        {code.isRevealed ? code.decryptedData?.code : '••••••••••••'}
                       </code>
                     </div>
                     <div className="flex items-center space-x-2 ml-3">
                       {code.isDecrypting ? (
-                        <Shield className="w-4 h-4 text-primary-bright animate-pulse" />
+                        <Loader2 className="w-4 h-4 text-primary-bright animate-spin" />
                       ) : (
                         <button
                           onClick={() => toggleReveal(code.id)}
@@ -275,9 +312,9 @@ const DashboardPage: React.FC = () => {
                           )}
                         </button>
                       )}
-                      {code.isRevealed && code.decryptedData && (
+                      {code.isRevealed && (
                         <button
-                          onClick={() => handleCopy(code.decryptedData!.code, code.id)}
+                          onClick={() => handleCopy(code.decryptedData?.code || '', code.id)}
                           className="p-1 hover:bg-neutral-medium/20 rounded transition-colors duration-200"
                           title="Copy code"
                         >
@@ -294,7 +331,7 @@ const DashboardPage: React.FC = () => {
 
                 <div className="flex items-center justify-between text-small">
                   <span className="font-sans text-neutral-medium">
-                    Expires: {code.decryptedData?.expires || 'Hidden'}
+                    Expires: {code.decryptedData?.expires}
                   </span>
                 </div>
               </Card>
