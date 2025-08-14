@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Shield, Lock, AlertCircle, Eye, EyeOff, AlertTriangle as TriangleAlert } from 'lucide-react' from './ui/Button';
+import { Shield, Lock, AlertCircle, Eye, EyeOff, AlertTriangle as TriangleAlert } from 'lucide-react';
 import Input from './ui/Input';
 import Card from './ui/Card';
 
