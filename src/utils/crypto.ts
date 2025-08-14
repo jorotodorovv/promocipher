@@ -1,8 +1,16 @@
 import sodium from 'libsodium-wrappers-sumo';
 import type { PromoCodeData } from '../types/promoCode';
 
-// Initialize libsodium at module load time
-await sodium.ready;
+// Initialize libsodium and export it
+let isSodiumReady = false;
+
+export async function initializeCrypto(): Promise<void> {
+  if (isSodiumReady) {
+    return;
+  }
+  await sodium.ready;
+  isSodiumReady = true;
+}
 
 // Cryptographic constants based on the terminal output
 export const CRYPTO_CONFIG = {
