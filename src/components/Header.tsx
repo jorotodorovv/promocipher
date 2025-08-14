@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Moon, Sun, Shield, Menu, X, LogOut, User } from 'lucide-react';
+import { Moon, Sun, Shield, Menu, X, LogOut, User, ShieldEllipsis } from 'lucide-react';
 import { User as SupabaseUser } from '@supabase/supabase-js';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -26,7 +26,7 @@ const Header: React.FC<HeaderProps> = ({ darkMode, onToggleDarkMode, user }) => 
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center space-x-4">
-            <Shield className="w-8 h-8 text-white" />
+            <ShieldEllipsis className="w-8 h-8 text-white" />
             <h1 className="font-pixel text-white text-sm uppercase tracking-wider">
               PromoCipher
             </h1>
