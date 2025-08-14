@@ -91,8 +91,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     setPassword('');
     setConfirmPassword('');
     setAgreeToTerms(false);
+    setShowPassword(false);
     setError(null);
-    setIsSignUp(false);
   };
 
   return (
