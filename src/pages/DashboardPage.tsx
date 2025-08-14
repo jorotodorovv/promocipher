@@ -203,7 +203,7 @@ const DashboardPage: React.FC = () => {
               return {
                 ...code,
                 isDecrypting: false,
-                isRevealed: true
+                isRevealed: true,
                 decryptedCode: decryptedCode,
                 decryptionError: null
               };
