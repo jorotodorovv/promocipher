@@ -3,7 +3,7 @@ import { Shield, Chrome, Mail, Lock, AlertCircle, Eye, EyeOff } from 'lucide-rea
 import Modal from './ui/Modal';
 import Button from './ui/Button';
 import Input from './ui/Input';
-import { supabase } from '../utils/supabase';
+import { authService } from '../services/authService';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -25,13 +25,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     setError(null);
     
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: window.location.origin
-        }
-      });
-      
+      const { error } = await authService.signInWithOAuth('google');
       if (error) throw error;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to sign in with Google');
@@ -64,19 +58,13 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
 
     try {
       if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-        });
+        const { error } = await authService.signUp(email, password);
         if (error) throw error;
         // Show success message for sign up
         setError(null);
         alert('Account created successfully! Please check your email to verify your account.');
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
+        const { error } = await authService.signIn(email, password);
         if (error) throw error;
       }
     } catch (err) {

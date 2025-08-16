@@ -5,7 +5,7 @@ export const userSaltService = {
   // Get user salt by user ID
   async getByUserId(userId: string): Promise<string | null> {
     const { data, error } = await supabase
-      .from('user_salts')
+      .from('user_key_salts')
       .select('salt')
       .eq('user_id', userId)
       .single();
@@ -24,7 +24,7 @@ export const userSaltService = {
   // Create a new user salt
   async create(userId: string, salt: string): Promise<void> {
     const { error } = await supabase
-      .from('user_salts')
+      .from('user_key_salts')
       .insert({ user_id: userId, salt });
 
     if (error) {
@@ -35,7 +35,7 @@ export const userSaltService = {
   // Update user salt
   async update(userId: string, salt: string): Promise<void> {
     const { error } = await supabase
-      .from('user_salts')
+      .from('user_key_salts')
       .update({ salt })
       .eq('user_id', userId);
 
@@ -47,7 +47,7 @@ export const userSaltService = {
   // Delete user salt
   async delete(userId: string): Promise<void> {
     const { error } = await supabase
-      .from('user_salts')
+      .from('user_key_salts')
       .delete()
       .eq('user_id', userId);
 

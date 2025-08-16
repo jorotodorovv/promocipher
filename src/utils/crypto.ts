@@ -140,3 +140,16 @@ export function arrayToBase64(array: Uint8Array): string {
 export function base64ToArray(base64: string): Uint8Array {
   return sodium.from_base64(base64);
 }
+
+// Validate if a string is valid base64
+export function isValidBase64(str: string): boolean {
+  if (typeof str !== 'string' || str.trim() === '') {
+    return false;
+  }
+  try {
+    sodium.from_base64(str);
+    return true;
+  } catch {
+    return false;
+  }
+}

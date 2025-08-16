@@ -60,5 +60,16 @@ export const authService = {
   async updatePassword(password: string): Promise<{ error: AuthError | null }> {
     const { error } = await supabase.auth.updateUser({ password });
     return { error };
+  },
+
+  // Sign in with OAuth provider
+  async signInWithOAuth(provider: 'google' | 'github' | 'discord', redirectTo?: string): Promise<{ error: AuthError | null }> {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: redirectTo || window.location.origin
+      }
+    });
+    return { error };
   }
 };

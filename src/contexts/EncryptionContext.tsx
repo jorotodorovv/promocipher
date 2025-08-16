@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useAuth } from './AuthContext';
 import { userSaltService } from '../services/userSaltService';
-import { deriveKey, generateSalt, arrayToBase64, base64ToArray } from '../utils/crypto';
+import { deriveKey, generateSalt, arrayToBase64, base64ToArray, isValidBase64 } from '../utils/crypto';
 import { storeDerivedKey, getStoredDerivedKey, clearStoredDerivedKey } from '../utils/keyStorage';
 
 interface EncryptionContextType {
@@ -81,8 +81,18 @@ export const EncryptionProvider: React.FC<EncryptionProviderProps> = ({ children
         userSalt = saltBase64;
       }
 
-      // Convert salt from base64 back to Uint8Array
-      const saltArray = base64ToArray(userSalt);
+      // Validate and convert salt from base64 back to Uint8Array
+      let saltArray: Uint8Array;
+      if (!isValidBase64(userSalt)) {
+        console.warn('Invalid salt detected, regenerating');
+        // Regenerate salt if the existing one is corrupted
+        const newSalt = generateSalt();
+        const saltBase64 = arrayToBase64(newSalt);
+        await userSaltService.update(user.id, saltBase64);
+        saltArray = newSalt;
+      } else {
+        saltArray = base64ToArray(userSalt);
+      }
 
       // Derive encryption key using Argon2id
       const key = await deriveKey(masterPassword, saltArray);

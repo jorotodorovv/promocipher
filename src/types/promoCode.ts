@@ -35,8 +35,8 @@ export interface PromoCodeWithMetadata {
   encrypted_data: string;
   nonce: string;
   tag: string;
-  code_created_at: string;
-  code_updated_at: string;
+  created_at: string;
+  updated_at: string;
   // From promo_code_metadata table
   store: string;
   discount: string;

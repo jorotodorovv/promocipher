@@ -60,8 +60,8 @@ export const PromoCodeProvider: React.FC<PromoCodeProviderProps> = ({ children }
           );
           decryptedPromoCodes.push({
             ...encryptedCode,
-            created_at: encryptedCode.code_created_at,
-            updated_at: encryptedCode.code_updated_at,
+            created_at: encryptedCode.created_at,
+            updated_at: encryptedCode.updated_at,
             decryptedCode,
             isRevealed: false,
             isDecrypting: false,
@@ -116,8 +116,8 @@ export const PromoCodeProvider: React.FC<PromoCodeProviderProps> = ({ children }
       );
       setPromoCodes(prev => [...prev, {
         ...newPromoCode,
-        created_at: newPromoCode.code_created_at,
-        updated_at: newPromoCode.code_updated_at,
+        created_at: newPromoCode.created_at,
+        updated_at: newPromoCode.updated_at,
         decryptedCode: code,
         isRevealed: false,
         isDecrypting: false,
