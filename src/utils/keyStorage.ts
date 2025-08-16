@@ -18,8 +18,10 @@ const REMEMBER_ME_PREFERENCE = 'rememberMeEnabled';
  */
 export async function storeDerivedKey(key: Uint8Array): Promise<void> {
   try {
+    console.log('[KeyStorage] Storing derived key (length:', key.length, ')');
     await keyStore.setItem(DERIVED_KEY_NAME, key);
     await keyStore.setItem(REMEMBER_ME_PREFERENCE, true);
+    console.log('[KeyStorage] Key stored successfully');
   } catch (error) {
     console.error('Failed to store derived key:', error);
     throw new Error('Failed to store encryption key locally');
@@ -32,6 +34,7 @@ export async function storeDerivedKey(key: Uint8Array): Promise<void> {
 export async function getStoredDerivedKey(): Promise<Uint8Array | null> {
   try {
     const key = await keyStore.getItem<Uint8Array>(DERIVED_KEY_NAME);
+    console.log('[KeyStorage] Retrieved stored key:', key ? 'Found key (length: ' + key.length + ')' : 'No key found');
     return key || null;
   } catch (error) {
     console.error('Failed to retrieve stored key:', error);
@@ -44,8 +47,10 @@ export async function getStoredDerivedKey(): Promise<Uint8Array | null> {
  */
 export async function clearStoredDerivedKey(): Promise<void> {
   try {
+    console.log('[KeyStorage] Clearing stored derived key');
     await keyStore.removeItem(DERIVED_KEY_NAME);
     await keyStore.removeItem(REMEMBER_ME_PREFERENCE);
+    console.log('[KeyStorage] Key cleared successfully');
   } catch (error) {
     console.error('Failed to clear stored key:', error);
     // Don't throw here - clearing should be forgiving
@@ -58,6 +63,7 @@ export async function clearStoredDerivedKey(): Promise<void> {
 export async function isRememberMeEnabled(): Promise<boolean> {
   try {
     const enabled = await keyStore.getItem<boolean>(REMEMBER_ME_PREFERENCE);
+    console.log('[KeyStorage] Remember me preference:', enabled);
     return enabled === true;
   } catch (error) {
     console.error('Failed to check remember me status:', error);
