@@ -36,36 +36,47 @@ export const EncryptionProvider: React.FC<EncryptionProviderProps> = ({ children
   const [isKeyDeriving, setIsKeyDeriving] = useState(false);
   const [keyDerivationError, setKeyDerivationError] = useState<string | null>(null);
 
+  // Initial key loading on component mount
   useEffect(() => {
-    const loadStoredKey = async () => {
-      if (user) {
-        try {
-          // First, check if user has an existing salt
-          const userSalt = await userSaltService.getByUserId(user.id);
-          setHasExistingSalt(!!userSalt);
-          
-          const storedKey = await getStoredDerivedKey();
-          if (storedKey) {
-            setDerivedKey(storedKey);
-          }
-        } catch (error) {
-          console.error('Failed to load stored key:', error);
-          // Clear potentially corrupted stored key
-          await clearStoredDerivedKey();
-        } finally {
-          setHasCheckedStoredKey(true);
+    const loadInitialStoredKey = async () => {
+      try {
+        const storedKey = await getStoredDerivedKey();
+        if (storedKey) {
+          setDerivedKey(storedKey);
         }
-      } else {
-        // Clear key data when user logs out
-        setDerivedKey(null);
-        setHasExistingSalt(false);
-        setHasCheckedStoredKey(false);
-        setKeyDerivationError(null);
+      } catch (error) {
+        console.error('Failed to load initial stored key:', error);
+        // Clear potentially corrupted stored key
         await clearStoredDerivedKey();
+      } finally {
+        setHasCheckedStoredKey(true);
       }
     };
 
-    loadStoredKey();
+    loadInitialStoredKey();
+  }, []);
+
+  // Handle user authentication state changes
+  useEffect(() => {
+    const handleUserStateChange = async () => {
+      if (user) {
+        try {
+          // Check if user has an existing salt
+          const userSalt = await userSaltService.getByUserId(user.id);
+          setHasExistingSalt(!!userSalt);
+        } catch (error) {
+          console.error('Failed to check user salt:', error);
+          setHasExistingSalt(false);
+        }
+      } else {
+        // User logged out - reset state but don't clear stored key yet
+        setDerivedKey(null);
+        setHasExistingSalt(false);
+        setKeyDerivationError(null);
+      }
+    };
+
+    handleUserStateChange();
   }, [user]);
 
   const deriveEncryptionKey = async (masterPassword: string, rememberMe: boolean = false) => {

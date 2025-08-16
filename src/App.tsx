@@ -36,6 +36,16 @@ function App() {
     setShowAuthModal(false);
   };
 
+  const handleSignOut = async () => {
+    const { signOut } = useAuth();
+    try {
+      await signOut();
+      await clearEncryptionKey();
+    } catch (error) {
+      console.error('Sign out error:', error);
+    }
+  };
+
   // Show loading state while checking authentication
   if (loading) {
     return (
