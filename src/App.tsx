@@ -19,7 +19,7 @@ function App() {
   const [darkMode, setDarkMode] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const { user, loading } = useAuth();
-  const { hasCheckedStoredKey, hasExistingSalt, derivedKey, isKeyDeriving, keyDerivationError, deriveEncryptionKey, clearEncryptionKey } = useEncryption();
+  const { hasCheckedStoredKey, hasExistingSalt, isLoadingSalt, derivedKey, isKeyDeriving, keyDerivationError, deriveEncryptionKey, clearEncryptionKey } = useEncryption();
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
@@ -81,13 +81,28 @@ function App() {
             /* Fully authenticated user with encryption key */
             <DashboardPage />
           ) : hasCheckedStoredKey ? (
-            /* User is authenticated but needs to provide master password */
-            <MasterPasswordInput
-              hasExistingSalt={hasExistingSalt}
-              onPasswordSubmit={deriveEncryptionKey}
-              isLoading={isKeyDeriving}
-              error={keyDerivationError}
-            />
+            /* Check if we're still loading salt information */
+            isLoadingSalt ? (
+              /* Loading state - checking for user salt */
+              <div className="min-h-screen bg-background-light dark:bg-background-dark flex items-center justify-center">
+                <div className="text-center">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-bright rounded-lg mb-4 animate-pulse-glow">
+                    <Shield className="w-8 h-8 text-white" />
+                  </div>
+                  <p className="font-sans text-body text-neutral-dark dark:text-neutral-medium">
+                    Checking for existing master password...
+                  </p>
+                </div>
+              </div>
+            ) : (
+              /* User is authenticated but needs to provide master password */
+              <MasterPasswordInput
+                hasExistingSalt={hasExistingSalt}
+                onPasswordSubmit={deriveEncryptionKey}
+                isLoading={isKeyDeriving}
+                error={keyDerivationError}
+              />
+            )
           ) : (
             /* Loading state - checking for stored credentials */
             <div className="min-h-screen bg-background-light dark:bg-background-dark flex items-center justify-center">

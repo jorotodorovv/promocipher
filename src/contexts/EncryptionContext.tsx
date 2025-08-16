@@ -7,6 +7,7 @@ import { storeDerivedKey, getStoredDerivedKey, clearStoredDerivedKey } from '../
 interface EncryptionContextType {
   hasCheckedStoredKey: boolean;
   hasExistingSalt: boolean;
+  isLoadingSalt: boolean;
   derivedKey: Uint8Array | null;
   isKeyDeriving: boolean;
   keyDerivationError: string | null;
@@ -32,6 +33,7 @@ export const EncryptionProvider: React.FC<EncryptionProviderProps> = ({ children
   const { user } = useAuth();
   const [hasCheckedStoredKey, setHasCheckedStoredKey] = useState(false);
   const [hasExistingSalt, setHasExistingSalt] = useState(false);
+  const [isLoadingSalt, setIsLoadingSalt] = useState(true);
   const [derivedKey, setDerivedKey] = useState<Uint8Array | null>(null);
   const [isKeyDeriving, setIsKeyDeriving] = useState(false);
   const [keyDerivationError, setKeyDerivationError] = useState<string | null>(null);
@@ -60,6 +62,7 @@ export const EncryptionProvider: React.FC<EncryptionProviderProps> = ({ children
   useEffect(() => {
     const handleUserStateChange = async () => {
       if (user) {
+        setIsLoadingSalt(true);
         try {
           // Check if user has an existing salt
           const userSalt = await userSaltService.getByUserId(user.id);
@@ -67,11 +70,14 @@ export const EncryptionProvider: React.FC<EncryptionProviderProps> = ({ children
         } catch (error) {
           console.error('Failed to check user salt:', error);
           setHasExistingSalt(false);
+        } finally {
+          setIsLoadingSalt(false);
         }
       } else {
         // User logged out - reset state but don't clear stored key yet
         setDerivedKey(null);
         setHasExistingSalt(false);
+        setIsLoadingSalt(false);
         setKeyDerivationError(null);
       }
     };
@@ -143,6 +149,7 @@ export const EncryptionProvider: React.FC<EncryptionProviderProps> = ({ children
   const value = {
     hasCheckedStoredKey,
     hasExistingSalt,
+    isLoadingSalt,
     derivedKey,
     isKeyDeriving,
     keyDerivationError,
