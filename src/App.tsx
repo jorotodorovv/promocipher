@@ -19,7 +19,7 @@ function App() {
   const [darkMode, setDarkMode] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const { user, loading } = useAuth();
-  const { hasCheckedStoredKey, derivedKey, isKeyDeriving, keyDerivationError, deriveEncryptionKey, clearEncryptionKey } = useEncryption();
+  const { hasCheckedStoredKey, hasExistingSalt, derivedKey, isKeyDeriving, keyDerivationError, deriveEncryptionKey, clearEncryptionKey } = useEncryption();
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
@@ -73,6 +73,7 @@ function App() {
           ) : hasCheckedStoredKey ? (
             /* User is authenticated but needs to provide master password */
             <MasterPasswordInput
+              hasExistingSalt={hasExistingSalt}
               onPasswordSubmit={deriveEncryptionKey}
               isLoading={isKeyDeriving}
               error={keyDerivationError}

@@ -6,6 +6,7 @@ import { storeDerivedKey, getStoredDerivedKey, clearStoredDerivedKey } from '../
 
 interface EncryptionContextType {
   hasCheckedStoredKey: boolean;
+  hasExistingSalt: boolean;
   derivedKey: Uint8Array | null;
   isKeyDeriving: boolean;
   keyDerivationError: string | null;
@@ -30,6 +31,7 @@ interface EncryptionProviderProps {
 export const EncryptionProvider: React.FC<EncryptionProviderProps> = ({ children }) => {
   const { user } = useAuth();
   const [hasCheckedStoredKey, setHasCheckedStoredKey] = useState(false);
+  const [hasExistingSalt, setHasExistingSalt] = useState(false);
   const [derivedKey, setDerivedKey] = useState<Uint8Array | null>(null);
   const [isKeyDeriving, setIsKeyDeriving] = useState(false);
   const [keyDerivationError, setKeyDerivationError] = useState<string | null>(null);
@@ -38,6 +40,10 @@ export const EncryptionProvider: React.FC<EncryptionProviderProps> = ({ children
     const loadStoredKey = async () => {
       if (user) {
         try {
+          // First, check if user has an existing salt
+          const userSalt = await userSaltService.getByUserId(user.id);
+          setHasExistingSalt(!!userSalt);
+          
           const storedKey = await getStoredDerivedKey();
           if (storedKey) {
             setDerivedKey(storedKey);
@@ -52,6 +58,7 @@ export const EncryptionProvider: React.FC<EncryptionProviderProps> = ({ children
       } else {
         // Clear key data when user logs out
         setDerivedKey(null);
+        setHasExistingSalt(false);
         setHasCheckedStoredKey(false);
         setKeyDerivationError(null);
         await clearStoredDerivedKey();
@@ -117,12 +124,14 @@ export const EncryptionProvider: React.FC<EncryptionProviderProps> = ({ children
   const clearEncryptionKey = async () => {
     setDerivedKey(null);
     setHasCheckedStoredKey(false);
+    setHasExistingSalt(false);
     setKeyDerivationError(null);
     await clearStoredDerivedKey();
   };
   
   const value = {
     hasCheckedStoredKey,
+    hasExistingSalt,
     derivedKey,
     isKeyDeriving,
     keyDerivationError,
