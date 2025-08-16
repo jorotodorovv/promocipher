@@ -39,12 +39,12 @@ export const promoCodeService = {
       tag: item.tag,
       created_at: item.created_at,
       updated_at: item.updated_at,
-      store: item.promo_code_metadata?.[0]?.store || '',
-      discount: item.promo_code_metadata?.[0]?.discount || '',
-      expires: item.promo_code_metadata?.[0]?.expires || '',
-      notes: item.promo_code_metadata?.[0]?.notes || '',
-      metadata_created_at: item.promo_code_metadata?.[0]?.created_at || '',
-      metadata_updated_at: item.promo_code_metadata?.[0]?.updated_at || ''
+      store: item.promo_code_metadata?.store || '',
+      discount: item.promo_code_metadata?.discount || '',
+      expires: item.promo_code_metadata?.expires || '',
+      notes: item.promo_code_metadata?.notes || '',
+      metadata_created_at: item.promo_code_metadata?.created_at || '',
+      metadata_updated_at: item.promo_code_metadata?.updated_at || ''
     }));
 
     return transformedData;
