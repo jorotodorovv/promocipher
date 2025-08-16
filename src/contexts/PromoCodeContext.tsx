@@ -98,16 +98,17 @@ export const PromoCodeProvider: React.FC<PromoCodeProviderProps> = ({ children }
         derivedKey,
         user.id
       );
+      const promoCodeId = crypto.randomUUID();
       const newPromoCode = await promoCodeService.create(
         {
-          id: crypto.randomUUID(),
+          id: promoCodeId,
           user_id: user.id,
           encrypted_data: encryptedData.encryptedData,
           nonce: encryptedData.nonce,
           tag: encryptedData.tag
         },
         {
-          id: crypto.randomUUID(),
+          id: promoCodeId,
           store,
           discount,
           expires,
