@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Settings, LogOut, Loader2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import type { DisplayPromoCode, PromoCodeData, NewPromoCodeForm } from '../types/promoCode';
-import { encrypt, decrypt } from '../utils/crypto';
-import { promoCodeService } from '../utils/supabase';
+import { usePromoCode } from '../contexts/PromoCodeContext';
+import type { NewPromoCodeForm } from '../types/promoCode';
 import Button from '../components/ui/Button';
 import DashboardStats from '../components/dashboard/DashboardStats';
 import ActionBar from '../components/dashboard/ActionBar';
@@ -13,125 +12,28 @@ import EmptyState from '../components/dashboard/EmptyState';
 import SecurityNotice from '../components/dashboard/SecurityNotice';
 
 const DashboardPage: React.FC = () => {
-  const { user, signOut, derivedKey } = useAuth();
+  const { user, signOut } = useAuth();
+  const { promoCodes, loading: isLoadingCodes, addPromoCode } = usePromoCode();
   const [searchTerm, setSearchTerm] = useState('');
   const [copiedCodeId, setCopiedCodeId] = useState<string | null>(null);
   const [showAddCodeModal, setShowAddCodeModal] = useState(false);
-  const [isLoadingCodes, setIsLoadingCodes] = useState(true);
   const [isAddingCode, setIsAddingCode] = useState(false);
   const [addCodeError, setAddCodeError] = useState<string | null>(null);
-  const [promoCodes, setPromoCodes] = useState<DisplayPromoCode[]>([]);
 
-  // Fetch promo codes from Supabase on component mount
-  useEffect(() => {
-    const fetchPromoCodes = async () => {
-      if (!user || !derivedKey) return;
-      
-      setIsLoadingCodes(true);
-      try {
-        const codesWithMetadata = await promoCodeService.getAll();
-        const displayCodes: DisplayPromoCode[] = codesWithMetadata.map(code => ({
-          ...code,
-          created_at: code.metadata_created_at,
-          updated_at: code.metadata_updated_at,
-          decryptedCode: null,
-          isRevealed: false,
-          isDecrypting: false,
-          decryptionError: null
-        }));
-        setPromoCodes(displayCodes);
-      } catch (error) {
-        console.error('Failed to fetch promo codes:', error);
-      } finally {
-        setIsLoadingCodes(false);
-      }
-    };
-
-    fetchPromoCodes();
-  }, [user, derivedKey]);
-
-  // Auto-hide revealed codes after 15 seconds
-  useEffect(() => {
-    const revealedCodes = promoCodes.filter(code => code.isRevealed);
-    
-    const timers = revealedCodes.map(code => {
-      return setTimeout(() => {
-        setPromoCodes(prevCodes => 
-          prevCodes.map(c => 
-            c.id === code.id 
-              ? { ...c, isRevealed: false }
-              : c
-          )
-        );
-      }, 15000); // 15 seconds
-    });
-
-    return () => {
-      timers.forEach(timer => clearTimeout(timer));
-    };
-  }, [promoCodes.map(c => c.isRevealed).join(',')]);
+  // Promo codes are now managed by PromoCodeContext
 
   const handleAddPromoCode = async (newCode: NewPromoCodeForm) => {
-    if (!user || !derivedKey) {
-      setAddCodeError('Authentication required');
-      return;
-    }
-
     setIsAddingCode(true);
     setAddCodeError(null);
 
     try {
-      // Create PromoCodeData object
-      const promoCodeData: PromoCodeData = {
-        id: crypto.randomUUID(),
-        code: newCode.code.trim(),
-        userId: user.id
-      };
-
-      // Encrypt the promo code data
-      const encryptionResult = await encrypt(promoCodeData, derivedKey, user.id);
-
-      // Prepare encrypted code data
-      const encryptedCodeData = {
-        id: promoCodeData.id,
-        user_id: user.id,
-        encrypted_data: encryptionResult.encryptedData,
-        nonce: encryptionResult.nonce,
-        tag: encryptionResult.tag
-      };
-
-      // Prepare metadata
-      const metadataData = {
-        id: promoCodeData.id,
-        store: newCode.store.trim(),
-        discount: newCode.discount.trim(),
-        expires: newCode.expires,
-        notes: newCode.notes.trim()
-      };
-
-      // Save to Supabase (both tables)
-      const savedCode = await promoCodeService.create(encryptedCodeData, metadataData);
-
-      // Add to local state
-      const newDisplayCode: DisplayPromoCode = {
-        id: savedCode.id,
-        user_id: savedCode.user_id,
-        encrypted_data: savedCode.encrypted_data,
-        nonce: savedCode.nonce,
-        tag: savedCode.tag,
-        store: savedCode.store,
-        discount: savedCode.discount,
-        expires: savedCode.expires,
-        notes: savedCode.notes,
-        created_at: savedCode.metadata_created_at,
-        updated_at: savedCode.metadata_updated_at,
-        decryptedCode: null,
-        isRevealed: false,
-        isDecrypting: false,
-        decryptionError: null
-      };
-
-      setPromoCodes(prevCodes => [newDisplayCode, ...prevCodes]);
+      await addPromoCode(
+        newCode.code.trim(),
+        newCode.store.trim(),
+        newCode.discount.trim(),
+        newCode.expires,
+        newCode.notes.trim()
+      );
       setShowAddCodeModal(false);
     } catch (error) {
       console.error('Failed to add promo code:', error);
@@ -141,76 +43,10 @@ const DashboardPage: React.FC = () => {
     }
   };
 
-  const toggleReveal = async (codeId: string) => {
-    const code = promoCodes.find(c => c.id === codeId);
-    if (!code || !derivedKey) return;
-
-    setPromoCodes(prevCodes => 
-      prevCodes.map(code => {
-        if (code.id === codeId) {
-          if (code.isRevealed) {
-            // Hide the code
-            return {
-              ...code,
-              isRevealed: false,
-              decryptedCode: null,
-              decryptionError: null
-            };
-          } else {
-            // Start revealing the code
-            return {
-              ...code,
-              isDecrypting: true,
-              decryptionError: null
-            };
-          }
-        }
-        return code;
-      })
-    );
-
-    // Perform actual decryption
-    if (!code.isRevealed) {
-      try {
-        const decryptedCode = await decrypt(
-          code.encrypted_data,
-          code.nonce,
-          code.tag,
-          user!.id,
-          code.id,
-          derivedKey
-        );
-
-        setPromoCodes(prevCodes => 
-          prevCodes.map(code => {
-            if (code.id === codeId) {
-              return {
-                ...code,
-                isDecrypting: false,
-                isRevealed: true,
-                decryptedCode: decryptedCode,
-                decryptionError: null
-              };
-            }
-            return code;
-          })
-        );
-      } catch (error) {
-        setPromoCodes(prevCodes => 
-          prevCodes.map(code => {
-            if (code.id === codeId) {
-              return {
-                ...code,
-                isDecrypting: false,
-                isRevealed: false,
-                decryptionError: error instanceof Error ? error.message : 'Decryption failed'
-              };
-            }
-            return code;
-          })
-        );
-      }
-    }
+  const handleToggleReveal = async (codeId: string) => {
+    // Code revelation functionality needs to be implemented
+    // For now, this is a placeholder
+    console.log('Toggle reveal for code:', codeId);
   };
 
   const handleCopy = async (codeText: string, codeId: string) => {
@@ -236,7 +72,7 @@ const DashboardPage: React.FC = () => {
     setShowAddCodeModal(true);
   };
 
-  const filteredCodes = promoCodes.filter(code => 
+  const filteredCodes = promoCodes.filter(code =>
     code.store.toLowerCase().includes(searchTerm.toLowerCase()) ||
     code.discount.toLowerCase().includes(searchTerm.toLowerCase()) ||
     searchTerm === ''
@@ -317,7 +153,7 @@ const DashboardPage: React.FC = () => {
                     code={code}
                     index={index}
                     copiedCodeId={copiedCodeId}
-                    onToggleReveal={toggleReveal}
+                    onToggleReveal={handleToggleReveal}
                     onCopy={handleCopy}
                   />
                 ))}

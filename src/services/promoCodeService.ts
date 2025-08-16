@@ -1,16 +1,5 @@
-import { createClient } from '@supabase/supabase-js';
-import { User } from '@supabase/supabase-js';
-import type { EncryptedPromoCode, PromoMetadata, PromoCodeWithMetadata, UserKeySalt } from '../types/promoCode';
-
-// Initialize Supabase client
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
-}
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+import { supabase } from './supabase';
+import type { EncryptedPromoCode, PromoMetadata, PromoCodeWithMetadata } from '../types/promoCode';
 
 // Database operations for encrypted promo codes
 export const promoCodeService = {
@@ -48,14 +37,14 @@ export const promoCodeService = {
       encrypted_data: item.encrypted_data,
       nonce: item.nonce,
       tag: item.tag,
-      code_created_at: item.code_created_at,
-      code_updated_at: item.code_updated_at,
-      store: item.promo_code_metadata?.store || '',
-      discount: item.promo_code_metadata?.discount || '',
-      expires: item.promo_code_metadata?.expires || '',
-      notes: item.promo_code_metadata?.notes || '',
-      metadata_created_at: item.promo_code_metadata?.created_at || '',
-      metadata_updated_at: item.promo_code_metadata?.updated_at || ''
+      code_created_at: item.created_at,
+      code_updated_at: item.updated_at,
+      store: item.promo_code_metadata?.[0]?.store || '',
+      discount: item.promo_code_metadata?.[0]?.discount || '',
+      expires: item.promo_code_metadata?.[0]?.expires || '',
+      notes: item.promo_code_metadata?.[0]?.notes || '',
+      metadata_created_at: item.promo_code_metadata?.[0]?.created_at || '',
+      metadata_updated_at: item.promo_code_metadata?.[0]?.updated_at || ''
     }));
 
     return transformedData;
@@ -141,67 +130,6 @@ export const promoCodeService = {
 
     if (error) {
       throw new Error(`Failed to delete promo code: ${error.message}`);
-    }
-  }
-};
-
-// Database operations for user key salts
-export const userSaltService = {
-  // Get the salt for the current user
-  async getSalt(): Promise<UserKeySalt | null> {
-    const { data, error } = await supabase
-      .from('user_key_salts')
-      .select('*')
-      .maybeSingle();
-
-    if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
-      throw new Error(`Failed to fetch user salt: ${error.message}`);
-    }
-
-    return data;
-  },
-
-  // Create a salt for the current user
-  async createSalt(salt: string): Promise<UserKeySalt> {
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user) {
-      throw new Error('User not authenticated');
-    }
-
-    const { data, error } = await supabase
-      .from('user_key_salts')
-      .insert({
-        user_id: user.id,
-        salt
-      })
-      .select()
-      .single();
-
-    if (error) {
-      throw new Error(`Failed to create user salt: ${error.message}`);
-    }
-
-    return data;
-  }
-};
-
-// Authentication helpers
-export const authService = {
-  // Get current user
-  async getCurrentUser(): Promise<User | null> {
-    const { data: { user }, error } = await supabase.auth.getUser();
-    if (error) {
-      throw new Error(`Failed to get current user: ${error.message}`);
-    }
-    return user;
-  },
-
-  // Sign out
-  async signOut() {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      throw new Error(`Sign out failed: ${error.message}`);
     }
   }
 };

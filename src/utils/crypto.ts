@@ -12,15 +12,11 @@ export async function initializeCrypto(): Promise<void> {
   isSodiumReady = true;
 }
 
-// Cryptographic constants based on the terminal output
+// Cryptographic constants (static values to avoid initialization issues)
 export const CRYPTO_CONFIG = {
   // Argon2id parameters for key derivation
   ARGON2_MEMORY: 64 * 1024 * 1024, // 64 MiB
   ARGON2_ITERATIONS: 3,
-  ARGON2_PARALLELISM: 1,
-  SALT_LENGTH: 16, // 16 bytes
-  NONCE_LENGTH: 24, // 24 bytes for XChaCha20
-  TAG_LENGTH: 16,   // 16 bytes for Poly1305
 } as const;
 
 // Interface for the crypto encrypted result (now only for the code)
@@ -61,14 +57,14 @@ export async function encrypt(
   // Only encrypt the sensitive code field
   const codeToEncrypt = promoCodeData.code;
   
-  // Generate a random nonce (24 bytes for XChaCha20)
-  const nonce = sodium.randombytes_buf(CRYPTO_CONFIG.NONCE_LENGTH);
+  // Generate a random nonce using libsodium
+  const nonce = sodium.randombytes_buf(sodium.crypto_aead_xchacha20poly1305_ietf_NPUBBYTES);
   
   // Use user_id and promo_code_id as Additional Authenticated Data (AAD)
   const aadString = `${userId}:${promoCodeData.id}`;
   const aad = new TextEncoder().encode(aadString);
   
-  // Encrypt using XChaCha20-Poly1305
+  // Encrypt using XChaCha20-Poly1305 (returns ciphertext + tag combined)
   const ciphertext = sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(
     codeToEncrypt,
     aad,
@@ -77,15 +73,16 @@ export async function encrypt(
     key
   );
   
-  // XChaCha20-Poly1305 returns ciphertext + tag combined
-  const encryptedData = ciphertext.slice(0, -CRYPTO_CONFIG.TAG_LENGTH);
-  const tag = ciphertext.slice(-CRYPTO_CONFIG.TAG_LENGTH);
+  // Split ciphertext and tag
+  const tagLength = sodium.crypto_aead_xchacha20poly1305_ietf_ABYTES;
+  const encryptedData = ciphertext.slice(0, -tagLength);
+  const tag = ciphertext.slice(-tagLength);
   
   return {
-    encryptedData: arrayToBase64(encryptedData),
-    nonce: arrayToBase64(nonce),
-    tag: arrayToBase64(tag),
-    aad: arrayToBase64(aad)
+    encryptedData: sodium.to_base64(encryptedData),
+    nonce: sodium.to_base64(nonce),
+    tag: sodium.to_base64(tag),
+    aad: sodium.to_base64(aad)
   };
 }
 
@@ -99,10 +96,10 @@ export async function decrypt(
   key: Uint8Array
 ): Promise<string> {
   try {
-    // Decode Base64 strings
-    const ciphertextArray = base64ToArray(encryptedData);
-    const nonceArray = base64ToArray(nonce);
-    const tagArray = base64ToArray(tag);
+    // Decode Base64 strings using libsodium
+    const ciphertextArray = sodium.from_base64(encryptedData);
+    const nonceArray = sodium.from_base64(nonce);
+    const tagArray = sodium.from_base64(tag);
     
     // Reconstruct AAD from user_id and promo_code_id
     const aadString = `${userId}:${promoCodeId}`;
@@ -130,17 +127,16 @@ export async function decrypt(
   }
 }
 
-// Generate a cryptographically secure salt for key derivation
+// Generate a cryptographically secure salt for key derivation using libsodium
 export function generateSalt(): Uint8Array {
-  return window.crypto.getRandomValues(new Uint8Array(CRYPTO_CONFIG.SALT_LENGTH));
+  return sodium.randombytes_buf(sodium.crypto_pwhash_SALTBYTES);
 }
 
-// Utility function to convert Uint8Array to Base64
+// Utility functions using libsodium's built-in Base64 conversion
 export function arrayToBase64(array: Uint8Array): string {
-  return btoa(String.fromCharCode(...array));
+  return sodium.to_base64(array);
 }
 
-// Utility function to convert Base64 to Uint8Array
 export function base64ToArray(base64: string): Uint8Array {
-  return new Uint8Array(atob(base64).split('').map(char => char.charCodeAt(0)));
+  return sodium.from_base64(base64);
 }

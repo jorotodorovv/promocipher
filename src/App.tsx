@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Moon, Sun, Shield } from 'lucide-react';
 import { useAuth } from './contexts/AuthContext';
+import { useEncryption } from './contexts/EncryptionContext';
 import Header from './components/Header';
 import AuthModal from './components/AuthModal';
 import MasterPasswordInput from './components/MasterPasswordInput';
@@ -17,7 +18,8 @@ import Footer from './components/Footer';
 function App() {
   const [darkMode, setDarkMode] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const { user, loading, hasCheckedStoredKey, derivedKey, isKeyDeriving, keyDerivationError, deriveEncryptionKey } = useAuth();
+  const { user, loading } = useAuth();
+  const { hasCheckedStoredKey, derivedKey, isKeyDeriving, keyDerivationError, deriveEncryptionKey, clearEncryptionKey } = useEncryption();
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);

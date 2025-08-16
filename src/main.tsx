@@ -2,6 +2,8 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import { AuthProvider } from './contexts/AuthContext';
+import { EncryptionProvider } from './contexts/EncryptionContext';
+import { PromoCodeProvider } from './contexts/PromoCodeContext';
 import { initializeCrypto } from './utils/crypto';
 import './index.css';
 
@@ -10,7 +12,11 @@ initializeCrypto().then(() => {
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
       <AuthProvider>
-        <App />
+        <EncryptionProvider>
+          <PromoCodeProvider>
+            <App />
+          </PromoCodeProvider>
+        </EncryptionProvider>
       </AuthProvider>
     </StrictMode>
   );
