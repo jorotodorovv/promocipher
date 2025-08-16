@@ -62,6 +62,14 @@ export const EncryptionProvider: React.FC<EncryptionProviderProps> = ({ children
   useEffect(() => {
     const handleUserStateChange = async () => {
       if (user) {
+        // Check if user.id is available
+        if (!user.id) {
+          console.warn('User object exists but user.id is missing. Setting default state for new user flow.');
+          setHasExistingSalt(false);
+          setIsLoadingSalt(false);
+          return;
+        }
+        
         setIsLoadingSalt(true);
         try {
           // Check if user has an existing salt
