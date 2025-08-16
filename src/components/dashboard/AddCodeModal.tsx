@@ -143,22 +143,6 @@ const AddCodeModal: React.FC<AddCodeModalProps> = ({
           </Button>
         </div>
       </form>
-
-      {/* Security Notice */}
-      <div className="mt-6 p-4 bg-primary-bright/10 border border-primary-bright/20 rounded-lg text-left">
-        <div className="flex items-start space-x-3">
-          <Shield className="w-5 h-5 text-primary-bright mt-0.5 flex-shrink-0" />
-          <div>
-            <h4 className="font-sans font-medium text-primary-bright mb-2">
-              Zero-Knowledge Encryption
-            </h4>
-            <p className="font-sans text-small text-neutral-dark dark:text-neutral-medium">
-              Your promo code will be encrypted on this device before being sent to our servers. 
-              We cannot see your codes even if we wanted to.
-            </p>
-          </div>
-        </div>
-      </div>
     </Modal>
   );
 };
