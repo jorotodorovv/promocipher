@@ -51,6 +51,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const signOut = async () => {
     await authService.signOut();
+    setUser(null);
+    setLoading(false);
   };
 
 
