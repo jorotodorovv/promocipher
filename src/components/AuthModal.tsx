@@ -271,24 +271,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           }
         </button>
       </div>
-
-      {/* Security Notice */}
-      <div className={`${isSignUp ? 'mt-4' : 'mt-8'} p-4 bg-primary-bright/10 border border-primary-bright/20 rounded-lg text-left`}>
-        <div className="flex items-start space-x-3">
-          <Shield className="w-5 h-5 text-primary-bright mt-0.5 flex-shrink-0" />
-          <div>
-            <h4 className="font-sans font-medium text-primary-bright mb-2">
-              Zero-Knowledge Security
-            </h4>
-            <p className="font-sans text-small text-neutral-dark dark:text-neutral-medium">
-              {isSignUp 
-                ? 'Your master password will never leave your device. We cannot recover it if you forget it.'
-                : 'Your master password never leaves this device. All encryption happens locally in your browser.'
-              }
-            </p>
-          </div>
-        </div>
-      </div>
     </Modal>
   );
 };
