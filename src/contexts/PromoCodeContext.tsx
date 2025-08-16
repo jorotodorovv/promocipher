@@ -93,13 +93,13 @@ export const PromoCodeProvider: React.FC<PromoCodeProviderProps> = ({ children }
       setError('User not authenticated or key not derived.');
       return;
     }
+    const promoCodeId = crypto.randomUUID();
     try {
       const encryptedData = await encrypt(
-        { id: crypto.randomUUID(), code, userId: user.id },
+        { id: promoCodeId, code, userId: user.id },
         derivedKey,
         user.id
       );
-      const promoCodeId = crypto.randomUUID();
       const newPromoCode = await promoCodeService.create(
         {
           id: promoCodeId,
