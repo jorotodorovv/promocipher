@@ -12,6 +12,7 @@ interface PromoCodeContextType {
   addPromoCode: (code: string, store: string, discount: string, expires: string, notes: string) => Promise<void>;
   updatePromoCode: (id: string, code: string, store: string, discount: string, expires: string, notes: string) => Promise<void>;
   deletePromoCode: (id: string) => Promise<void>;
+  toggleCodeRevelation: (codeId: string) => Promise<void>;
 }
 
 const PromoCodeContext = createContext<PromoCodeContextType | undefined>(undefined);
@@ -175,6 +176,77 @@ export const PromoCodeProvider: React.FC<PromoCodeProviderProps> = ({ children }
     }
   };
 
+  const toggleCodeRevelation = async (codeId: string) => {
+    if (!user || !derivedKey) {
+      setError('User not authenticated or key not derived.');
+      return;
+    }
+
+    const codeIndex = promoCodes.findIndex(pc => pc.id === codeId);
+    if (codeIndex === -1) {
+      setError('Promo code not found.');
+      return;
+    }
+
+    const currentCode = promoCodes[codeIndex];
+    
+    // If currently revealed, hide it
+    if (currentCode.isRevealed) {
+      setPromoCodes(prev => prev.map(pc => 
+        pc.id === codeId 
+          ? { ...pc, isRevealed: false, decryptedCode: null, decryptionError: null }
+          : pc
+      ));
+      return;
+    }
+
+    // If not revealed, decrypt and reveal it
+    setPromoCodes(prev => prev.map(pc => 
+      pc.id === codeId 
+        ? { ...pc, isDecrypting: true, decryptionError: null }
+        : pc
+    ));
+
+    try {
+      const decryptedCode = await decrypt(
+        currentCode.encrypted_data,
+        currentCode.nonce,
+        currentCode.tag,
+        currentCode.user_id,
+        currentCode.id,
+        derivedKey
+      );
+
+      setPromoCodes(prev => prev.map(pc => 
+        pc.id === codeId 
+          ? { 
+              ...pc, 
+              decryptedCode, 
+              isRevealed: true, 
+              isDecrypting: false, 
+              decryptionError: null 
+            }
+          : pc
+      ));
+    } catch (decryptError) {
+      console.error('Failed to decrypt promo code:', decryptError);
+      const errorMessage = decryptError instanceof Error 
+        ? decryptError.message 
+        : 'Failed to decrypt promo code';
+      
+      setPromoCodes(prev => prev.map(pc => 
+        pc.id === codeId 
+          ? { 
+              ...pc, 
+              isDecrypting: false, 
+              decryptionError: errorMessage,
+              isRevealed: false,
+              decryptedCode: null
+            }
+          : pc
+      ));
+    }
+  };
   const value = {
     promoCodes,
     loading,
@@ -182,6 +254,7 @@ export const PromoCodeProvider: React.FC<PromoCodeProviderProps> = ({ children }
     addPromoCode,
     updatePromoCode,
     deletePromoCode,
+    toggleCodeRevelation,
   };
 
   return (

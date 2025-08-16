@@ -13,14 +13,13 @@ import SecurityNotice from '../components/dashboard/SecurityNotice';
 
 const DashboardPage: React.FC = () => {
   const { user, signOut } = useAuth();
-  const { promoCodes, loading: isLoadingCodes, addPromoCode } = usePromoCode();
+  const { promoCodes, loading: isLoadingCodes, addPromoCode, toggleCodeRevelation } = usePromoCode();
   const [searchTerm, setSearchTerm] = useState('');
   const [copiedCodeId, setCopiedCodeId] = useState<string | null>(null);
   const [showAddCodeModal, setShowAddCodeModal] = useState(false);
   const [isAddingCode, setIsAddingCode] = useState(false);
   const [addCodeError, setAddCodeError] = useState<string | null>(null);
 
-  // Promo codes are now managed by PromoCodeContext
 
   const handleAddPromoCode = async (newCode: NewPromoCodeForm) => {
     setIsAddingCode(true);
@@ -44,9 +43,11 @@ const DashboardPage: React.FC = () => {
   };
 
   const handleToggleReveal = async (codeId: string) => {
-    // Code revelation functionality needs to be implemented
-    // For now, this is a placeholder
-    console.log('Toggle reveal for code:', codeId);
+    try {
+      await toggleCodeRevelation(codeId);
+    } catch (error) {
+      console.error('Failed to toggle code revelation:', error);
+    }
   };
 
   const handleCopy = async (codeText: string, codeId: string) => {
