@@ -177,20 +177,6 @@ const MasterPasswordInput: React.FC<MasterPasswordInputProps> = ({
               )}
             </Button>
           </form>
-
-          {/* Toggle between first time and returning user */}
-          <div className="mt-6">
-            <button
-              type="button"
-              onClick={() => setIsFirstTime(!isFirstTime)}
-              className="font-sans text-small text-primary-bright hover:text-primary-deep transition-colors duration-200"
-            >
-              {isFirstTime 
-                ? 'Already have a master password? Sign in' 
-                : 'First time? Create master password'
-              }
-            </button>
-          </div>
         </Card>
       </div>
     </div>
