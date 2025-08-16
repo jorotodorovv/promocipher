@@ -191,23 +191,6 @@ const MasterPasswordInput: React.FC<MasterPasswordInputProps> = ({
               }
             </button>
           </div>
-
-          {/* Security Notice */}
-          <div className="mt-8 p-4 bg-primary-bright/10 border border-primary-bright/20 rounded-lg text-left">
-            <div className="flex items-start space-x-3">
-              <Shield className="w-5 h-5 text-primary-bright mt-0.5 flex-shrink-0" />
-              <div>
-                <h4 className="font-sans font-medium text-primary-bright mb-2">
-                  Zero-Knowledge Security
-                </h4>
-                <ul className="space-y-1 font-sans text-small text-neutral-dark dark:text-neutral-medium">
-                  <li>• Your master password never leaves this device</li>
-                  <li>• We cannot recover your password if you forget it</li>
-                  <li>• All encryption happens locally in your browser</li>
-                </ul>
-              </div>
-            </div>
-          </div>
         </Card>
       </div>
     </div>
