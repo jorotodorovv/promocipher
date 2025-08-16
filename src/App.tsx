@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Moon, Sun, Shield } from 'lucide-react';
+import { useTheme } from './hooks/useTheme';
 import { useAuth } from './contexts/AuthContext';
 import { useEncryption } from './contexts/EncryptionContext';
 import Header from './components/Header';
@@ -16,14 +17,10 @@ import CTA from './components/CTA';
 import Footer from './components/Footer';
 
 function App() {
-  const [darkMode, setDarkMode] = useState(false);
+  const { isDarkMode, toggleTheme } = useTheme();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const { user, loading } = useAuth();
   const { hasCheckedStoredKey, hasExistingSalt, isLoadingSalt, derivedKey, isKeyDeriving, keyDerivationError, deriveEncryptionKey, clearEncryptionKey } = useEncryption();
-
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-  };
 
   const handleDashboardAccess = () => {
     if (!user) {
@@ -49,7 +46,7 @@ function App() {
   // Show loading state while checking authentication
   if (loading) {
     return (
-      <div className={darkMode ? 'dark' : ''}>
+      <div className={isDarkMode ? 'dark' : ''}>
         <div className="min-h-screen bg-background-light dark:bg-background-dark flex items-center justify-center">
           <div className="text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-bright rounded-lg mb-4 animate-pulse-glow">
@@ -65,14 +62,14 @@ function App() {
   }
 
   return (
-    <div className={darkMode ? 'dark' : ''}>
+    <div className={isDarkMode ? 'dark' : ''}>
       {/* Authentication Modal - only show when user tries to access dashboard */}
       <AuthModal isOpen={showAuthModal && !user} onClose={closeAuthModal} />
       
-      <div className="min-h-screen bg-background-light dark:bg-background-dark transition-colors duration-300">
+      <div className="min-h-screen bg-background-light dark:bg-background-dark transition-colors duration-500">
         {/* Only show header when user is fully authenticated and has derived key */}
         {user && derivedKey && (
-          <Header darkMode={darkMode} onToggleDarkMode={toggleDarkMode} user={user} />
+          <Header darkMode={isDarkMode} onToggleDarkMode={toggleTheme} user={user} />
         )}
         
         {user ? (
@@ -119,7 +116,7 @@ function App() {
         ) : (
           /* Public Landing Page */
           <>
-            <Header darkMode={darkMode} onToggleDarkMode={toggleDarkMode} user={user} />
+            <Header darkMode={isDarkMode} onToggleDarkMode={toggleTheme} user={user} />
             <LandingHero onDashboardAccess={handleDashboardAccess} />
             <TerminalSection />
             <Features />
