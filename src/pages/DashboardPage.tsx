@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Settings, LogOut, Loader2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { usePromoCode } from '../contexts/PromoCodeContext';
+
+import { useInfinitePromoCodes, useCreatePromoCode, useUpdatePromoCode, useDeletePromoCode } from '../hooks/usePromoCodeQueries';
 import type { NewPromoCodeForm, DisplayPromoCode } from '../types/promoCode';
 import Button from '../components/ui/Button';
 import DashboardStats from '../components/dashboard/DashboardStats';
@@ -15,9 +16,37 @@ import SecurityNotice from '../components/dashboard/SecurityNotice';
 
 const DashboardPage: React.FC = () => {
   const { user, signOut } = useAuth();
-  const { promoCodes, loading: isLoadingCodes, addPromoCode, updatePromoCode, deletePromoCode, toggleCodeRevelation } = usePromoCode();
+
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [copiedCodeId, setCopiedCodeId] = useState<string | null>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+
+  // React Query hooks
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading: isLoadingCodes,
+    error: queryError
+  } = useInfinitePromoCodes(debouncedSearchTerm);
+
+  const createPromoCodeMutation = useCreatePromoCode();
+  const updatePromoCodeMutation = useUpdatePromoCode();
+  const deletePromoCodeMutation = useDeletePromoCode();
+
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  // Flatten all pages data
+  const promoCodes = data?.pages.flatMap((page: { data: any[]; hasMore: boolean; total: number }) => page.data) || [];
   const [showAddCodeModal, setShowAddCodeModal] = useState(false);
   const [isAddingCode, setIsAddingCode] = useState(false);
   const [addCodeError, setAddCodeError] = useState<string | null>(null);
@@ -39,19 +68,21 @@ const DashboardPage: React.FC = () => {
     setAddCodeError(null);
 
     try {
-      await addPromoCode({
-        id: crypto.randomUUID(),
-        user_id: user?.id || '',
-        encrypted_data: '',
-        nonce: '',
-        tag: '',
-        code: newCode.code.trim(),
-        store: newCode.store.trim(),
-        discount: newCode.discount.trim(),
-        expires: newCode.expires,
-        notes: newCode.notes.trim(),
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+      await createPromoCodeMutation.mutateAsync({
+        encryptedCode: {
+          id: crypto.randomUUID(),
+          user_id: user?.id || '',
+          encrypted_data: '',
+          nonce: '',
+          tag: ''
+        },
+        metadata: {
+          id: crypto.randomUUID(),
+          store: newCode.store.trim(),
+          discount: newCode.discount.trim(),
+          expires: newCode.expires,
+          notes: newCode.notes.trim()
+        },
       });
       setShowAddCodeModal(false);
     } catch (error) {
@@ -73,7 +104,10 @@ const DashboardPage: React.FC = () => {
     setEditCodeError(null);
 
     try {
-      await updatePromoCode(id, store, discount, expires, notes);
+      await updatePromoCodeMutation.mutateAsync({
+        id,
+        metadata: { store, discount, expires, notes }
+      });
       setShowEditCodeModal(false);
       setSelectedPromoCode(null);
     } catch (error) {
@@ -91,10 +125,10 @@ const DashboardPage: React.FC = () => {
 
   const handleConfirmDelete = async () => {
     if (!selectedPromoCode) return;
-    
+
     setIsDeletingCode(true);
     try {
-      await deletePromoCode(selectedPromoCode.id);
+      await deletePromoCodeMutation.mutateAsync(selectedPromoCode.id);
       setShowDeleteConfirmModal(false);
       setSelectedPromoCode(null);
     } catch (error) {
@@ -115,12 +149,9 @@ const DashboardPage: React.FC = () => {
     setSelectedPromoCode(null);
   };
 
-  const handleToggleReveal = async (codeId: string) => {
-    try {
-      await toggleCodeRevelation(codeId);
-    } catch (error) {
-      console.error('Failed to toggle code revelation:', error);
-    }
+  const handleToggleReveal = (codeId: string) => {
+    // Toggle revelation state is now handled by the PromoCodeCard component internally
+    // This function is kept for compatibility with the PromoCodeCard interface
   };
 
   const handleCopy = async (codeText: string, codeId: string) => {
@@ -153,7 +184,7 @@ const DashboardPage: React.FC = () => {
       const exportData = {
         version: '1.0',
         exportDate: new Date().toISOString(),
-        promoCodes: promoCodes.map(code => ({
+        promoCodes: promoCodes.map((code: any) => ({
           id: code.id,
           user_id: code.user_id,
           store: code.store,
@@ -180,7 +211,7 @@ const DashboardPage: React.FC = () => {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-      
+
       setExportSuccess(true);
       setTimeout(() => setExportSuccess(false), 3000);
     } catch (error) {
@@ -194,43 +225,45 @@ const DashboardPage: React.FC = () => {
     setIsImporting(true);
     setImportError(null);
     setImportSuccess(false);
-    
+
     try {
       const text = await file.text();
       const importData = JSON.parse(text);
-      
+
       if (!importData.promoCodes || !Array.isArray(importData.promoCodes)) {
         throw new Error('Invalid file format. Please select a valid PromoCipher export file.');
       }
 
       let importedCount = 0;
-      for (const code of importData.promoCodes) {
+      for (const code of importData.promoCodes as any[]) {
         if (!code.store || !code.discount) {
           continue; // Skip invalid entries
         }
-        
+
         try {
-          // Use addPromoCode for import (same as creation)
-          await addPromoCode({
-            id: code.id,
-            user_id: code.user_id,
-            encrypted_data: code.encrypted_data,
-            nonce: code.nonce,
-            tag: code.tag,
-            code: '',
-            store: code.store,
-            discount: code.discount,
-            expires: code.expires || null,
-            notes: code.notes || '',
-            created_at: code.created_at,
-            updated_at: code.updated_at
+          // Use createPromoCodeMutation for import (same as creation)
+          await createPromoCodeMutation.mutateAsync({
+            encryptedCode: {
+              id: code.id,
+              user_id: code.user_id,
+              encrypted_data: code.encrypted_data,
+              nonce: code.nonce,
+              tag: code.tag
+            },
+            metadata: {
+              id: code.id,
+              store: code.store,
+              discount: code.discount,
+              expires: code.expires || null,
+              notes: code.notes || ''
+            }
           });
           importedCount++;
         } catch (error) {
           console.error('Failed to import code:', error);
         }
       }
-      
+
       setImportSuccess(true);
       setTimeout(() => setImportSuccess(false), 3000);
     } catch (error) {
@@ -242,11 +275,17 @@ const DashboardPage: React.FC = () => {
     }
   };
 
-  const filteredCodes = promoCodes.filter(code =>
-    code.store.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    code.discount.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    searchTerm === ''
-  );
+  // Infinite scroll observer
+  const lastPromoCodeRef = useCallback((node: HTMLDivElement | null) => {
+    if (isLoadingCodes) return;
+    if (observerRef.current) observerRef.current.disconnect();
+    observerRef.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+      }
+    });
+    if (node) observerRef.current.observe(node);
+  }, [isLoadingCodes, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   return (
     <div className="min-h-screen bg-background-light dark:bg-background-dark pt-20">
@@ -301,7 +340,7 @@ const DashboardPage: React.FC = () => {
               </div>
             </div>
           )}
-          
+
           {importSuccess && (
             <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
               <div className="flex items-center">
@@ -318,7 +357,7 @@ const DashboardPage: React.FC = () => {
               </div>
             </div>
           )}
-          
+
           {importError && (
             <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
               <div className="flex items-center">
@@ -363,21 +402,40 @@ const DashboardPage: React.FC = () => {
           ) : (
             <>
               {/* Promo Codes Grid */}
-              {filteredCodes.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredCodes.map((code, index) => (
-                    <PromoCodeCard
-                      key={code.id}
-                      code={code}
-                      index={index}
-                      copiedCodeId={copiedCodeId}
-                      onToggleReveal={handleToggleReveal}
-                      onCopy={handleCopy}
-                      onEdit={handleEditPromoCode}
-                      onDelete={handleDeletePromoCode}
-                    />
-                  ))}
-                </div>
+              {promoCodes.length > 0 ? (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {promoCodes.map((code: any, index: number) => {
+                      const isLast = index === promoCodes.length - 1;
+                      return (
+                        <div
+                          key={code.id}
+                          ref={isLast ? lastPromoCodeRef : null}
+                        >
+                          <PromoCodeCard
+                            code={code}
+                            index={index}
+                            copiedCodeId={copiedCodeId}
+                            onToggleReveal={handleToggleReveal}
+                            onCopy={handleCopy}
+                            onEdit={handleEditPromoCode}
+                            onDelete={handleDeletePromoCode}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Loading more indicator */}
+                  {isFetchingNextPage && (
+                    <div className="text-center py-8">
+                      <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary-bright" />
+                      <p className="mt-2 text-sm text-neutral-dark dark:text-neutral-medium">
+                        Loading more codes...
+                      </p>
+                    </div>
+                  )}
+                </>
               ) : (
                 <EmptyState onAddCode={handleAddCodeModalOpen} />
               )}

@@ -56,6 +56,81 @@ export const promoCodeService = {
     return transformedData;
   },
 
+  async getPaginated({
+    offset = 0,
+    limit = 10,
+    searchStore = ''
+  }: {
+    offset?: number;
+    limit?: number;
+    searchStore?: string;
+  } = {}): Promise<{ data: PromoCodeWithMetadata[]; hasMore: boolean; total: number }> {
+    let query = supabase
+      .from('promo_codes')
+      .select(`
+        id,
+        user_id,
+        encrypted_data,
+        nonce,
+        tag,
+        created_at:created_at,
+        updated_at:updated_at,
+        promo_code_metadata (
+          store,
+          discount,
+          expires,
+          notes,
+          created_at,
+          updated_at
+        )
+      `, { count: 'exact' })
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1);
+
+    // Add search filter if provided
+    if (searchStore.trim()) {
+      query = query.filter('promo_code_metadata.store', 'ilike', `%${searchStore.trim()}%`);
+    }
+
+    const { data, error, count } = await query;
+
+    if (error) {
+      throw new Error(`Failed to fetch promo codes: ${error.message}`);
+    }
+
+    // Transform the joined data into the expected format
+    const transformedData: PromoCodeWithMetadata[] = (data || []).map(item => {
+      const metadata = Array.isArray(item.promo_code_metadata) 
+        ? item.promo_code_metadata[0] 
+        : item.promo_code_metadata;
+      
+      return {
+        id: item.id,
+        user_id: item.user_id,
+        encrypted_data: item.encrypted_data,
+        nonce: item.nonce,
+        tag: item.tag,
+        created_at: item.created_at,
+        updated_at: item.updated_at,
+        store: metadata?.store || '',
+        discount: metadata?.discount || '',
+        expires: metadata?.expires || '',
+        notes: metadata?.notes || '',
+        metadata_created_at: metadata?.created_at || '',
+        metadata_updated_at: metadata?.updated_at || ''
+      };
+    });
+
+    const total = count || 0;
+    const hasMore = offset + limit < total;
+
+    return {
+      data: transformedData,
+      hasMore,
+      total
+    };
+  },
+
   // Create a new promo code with encrypted code and unencrypted metadata
   async create(
     encryptedCode: Omit<EncryptedPromoCode, 'created_at' | 'updated_at'>,
