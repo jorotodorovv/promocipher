@@ -19,7 +19,7 @@ const MasterPasswordInput: React.FC<MasterPasswordInputProps> = ({
 }) => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [isFirstTime, setIsFirstTime] = useState(!hasExistingSalt);
+  const [isFirstTime] = useState(!hasExistingSalt);
   const [rememberMe, setRememberMe] = useState(false);
   const [agreeToRisks, setAgreeToRisks] = useState(false);
 

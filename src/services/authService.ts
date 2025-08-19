@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import type { User, AuthError } from '@supabase/supabase-js';
+import type { User, AuthError, Session } from '@supabase/supabase-js';
 
 // Authentication service
 export const authService = {
@@ -40,7 +40,7 @@ export const authService = {
   },
 
   // Listen to auth state changes
-  onAuthStateChange(callback: (event: string, session: any) => void) {
+  onAuthStateChange(callback: (event: string, session: Session | null) => void) {
     return supabase.auth.onAuthStateChange(callback);
   },
 

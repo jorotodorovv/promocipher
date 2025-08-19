@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shield, Code2, Lock, ShieldEllipsis } from 'lucide-react';
+import { Shield, Lock, ShieldEllipsis } from 'lucide-react';
 
 const Footer: React.FC = () => {
   return (

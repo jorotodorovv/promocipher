@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Tag, TrendingUp, Users, BarChart3, Copy, Eye } from 'lucide-react';
 import Card from './ui/Card';
-import Button from './ui/Button';
 
 const Features: React.FC = () => {
   const [activeTab, setActiveTab] = useState('personal');

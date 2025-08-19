@@ -53,7 +53,7 @@ export const useTheme = (): UseThemeReturn => {
   // Initialize theme on component mount
   useEffect(() => {
     applyTheme(theme);
-  }, []);
+  }, [theme]);
 
   // Listen for system theme changes if user hasn't set a preference
   useEffect(() => {

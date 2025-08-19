@@ -37,6 +37,7 @@ export const EncryptionProvider: React.FC<EncryptionProviderProps> = ({ children
   const [derivedKey, setDerivedKey] = useState<Uint8Array | null>(null);
   const [isKeyDeriving, setIsKeyDeriving] = useState(false);
   const [keyDerivationError, setKeyDerivationError] = useState<string | null>(null);
+  const [previousUserId, setPreviousUserId] = useState<string | null>(null);
 
   // Initial key loading on component mount
   useEffect(() => {
@@ -70,7 +71,16 @@ export const EncryptionProvider: React.FC<EncryptionProviderProps> = ({ children
           return;
         }
         
+        // Check if this is a different user than before
+        if (previousUserId && previousUserId !== user.id) {
+          // Different user - clear the stored key and reset state
+          await clearStoredDerivedKey();
+          setDerivedKey(null);
+        }
+        
+        setPreviousUserId(user.id);
         setIsLoadingSalt(true);
+        
         try {
           // Check if user has an existing salt
           const userSalt = await userSaltService.getByUserId(user.id);
@@ -82,8 +92,12 @@ export const EncryptionProvider: React.FC<EncryptionProviderProps> = ({ children
           setIsLoadingSalt(false);
         }
       } else {
-        // User logged out - reset state but don't clear stored key yet
-        setDerivedKey(null);
+        // User logged out - clear everything including stored key
+        if (previousUserId) {
+          await clearStoredDerivedKey();
+          setDerivedKey(null);
+          setPreviousUserId(null);
+        }
         setHasExistingSalt(false);
         setIsLoadingSalt(false);
         setKeyDerivationError(null);
@@ -91,7 +105,7 @@ export const EncryptionProvider: React.FC<EncryptionProviderProps> = ({ children
     };
 
     handleUserStateChange();
-  }, [user]);
+  }, [user, previousUserId]);
 
   const deriveEncryptionKey = async (masterPassword: string, rememberMe: boolean = false) => {
     setIsKeyDeriving(true);
@@ -131,6 +145,9 @@ export const EncryptionProvider: React.FC<EncryptionProviderProps> = ({ children
           // Don't fail the entire operation, just warn the user
           setKeyDerivationError('Key derived successfully but failed to store locally. You may need to re-enter your password next time.');
         }
+      } else {
+        // If user didn't check remember me, clear any existing stored key
+        await clearStoredDerivedKey();
       }
       
       setDerivedKey(key);
@@ -151,6 +168,7 @@ export const EncryptionProvider: React.FC<EncryptionProviderProps> = ({ children
     setHasCheckedStoredKey(false);
     setHasExistingSalt(false);
     setKeyDerivationError(null);
+    setPreviousUserId(null);
     await clearStoredDerivedKey();
   };
   

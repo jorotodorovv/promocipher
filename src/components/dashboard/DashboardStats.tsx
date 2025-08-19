@@ -1,5 +1,4 @@
 import React from 'react';
-import { Shield } from 'lucide-react';
 import Card from '../ui/Card';
 
 interface DashboardStatsProps {

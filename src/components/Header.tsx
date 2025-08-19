@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Moon, Sun, Shield, Menu, X, LogOut, User, ShieldEllipsis } from 'lucide-react';
+import { Moon, Sun, Menu, X, LogOut, User, ShieldEllipsis } from 'lucide-react';
 import { User as SupabaseUser } from '@supabase/supabase-js';
 import { useAuth } from '../contexts/AuthContext';
 
