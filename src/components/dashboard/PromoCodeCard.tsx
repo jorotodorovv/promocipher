@@ -1,5 +1,5 @@
-import React from 'react';
-import { Eye, EyeOff, Copy, Check, Loader2, AlertCircle, Edit, Trash2 } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Eye, EyeOff, Copy, Check, Loader2, AlertCircle, Edit, Trash2, Clock } from 'lucide-react';
 import Card from '../ui/Card';
 import type { DisplayPromoCode } from '../../types/promoCode';
 
@@ -22,7 +22,36 @@ const PromoCodeCard: React.FC<PromoCodeCardProps> = ({
   onEdit,
   onDelete
 }) => {
+  const [countdown, setCountdown] = useState<number | null>(null);
   const isExpired = new Date(code.expires) <= new Date();
+
+  // Auto-hide timer effect
+  useEffect(() => {
+    if (code.isRevealed && !code.isDecrypting) {
+      setCountdown(15);
+      
+      const timer = setInterval(() => {
+        setCountdown(prev => {
+          if (prev === null || prev <= 1) {
+            onToggleReveal(code.id); // Auto-hide the code
+            return null;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      return () => {
+        clearInterval(timer);
+        setCountdown(null);
+      };
+    } else {
+      setCountdown(null);
+    }
+  }, [code.isRevealed, code.isDecrypting, code.id]);
+
+  const handleToggleReveal = useCallback(() => {
+    onToggleReveal(code.id);
+  }, [code.id, onToggleReveal]);
 
   return (
     <Card 
@@ -47,6 +76,12 @@ const PromoCodeCard: React.FC<PromoCodeCardProps> = ({
       <div className="mb-4">
         <div className="flex items-center justify-between mb-2">
           <span className="font-sans text-small text-neutral-medium">Promo Code</span>
+          {code.isRevealed && countdown !== null && (
+            <div className="flex items-center space-x-1 text-xs text-neutral-medium">
+              <Clock className="w-3 h-3" />
+              <span>Auto-hide in {countdown}s</span>
+            </div>
+          )}
         </div>
         <div className="bg-neutral-light dark:bg-neutral-medium/20 rounded p-3 flex items-center justify-between">
           <div className="flex-1">
@@ -59,7 +94,7 @@ const PromoCodeCard: React.FC<PromoCodeCardProps> = ({
               <Loader2 className="w-4 h-4 text-primary-bright animate-spin" />
             ) : (
               <button
-                onClick={() => onToggleReveal(code.id)}
+                onClick={handleToggleReveal}
                 className="p-1 hover:bg-neutral-medium/20 rounded transition-colors duration-200"
                 title={code.isRevealed ? 'Hide code' : 'Reveal code'}
               >

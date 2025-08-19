@@ -15,7 +15,7 @@ export const promoCodeService = {
         tag,
         created_at:created_at,
         updated_at:updated_at,
-        promo_code_metadata (
+        promo_code_metadata!inner (
           store,
           discount,
           expires,
@@ -75,7 +75,7 @@ export const promoCodeService = {
         tag,
         created_at:created_at,
         updated_at:updated_at,
-        promo_code_metadata (
+        promo_code_metadata!inner (
           store,
           discount,
           expires,

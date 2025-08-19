@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Filter, Download, Upload, Plus } from 'lucide-react';
+import { Search, Filter, Download, Upload, Plus, Loader2 } from 'lucide-react';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
 
@@ -11,6 +11,7 @@ interface ActionBarProps {
   onImport: (file: File) => void;
   isExporting?: boolean;
   isImporting?: boolean;
+  searchLoading?: boolean;
 }
 
 const ActionBar: React.FC<ActionBarProps> = ({
@@ -20,7 +21,8 @@ const ActionBar: React.FC<ActionBarProps> = ({
   onExport,
   onImport,
   isExporting = false,
-  isImporting = false
+  isImporting = false,
+  searchLoading = false
 }) => {
   const handleImportClick = () => {
     const input = document.createElement('input');
@@ -42,7 +44,7 @@ const ActionBar: React.FC<ActionBarProps> = ({
           placeholder="Search promo codes..."
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
-          icon={<Search className="w-5 h-5" />}
+          icon={searchLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Search className="w-5 h-5" />}
         />
       </div>
       <div className="flex items-center space-x-3">

@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Settings, LogOut, Loader2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useEncryption } from '../contexts/EncryptionContext';
+import { decrypt } from '../utils/crypto';
 
 import { useInfinitePromoCodes, useCreatePromoCode, useUpdatePromoCode, useDeletePromoCode } from '../hooks/usePromoCodeQueries';
 import type { NewPromoCodeForm, DisplayPromoCode } from '../types/promoCode';
@@ -12,14 +14,18 @@ import AddCodeModal from '../components/dashboard/AddCodeModal';
 import EditCodeModal from '../components/dashboard/EditCodeModal';
 import DeleteConfirmModal from '../components/dashboard/DeleteConfirmModal';
 import EmptyState from '../components/dashboard/EmptyState';
+import NoMatchesState from '../components/dashboard/NoMatchesState';
 import SecurityNotice from '../components/dashboard/SecurityNotice';
 
 const DashboardPage: React.FC = () => {
   const { user, signOut } = useAuth();
+  const { derivedKey } = useEncryption();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+  const [searchLoading, setSearchLoading] = useState(false);
   const [copiedCodeId, setCopiedCodeId] = useState<string | null>(null);
+  const [revealedCodes, setRevealedCodes] = useState<Record<string, { decryptedCode: string; isDecrypting: boolean; decryptionError: string | null }>>({});
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
@@ -39,11 +45,19 @@ const DashboardPage: React.FC = () => {
 
   // Debounce search term
   useEffect(() => {
+    if (searchTerm !== debouncedSearchTerm) {
+      setSearchLoading(true);
+    }
+    
     const timer = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [searchTerm]);
+      setSearchLoading(false);
+    }, 1000);
+    
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [searchTerm, debouncedSearchTerm]);
 
   // Flatten all pages data
   const promoCodes = data?.pages.flatMap((page: { data: any[]; hasMore: boolean; total: number }) => page.data) || [];
@@ -67,17 +81,18 @@ const DashboardPage: React.FC = () => {
     setIsAddingCode(true);
     setAddCodeError(null);
 
+    const id = crypto.randomUUID();
     try {
       await createPromoCodeMutation.mutateAsync({
         encryptedCode: {
-          id: crypto.randomUUID(),
+          id,
           user_id: user?.id || '',
           encrypted_data: '',
           nonce: '',
           tag: ''
         },
         metadata: {
-          id: crypto.randomUUID(),
+          id,
           store: newCode.store.trim(),
           discount: newCode.discount.trim(),
           expires: newCode.expires,
@@ -93,11 +108,11 @@ const DashboardPage: React.FC = () => {
     }
   };
 
-  const handleEditPromoCode = (code: DisplayPromoCode) => {
+  const handleEditPromoCode = useCallback((code: DisplayPromoCode) => {
     setSelectedPromoCode(code);
     setShowEditCodeModal(true);
     setEditCodeError(null);
-  };
+  }, []);
 
   const handleUpdatePromoCode = async (id: string, store: string, discount: string, expires: string, notes: string) => {
     setIsEditingCode(true);
@@ -118,10 +133,10 @@ const DashboardPage: React.FC = () => {
     }
   };
 
-  const handleDeletePromoCode = (code: DisplayPromoCode) => {
+  const handleDeletePromoCode = useCallback((code: DisplayPromoCode) => {
     setSelectedPromoCode(code);
     setShowDeleteConfirmModal(true);
-  };
+  }, []);
 
   const handleConfirmDelete = async () => {
     if (!selectedPromoCode) return;
@@ -149,12 +164,65 @@ const DashboardPage: React.FC = () => {
     setSelectedPromoCode(null);
   };
 
-  const handleToggleReveal = (codeId: string) => {
-    // Toggle revelation state is now handled by the PromoCodeCard component internally
-    // This function is kept for compatibility with the PromoCodeCard interface
-  };
+  const handleToggleReveal = useCallback(async (codeId: string) => {
+    if (!user || !derivedKey) {
+      console.error('User not authenticated or key not derived.');
+      return;
+    }
 
-  const handleCopy = async (codeText: string, codeId: string) => {
+    const currentRevealState = revealedCodes[codeId];
+    
+    // If currently revealed, hide it
+    if (currentRevealState?.decryptedCode) {
+      setRevealedCodes(prev => {
+        const newState = { ...prev };
+        delete newState[codeId];
+        return newState;
+      });
+      return;
+    }
+
+    // Find the code to decrypt
+    const codeToDecrypt = promoCodes.find(pc => pc.id === codeId);
+    if (!codeToDecrypt) {
+      console.error('Promo code not found.');
+      return;
+    }
+
+    // Set decrypting state
+    setRevealedCodes(prev => ({
+      ...prev,
+      [codeId]: { decryptedCode: '', isDecrypting: true, decryptionError: null }
+    }));
+
+    try {
+      const decryptedCode = await decrypt(
+        codeToDecrypt.encrypted_data,
+        codeToDecrypt.nonce,
+        codeToDecrypt.tag,
+        codeToDecrypt.user_id,
+        codeToDecrypt.id,
+        derivedKey
+      );
+
+      setRevealedCodes(prev => ({
+        ...prev,
+        [codeId]: { decryptedCode, isDecrypting: false, decryptionError: null }
+      }));
+    } catch (decryptError) {
+      console.error('Failed to decrypt promo code:', decryptError);
+      const errorMessage = decryptError instanceof Error
+        ? decryptError.message
+        : 'Failed to decrypt promo code';
+
+      setRevealedCodes(prev => ({
+        ...prev,
+        [codeId]: { decryptedCode: '', isDecrypting: false, decryptionError: errorMessage }
+      }));
+    }
+  }, [user, derivedKey, revealedCodes, promoCodes]);
+
+  const handleCopy = useCallback(async (codeText: string, codeId: string) => {
     try {
       await navigator.clipboard.writeText(codeText);
       setCopiedCodeId(codeId);
@@ -162,7 +230,7 @@ const DashboardPage: React.FC = () => {
     } catch (error) {
       console.error('Failed to copy code:', error);
     }
-  };
+  }, []);
 
   const handleSignOut = async () => {
     try {
@@ -384,10 +452,11 @@ const DashboardPage: React.FC = () => {
             onImport={handleImport}
             isExporting={isExporting}
             isImporting={isImporting}
+            searchLoading={searchLoading}
           />
 
           {/* Loading State */}
-          {isLoadingCodes ? (
+          {isLoadingCodes || searchLoading ? (
             <div className="text-center py-16">
               <div className="inline-flex items-center justify-center w-20 h-20 bg-primary-bright rounded-lg mb-6 animate-pulse-glow">
                 <Loader2 className="w-10 h-10 text-white animate-spin" />
@@ -407,13 +476,24 @@ const DashboardPage: React.FC = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {promoCodes.map((code: any, index: number) => {
                       const isLast = index === promoCodes.length - 1;
+                      const revealState = revealedCodes[code.id];
+                      
+                      // Transform code to DisplayPromoCode format
+                      const displayCode = {
+                        ...code,
+                        decryptedCode: revealState?.decryptedCode || null,
+                        isRevealed: !!revealState?.decryptedCode,
+                        isDecrypting: revealState?.isDecrypting || false,
+                        decryptionError: revealState?.decryptionError || null
+                      };
+                      
                       return (
                         <div
                           key={code.id}
                           ref={isLast ? lastPromoCodeRef : null}
                         >
                           <PromoCodeCard
-                            code={code}
+                            code={displayCode}
                             index={index}
                             copiedCodeId={copiedCodeId}
                             onToggleReveal={handleToggleReveal}
@@ -437,7 +517,15 @@ const DashboardPage: React.FC = () => {
                   )}
                 </>
               ) : (
-                <EmptyState onAddCode={handleAddCodeModalOpen} />
+                // Show different empty states based on search context
+                debouncedSearchTerm.trim() ? (
+                  <NoMatchesState 
+                    searchTerm={debouncedSearchTerm} 
+                    onClearSearch={() => setSearchTerm('')} 
+                  />
+                ) : (
+                  <EmptyState onAddCode={handleAddCodeModalOpen} />
+                )
               )}
             </>
           )}
