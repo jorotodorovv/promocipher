@@ -1,5 +1,5 @@
 import React from 'react';
-import { Eye, EyeOff, Copy, Check, Loader2, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, Copy, Check, Loader2, AlertCircle, Edit, Trash2 } from 'lucide-react';
 import Card from '../ui/Card';
 import type { DisplayPromoCode } from '../../types/promoCode';
 
@@ -9,6 +9,8 @@ interface PromoCodeCardProps {
   copiedCodeId: string | null;
   onToggleReveal: (codeId: string) => void;
   onCopy: (codeText: string, codeId: string) => void;
+  onEdit: (code: DisplayPromoCode) => void;
+  onDelete: (code: DisplayPromoCode) => void;
 }
 
 const PromoCodeCard: React.FC<PromoCodeCardProps> = ({
@@ -16,14 +18,15 @@ const PromoCodeCard: React.FC<PromoCodeCardProps> = ({
   index,
   copiedCodeId,
   onToggleReveal,
-  onCopy
+  onCopy,
+  onEdit,
+  onDelete
 }) => {
   const isExpired = new Date(code.expires) <= new Date();
 
   return (
     <Card 
       className="hover:shadow-hover-light dark:hover:shadow-hover-dark transform hover:scale-102 transition-all duration-300 animate-slide-up"
-      style={{ animationDelay: `${index * 0.1}s` }}
     >
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
@@ -94,15 +97,35 @@ const PromoCodeCard: React.FC<PromoCodeCardProps> = ({
         </div>
       )}
 
-      <div className="flex items-center justify-between text-small">
-        <span className="font-sans text-neutral-medium">
-          Expires: {code.expires}
-        </span>
-        {code.notes && (
-          <span className="font-sans text-neutral-medium italic">
-            {code.notes.length > 20 ? `${code.notes.substring(0, 20)}...` : code.notes}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between text-small">
+          <span className="font-sans text-neutral-medium">
+            Expires: {code.expires}
           </span>
-        )}
+          {code.notes && (
+            <span className="font-sans text-neutral-medium italic">
+              {code.notes.length > 20 ? `${code.notes.substring(0, 20)}...` : code.notes}
+            </span>
+          )}
+        </div>
+        
+        {/* Action buttons */}
+        <div className="flex items-center justify-end space-x-2 pt-2 border-t border-neutral-light dark:border-neutral-medium/20">
+          <button
+            onClick={() => onEdit(code)}
+            className="p-2 hover:bg-neutral-medium/20 rounded transition-colors duration-200 group"
+            title="Edit promo code"
+          >
+            <Edit className="w-4 h-4 text-neutral-medium group-hover:text-primary-bright" />
+          </button>
+          <button
+            onClick={() => onDelete(code)}
+            className="p-2 hover:bg-accent-error/10 rounded transition-colors duration-200 group"
+            title="Delete promo code"
+          >
+            <Trash2 className="w-4 h-4 text-neutral-medium group-hover:text-accent-error" />
+          </button>
+        </div>
       </div>
     </Card>
   );

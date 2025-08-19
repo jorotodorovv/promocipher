@@ -7,13 +7,33 @@ interface ActionBarProps {
   searchTerm: string;
   onSearchChange: (value: string) => void;
   onAddCode: () => void;
+  onExport: () => void;
+  onImport: (file: File) => void;
+  isExporting?: boolean;
+  isImporting?: boolean;
 }
 
 const ActionBar: React.FC<ActionBarProps> = ({
   searchTerm,
   onSearchChange,
-  onAddCode
+  onAddCode,
+  onExport,
+  onImport,
+  isExporting = false,
+  isImporting = false
 }) => {
+  const handleImportClick = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        onImport(file);
+      }
+    };
+    input.click();
+  };
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
       <div className="flex-1 max-w-md">
@@ -30,13 +50,23 @@ const ActionBar: React.FC<ActionBarProps> = ({
           <Filter className="w-4 h-4 mr-2" />
           Filter
         </Button>
-        <Button variant="secondary" size="medium">
+        <Button 
+          variant="secondary" 
+          size="medium" 
+          onClick={handleImportClick}
+          disabled={isImporting}
+        >
           <Upload className="w-4 h-4 mr-2" />
-          Import
+          {isImporting ? 'Importing...' : 'Import'}
         </Button>
-        <Button variant="secondary" size="medium">
+        <Button 
+          variant="secondary" 
+          size="medium" 
+          onClick={onExport}
+          disabled={isExporting}
+        >
           <Download className="w-4 h-4 mr-2" />
-          Export
+          {isExporting ? 'Exporting...' : 'Export'}
         </Button>
         <Button 
           variant="primary" 

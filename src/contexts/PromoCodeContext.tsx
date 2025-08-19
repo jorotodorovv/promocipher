@@ -9,7 +9,20 @@ interface PromoCodeContextType {
   promoCodes: DisplayPromoCode[];
   loading: boolean;
   error: string | null;
-  addPromoCode: (code: string, store: string, discount: string, expires: string, notes: string) => Promise<void>;
+  addPromoCode: (data: {
+    id: string;
+    user_id: string;
+    encrypted_data: string;
+    nonce: string;
+    tag: string;
+    code: string;
+    store: string;
+    discount: string;
+    expires: string | null;
+    notes: string;
+    created_at: string;
+    updated_at: string;
+  }) => Promise<void>;
   updatePromoCode: (id: string, code: string, store: string, discount: string, expires: string, notes: string) => Promise<void>;
   deletePromoCode: (id: string) => Promise<void>;
   toggleCodeRevelation: (codeId: string) => Promise<void>;
@@ -88,45 +101,69 @@ export const PromoCodeProvider: React.FC<PromoCodeProviderProps> = ({ children }
     }
   }, [user, derivedKey, authLoading, hasCheckedStoredKey, fetchPromoCodes]);
 
-  const addPromoCode = async (code: string, store: string, discount: string, expires: string, notes: string) => {
+  const addPromoCode = async (data: {
+    id: string;
+    user_id: string;
+    encrypted_data: string;
+    nonce: string;
+    tag: string;
+    code: string;
+    store: string;
+    discount: string;
+    expires: string | null;
+    notes: string;
+    created_at: string;
+    updated_at: string;
+  }) => {
     if (!user || !derivedKey) {
       setError('User not authenticated or key not derived.');
       return;
     }
-    const promoCodeId = crypto.randomUUID();
     try {
-      const encryptedData = await encrypt(
-        { id: promoCodeId, code, userId: user.id },
-        derivedKey,
-        user.id
-      );
+      let encryptedData = data.encrypted_data;
+      let nonce = data.nonce;
+      let tag = data.tag;
+      const code = data.code;
+
+      // If encrypted_data is empty, create initial encryption
+      if (!encryptedData && code) {
+        const encryptionResult = await encrypt(
+          { id: data.id, code, userId: user.id },
+          derivedKey,
+          user.id
+        );
+        encryptedData = encryptionResult.encryptedData;
+        nonce = encryptionResult.nonce;
+        tag = encryptionResult.tag;
+      }
+
       const newPromoCode = await promoCodeService.create(
         {
-          id: promoCodeId,
-          user_id: user.id,
-          encrypted_data: encryptedData.encryptedData,
-          nonce: encryptedData.nonce,
-          tag: encryptedData.tag
+          id: data.id,
+          user_id: data.user_id,
+          encrypted_data: encryptedData,
+          nonce: nonce,
+          tag: tag
         },
         {
-          id: promoCodeId,
-          store,
-          discount,
-          expires,
-          notes
+          id: data.id,
+          store: data.store,
+          discount: data.discount,
+          expires: data.expires || '',
+          notes: data.notes
         }
       );
       setPromoCodes(prev => [...prev, {
         ...newPromoCode,
         created_at: newPromoCode.created_at,
         updated_at: newPromoCode.updated_at,
-        decryptedCode: code,
+        decryptedCode: null,
         isRevealed: false,
         isDecrypting: false,
         decryptionError: null
       }]);
     } catch (err) {
-      console.error('Error adding promo code:', err);
+      console.error('Error adding promo code with encrypted data:', err);
       setError('Failed to add promo code.');
     }
   };
@@ -189,11 +226,11 @@ export const PromoCodeProvider: React.FC<PromoCodeProviderProps> = ({ children }
     }
 
     const currentCode = promoCodes[codeIndex];
-    
+
     // If currently revealed, hide it
     if (currentCode.isRevealed) {
-      setPromoCodes(prev => prev.map(pc => 
-        pc.id === codeId 
+      setPromoCodes(prev => prev.map(pc =>
+        pc.id === codeId
           ? { ...pc, isRevealed: false, decryptedCode: null, decryptionError: null }
           : pc
       ));
@@ -201,8 +238,8 @@ export const PromoCodeProvider: React.FC<PromoCodeProviderProps> = ({ children }
     }
 
     // If not revealed, decrypt and reveal it
-    setPromoCodes(prev => prev.map(pc => 
-      pc.id === codeId 
+    setPromoCodes(prev => prev.map(pc =>
+      pc.id === codeId
         ? { ...pc, isDecrypting: true, decryptionError: null }
         : pc
     ));
@@ -217,32 +254,32 @@ export const PromoCodeProvider: React.FC<PromoCodeProviderProps> = ({ children }
         derivedKey
       );
 
-      setPromoCodes(prev => prev.map(pc => 
-        pc.id === codeId 
-          ? { 
-              ...pc, 
-              decryptedCode, 
-              isRevealed: true, 
-              isDecrypting: false, 
-              decryptionError: null 
-            }
+      setPromoCodes(prev => prev.map(pc =>
+        pc.id === codeId
+          ? {
+            ...pc,
+            decryptedCode,
+            isRevealed: true,
+            isDecrypting: false,
+            decryptionError: null
+          }
           : pc
       ));
     } catch (decryptError) {
       console.error('Failed to decrypt promo code:', decryptError);
-      const errorMessage = decryptError instanceof Error 
-        ? decryptError.message 
+      const errorMessage = decryptError instanceof Error
+        ? decryptError.message
         : 'Failed to decrypt promo code';
-      
-      setPromoCodes(prev => prev.map(pc => 
-        pc.id === codeId 
-          ? { 
-              ...pc, 
-              isDecrypting: false, 
-              decryptionError: errorMessage,
-              isRevealed: false,
-              decryptedCode: null
-            }
+
+      setPromoCodes(prev => prev.map(pc =>
+        pc.id === codeId
+          ? {
+            ...pc,
+            isDecrypting: false,
+            decryptionError: errorMessage,
+            isRevealed: false,
+            decryptedCode: null
+          }
           : pc
       ));
     }

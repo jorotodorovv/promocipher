@@ -33,21 +33,23 @@ const Header: React.FC<HeaderProps> = ({ darkMode, onToggleDarkMode, user }) => 
             </h1>
           </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <a href="#features" className="text-white hover:text-primary-bright transition-colors duration-200 font-sans font-medium">
-              Features
-            </a>
-            <a href="#security" className="text-white hover:text-primary-bright transition-colors duration-200 font-sans font-medium">
-              Security
-            </a>
-            <a href="#pricing" className="text-white hover:text-primary-bright transition-colors duration-200 font-sans font-medium">
-              Pricing
-            </a>
-            <a href="#contact" className="text-white hover:text-primary-bright transition-colors duration-200 font-sans font-medium">
-              Contact
-            </a>
-          </nav>
+          {/* Desktop Navigation - Only show when user is not logged in */}
+          {!user && (
+            <nav className="hidden md:flex items-center space-x-8">
+              <a href="#features" className="text-white hover:text-primary-bright transition-colors duration-200 font-sans font-medium">
+                Features
+              </a>
+              <a href="#security" className="text-white hover:text-primary-bright transition-colors duration-200 font-sans font-medium">
+                Security
+              </a>
+              <a href="#pricing" className="text-white hover:text-primary-bright transition-colors duration-200 font-sans font-medium">
+                Pricing
+              </a>
+              <a href="#contact" className="text-white hover:text-primary-bright transition-colors duration-200 font-sans font-medium">
+                Contact
+              </a>
+            </nav>
+          )}
 
           {/* Controls */}
           <div className="flex items-center space-x-4">
@@ -81,42 +83,26 @@ const Header: React.FC<HeaderProps> = ({ darkMode, onToggleDarkMode, user }) => 
               )}
             </button>
 
-            {/* Mobile menu button */}
-            <button
-              className="md:hidden p-2 rounded hover:bg-white/10 transition-colors duration-200"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
-              {mobileMenuOpen ? (
-                <X className="w-6 h-6 text-white" />
-              ) : (
-                <Menu className="w-6 h-6 text-white" />
-              )}
-            </button>
+            {/* Mobile menu button - Only show when user is not logged in */}
+            {!user && (
+              <button
+                className="md:hidden p-2 rounded hover:bg-white/10 transition-colors duration-200"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              >
+                {mobileMenuOpen ? (
+                  <X className="w-6 h-6 text-white" />
+                ) : (
+                  <Menu className="w-6 h-6 text-white" />
+                )}
+              </button>
+            )}
           </div>
         </div>
 
-        {/* Mobile Navigation */}
-        {mobileMenuOpen && (
+        {/* Mobile Navigation - Only show when user is not logged in */}
+        {mobileMenuOpen && !user && (
           <div className="md:hidden bg-primary-deep border-t border-white/20 animate-slide-up">
             <div className="px-2 pt-2 pb-3 space-y-1">
-              {user && (
-                <div className="px-3 py-2 border-b border-white/20 mb-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2 text-white">
-                      <User className="w-4 h-4" />
-                      <span className="font-sans text-small">
-                        {user.email?.split('@')[0]}
-                      </span>
-                    </div>
-                    <button
-                      onClick={handleSignOut}
-                      className="p-1 rounded hover:bg-white/10 transition-colors duration-200"
-                    >
-                      <LogOut className="w-4 h-4 text-white" />
-                    </button>
-                  </div>
-                </div>
-              )}
               <a href="#features" className="block px-3 py-2 text-white hover:bg-white/10 rounded transition-colors duration-200">
                 Features
               </a>
