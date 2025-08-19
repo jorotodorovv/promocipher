@@ -8,7 +8,7 @@ import type { DisplayPromoCode } from '../../types/promoCode';
 interface EditCodeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (id: string, code: string, store: string, discount: string, expires: string, notes: string) => Promise<void>;
+  onSubmit: (id: string, store: string, discount: string, expires: string, notes: string) => Promise<void>;
   isLoading: boolean;
   error: string | null;
   promoCode: DisplayPromoCode | null;
@@ -23,7 +23,6 @@ const EditCodeModal: React.FC<EditCodeModalProps> = ({
   promoCode
 }) => {
   const [formData, setFormData] = useState({
-    code: '',
     store: '',
     discount: '',
     expires: '',
@@ -34,7 +33,6 @@ const EditCodeModal: React.FC<EditCodeModalProps> = ({
   useEffect(() => {
     if (promoCode) {
       setFormData({
-        code: promoCode.decryptedCode || '',
         store: promoCode.store,
         discount: promoCode.discount,
         expires: promoCode.expires,
@@ -48,7 +46,6 @@ const EditCodeModal: React.FC<EditCodeModalProps> = ({
     if (promoCode) {
       await onSubmit(
         promoCode.id,
-        formData.code,
         formData.store,
         formData.discount,
         formData.expires,
@@ -59,7 +56,6 @@ const EditCodeModal: React.FC<EditCodeModalProps> = ({
 
   const handleClose = () => {
     setFormData({
-      code: '',
       store: '',
       discount: '',
       expires: '',
@@ -79,10 +75,10 @@ const EditCodeModal: React.FC<EditCodeModalProps> = ({
           <Edit className="w-8 h-8 text-white" />
         </div>
         <h2 className="font-pixel text-h3 text-neutral-dark dark:text-white mb-2 uppercase tracking-wide">
-          Edit Promo Code
+          Edit Promo Code Details
         </h2>
         <p className="font-sans text-body text-neutral-dark dark:text-neutral-medium">
-          Your changes will be encrypted before being stored
+          Update store details and metadata. To change the promo code itself, delete and recreate the entry.
         </p>
       </div>
 
@@ -104,13 +100,7 @@ const EditCodeModal: React.FC<EditCodeModalProps> = ({
           required
         />
         
-        <Input
-          type="text"
-          placeholder="Promo code (e.g., SAVE20)"
-          value={formData.code}
-          onChange={(e) => updateField('code', e.target.value)}
-          required
-        />
+
         
         <Input
           type="text"
@@ -151,7 +141,7 @@ const EditCodeModal: React.FC<EditCodeModalProps> = ({
             size="large"
             className="flex-1"
             type="submit"
-            disabled={isLoading || !formData.code.trim() || !formData.store.trim()}
+            disabled={isLoading || !formData.store.trim()}
           >
             {isLoading ? (
               <>
@@ -161,7 +151,7 @@ const EditCodeModal: React.FC<EditCodeModalProps> = ({
             ) : (
               <>
                 <Shield className="w-4 h-4 mr-2" />
-                Update & Encrypt
+                Update Details
               </>
             )}
           </Button>

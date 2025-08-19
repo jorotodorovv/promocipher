@@ -23,7 +23,7 @@ interface PromoCodeContextType {
     created_at: string;
     updated_at: string;
   }) => Promise<void>;
-  updatePromoCode: (id: string, code: string, store: string, discount: string, expires: string, notes: string) => Promise<void>;
+  updatePromoCode: (id: string, store: string, discount: string, expires: string, notes: string) => Promise<void>;
   deletePromoCode: (id: string) => Promise<void>;
   toggleCodeRevelation: (codeId: string) => Promise<void>;
 }
@@ -168,22 +168,12 @@ export const PromoCodeProvider: React.FC<PromoCodeProviderProps> = ({ children }
     }
   };
 
-  const updatePromoCode = async (id: string, code: string, store: string, discount: string, expires: string, notes: string) => {
+  const updatePromoCode = async (id: string, store: string, discount: string, expires: string, notes: string) => {
     if (!user || !derivedKey) {
       setError('User not authenticated or key not derived.');
       return;
     }
     try {
-      const encryptedData = await encrypt(
-        { id, code, userId: user.id },
-        derivedKey,
-        user.id
-      );
-      await promoCodeService.updateCode(id, {
-        encrypted_data: encryptedData.encryptedData,
-        nonce: encryptedData.nonce,
-        tag: encryptedData.tag
-      });
       await promoCodeService.updateMetadata(id, {
         store,
         discount,
@@ -191,7 +181,7 @@ export const PromoCodeProvider: React.FC<PromoCodeProviderProps> = ({ children }
         notes
       });
       setPromoCodes(prev =>
-        prev.map(pc => (pc.id === id ? { ...pc, store, discount, expires, notes, decryptedCode: code } : pc))
+        prev.map(pc => (pc.id === id ? { ...pc, store, discount, expires, notes } : pc))
       );
     } catch (err) {
       console.error('Error updating promo code:', err);

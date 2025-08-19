@@ -68,12 +68,12 @@ const DashboardPage: React.FC = () => {
     setEditCodeError(null);
   };
 
-  const handleUpdatePromoCode = async (id: string, code: string, store: string, discount: string, expires: string, notes: string) => {
+  const handleUpdatePromoCode = async (id: string, store: string, discount: string, expires: string, notes: string) => {
     setIsEditingCode(true);
     setEditCodeError(null);
 
     try {
-      await updatePromoCode(id, code, store, discount, expires, notes);
+      await updatePromoCode(id, store, discount, expires, notes);
       setShowEditCodeModal(false);
       setSelectedPromoCode(null);
     } catch (error) {
