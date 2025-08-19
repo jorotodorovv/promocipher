@@ -31,21 +31,27 @@ export const promoCodeService = {
     }
 
     // Transform the joined data into the expected format
-    const transformedData: PromoCodeWithMetadata[] = (data || []).map(item => ({
-      id: item.id,
-      user_id: item.user_id,
-      encrypted_data: item.encrypted_data,
-      nonce: item.nonce,
-      tag: item.tag,
-      created_at: item.created_at,
-      updated_at: item.updated_at,
-      store: item.promo_code_metadata?.store || '',
-      discount: item.promo_code_metadata?.discount || '',
-      expires: item.promo_code_metadata?.expires || '',
-      notes: item.promo_code_metadata?.notes || '',
-      metadata_created_at: item.promo_code_metadata?.created_at || '',
-      metadata_updated_at: item.promo_code_metadata?.updated_at || ''
-    }));
+    const transformedData: PromoCodeWithMetadata[] = (data || []).map(item => {
+      const metadata = Array.isArray(item.promo_code_metadata) 
+        ? item.promo_code_metadata[0] 
+        : item.promo_code_metadata;
+      
+      return {
+        id: item.id,
+        user_id: item.user_id,
+        encrypted_data: item.encrypted_data,
+        nonce: item.nonce,
+        tag: item.tag,
+        created_at: item.created_at,
+        updated_at: item.updated_at,
+        store: metadata?.store || '',
+        discount: metadata?.discount || '',
+        expires: metadata?.expires || '',
+        notes: metadata?.notes || '',
+        metadata_created_at: metadata?.created_at || '',
+        metadata_updated_at: metadata?.updated_at || ''
+      };
+    });
 
     return transformedData;
   },
@@ -130,6 +136,18 @@ export const promoCodeService = {
 
     if (error) {
       throw new Error(`Failed to delete promo code: ${error.message}`);
+    }
+  },
+
+  // Delete all promo codes for the current user (metadata will be cascade deleted)
+  async deleteAll(): Promise<void> {
+    const { error } = await supabase
+      .from('promo_codes')
+      .delete()
+      .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all rows for current user (RLS handles user filtering)
+
+    if (error) {
+      throw new Error(`Failed to delete all promo codes: ${error.message}`);
     }
   }
 };

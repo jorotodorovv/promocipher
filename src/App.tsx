@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Moon, Sun, Shield } from 'lucide-react';
+import { useState } from 'react';
+import { Shield } from 'lucide-react';
 import { useTheme } from './hooks/useTheme';
 import { useAuth } from './contexts/AuthContext';
 import { useEncryption } from './contexts/EncryptionContext';
@@ -33,15 +33,7 @@ function App() {
     setShowAuthModal(false);
   };
 
-  const handleSignOut = async () => {
-    const { signOut } = useAuth();
-    try {
-      await signOut();
-      await clearEncryptionKey();
-    } catch (error) {
-      console.error('Sign out error:', error);
-    }
-  };
+
 
   // Show loading state while checking authentication
   if (loading) {
@@ -98,6 +90,7 @@ function App() {
                 onPasswordSubmit={deriveEncryptionKey}
                 isLoading={isKeyDeriving}
                 error={keyDerivationError}
+                onResetPassword={clearEncryptionKey}
               />
             )
           ) : (

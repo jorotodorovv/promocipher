@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useAuth } from './AuthContext';
 import { userSaltService } from '../services/userSaltService';
-import { deriveKey, generateSalt, arrayToBase64, base64ToArray, isValidBase64 } from '../utils/crypto';
+import { promoCodeService } from '../services/promoCodeService';
+import { deriveKey, generateSalt, arrayToBase64, base64ToArray, isValidBase64, decrypt } from '../utils/crypto';
 import { storeDerivedKey, getStoredDerivedKey, clearStoredDerivedKey } from '../utils/keyStorage';
 
 interface EncryptionContextType {
@@ -13,6 +14,7 @@ interface EncryptionContextType {
   keyDerivationError: string | null;
   deriveEncryptionKey: (masterPassword: string, rememberMe?: boolean) => Promise<void>;
   clearEncryptionKey: () => Promise<void>;
+  validateMasterPassword: (derivedKey: Uint8Array) => Promise<boolean>;
 }
 
 const EncryptionContext = createContext<EncryptionContextType | undefined>(undefined);
@@ -136,6 +138,14 @@ export const EncryptionProvider: React.FC<EncryptionProviderProps> = ({ children
       // Derive encryption key using Argon2id
       const key = await deriveKey(masterPassword, saltArray);
       
+      // For existing users, validate the password by attempting to decrypt existing data
+      if (hasExistingSalt) {
+        const isPasswordValid = await validateMasterPassword(key);
+        if (!isPasswordValid) {
+          throw new Error('INVALID_PASSWORD');
+        }
+      }
+      
       // Store key locally if user opted in
       if (rememberMe) {
         try {
@@ -153,23 +163,78 @@ export const EncryptionProvider: React.FC<EncryptionProviderProps> = ({ children
       setDerivedKey(key);
     } catch (error) {
       console.error('Key derivation failed:', error);
-      setKeyDerivationError(
-        error instanceof Error 
-          ? error.message 
-          : 'Failed to derive encryption key. Please try again.'
-      );
+      if (error instanceof Error && error.message === 'INVALID_PASSWORD') {
+        setKeyDerivationError('INVALID_PASSWORD');
+      } else {
+        setKeyDerivationError(
+          error instanceof Error 
+            ? error.message 
+            : 'Failed to derive encryption key. Please try again.'
+        );
+      }
     } finally {
       setIsKeyDeriving(false);
     }
   };
 
+  const validateMasterPassword = async (derivedKey: Uint8Array): Promise<boolean> => {
+    if (!user?.id) {
+      return false;
+    }
+
+    try {
+      // Get existing promo codes to test decryption
+      const encryptedPromoCodes = await promoCodeService.getAll();
+      
+      // If no promo codes exist, we can't validate but assume password is correct
+      if (encryptedPromoCodes.length === 0) {
+        return true;
+      }
+
+      // Try to decrypt the first promo code as a validation test
+      const firstCode = encryptedPromoCodes[0];
+      await decrypt(
+        firstCode.encrypted_data,
+        firstCode.nonce,
+        firstCode.tag,
+        firstCode.user_id,
+        firstCode.id,
+        derivedKey
+      );
+
+      // If decryption succeeds, password is correct
+      return true;
+    } catch (error) {
+      // If decryption fails, password is incorrect
+      console.error('Password validation failed:', error);
+      return false;
+    }
+  };
+
   const clearEncryptionKey = async () => {
-    setDerivedKey(null);
-    setHasCheckedStoredKey(false);
-    setHasExistingSalt(false);
-    setKeyDerivationError(null);
-    setPreviousUserId(null);
-    await clearStoredDerivedKey();
+    if (!user?.id) {
+      return;
+    }
+
+    try {
+      // Delete all user's promo codes and metadata
+      await promoCodeService.deleteAll();
+      
+      // Delete user's salt from database
+      await userSaltService.delete(user.id);
+      
+      // Clear local state and storage
+      setDerivedKey(null);
+      setHasExistingSalt(false);
+      setKeyDerivationError(null);
+      await clearStoredDerivedKey();
+      
+      // Keep hasCheckedStoredKey as true so we show the create password modal
+      // instead of loading state
+    } catch (error) {
+      console.error('Failed to reset password:', error);
+      setKeyDerivationError('Failed to reset password. Please try again.');
+    }
   };
   
   const value = {
@@ -181,6 +246,7 @@ export const EncryptionProvider: React.FC<EncryptionProviderProps> = ({ children
     keyDerivationError,
     deriveEncryptionKey,
     clearEncryptionKey,
+    validateMasterPassword,
   };
 
   return (

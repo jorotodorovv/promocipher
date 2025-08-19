@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Shield, Lock, AlertCircle, Eye, EyeOff, AlertTriangle as TriangleAlert } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Shield, Lock, AlertCircle, Eye, EyeOff, AlertTriangle as TriangleAlert, AlertTriangle } from 'lucide-react';
 import Input from './ui/Input';
 import Card from './ui/Card';
 import Button from './ui/Button';
@@ -9,25 +9,47 @@ interface MasterPasswordInputProps {
   onPasswordSubmit: (password: string, rememberMe?: boolean) => Promise<void>;
   isLoading: boolean;
   error: string | null;
+  onResetPassword?: () => void;
 }
 
 const MasterPasswordInput: React.FC<MasterPasswordInputProps> = ({
   hasExistingSalt,
   onPasswordSubmit,
   isLoading,
-  error
+  error,
+  onResetPassword
 }) => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isFirstTime] = useState(!hasExistingSalt);
   const [rememberMe, setRememberMe] = useState(false);
   const [agreeToRisks, setAgreeToRisks] = useState(false);
+  const [showResetDialog, setShowResetDialog] = useState(false);
+
+  // Show reset dialog when password validation fails
+  useEffect(() => {
+    if (error === 'INVALID_PASSWORD') {
+      setShowResetDialog(true);
+    }
+  }, [error]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password.trim()) {
       await onPasswordSubmit(password, rememberMe);
     }
+  };
+
+  const handleResetConfirm = () => {
+    setShowResetDialog(false);
+    if (onResetPassword) {
+      onResetPassword();
+    }
+  };
+
+  const handleResetCancel = () => {
+    setShowResetDialog(false);
+    setPassword('');
   };
 
   return (
@@ -49,7 +71,7 @@ const MasterPasswordInput: React.FC<MasterPasswordInputProps> = ({
             }
           </p>
 
-          {error && (
+          {error && error !== 'INVALID_PASSWORD' && (
             <div className="mb-6 p-4 bg-accent-error/10 border border-accent-error/20 rounded-lg">
               <div className="flex items-center space-x-2">
                 <AlertCircle className="w-5 h-5 text-accent-error" />
@@ -178,6 +200,50 @@ const MasterPasswordInput: React.FC<MasterPasswordInputProps> = ({
             </Button>
           </form>
         </Card>
+
+        {/* Password Reset Confirmation Dialog */}
+        {showResetDialog && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+            <Card className="max-w-md w-full">
+              <div className="text-center">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-accent-error/10 rounded-lg mb-6">
+                  <AlertTriangle className="w-8 h-8 text-accent-error" />
+                </div>
+                
+                <h3 className="font-pixel text-h3 text-neutral-dark dark:text-white mb-4 uppercase tracking-wide">
+                  Incorrect Password
+                </h3>
+                
+                <p className="font-sans text-body text-neutral-dark dark:text-neutral-medium mb-6 leading-relaxed">
+                  The master password you entered is incorrect and cannot decrypt your existing promo codes.
+                </p>
+                
+                <p className="font-sans text-small text-neutral-medium mb-8">
+                  Would you like to reset your master password? <strong className="text-accent-error">This will permanently delete all your existing promo codes.</strong>
+                </p>
+                
+                <div className="flex space-x-3">
+                  <Button
+                    variant="secondary"
+                    size="medium"
+                    className="flex-1"
+                    onClick={handleResetCancel}
+                  >
+                    Try Again
+                  </Button>
+                  <Button
+                    variant="primary"
+                    size="medium"
+                    className="flex-1 bg-accent-error hover:bg-accent-error/90"
+                    onClick={handleResetConfirm}
+                  >
+                    Reset Password
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          </div>
+        )}
       </div>
     </div>
   );
