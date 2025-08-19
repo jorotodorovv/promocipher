@@ -6,24 +6,48 @@ import type { PromoCodeWithMetadata, EncryptedPromoCode, PromoMetadata } from '.
 export const promoCodeKeys = {
   all: ['promoCodes'] as const,
   lists: () => [...promoCodeKeys.all, 'list'] as const,
-  list: (searchStore?: string) => [...promoCodeKeys.lists(), { searchStore }] as const,
+  list: (searchStore?: string, filter?: string) => [...promoCodeKeys.lists(), { searchStore, filter }] as const,
+  stats: () => [...promoCodeKeys.all, 'stats'] as const,
+  stat: (searchStore?: string) => [...promoCodeKeys.stats(), { searchStore }] as const,
   details: () => [...promoCodeKeys.all, 'detail'] as const,
   detail: (id: string) => [...promoCodeKeys.details(), id] as const,
 };
 
-// Infinite query hook for paginated promo codes with search
-export const useInfinitePromoCodes = (searchStore: string = '') => {
+// Infinite query hook for paginated promo codes with search and filter
+export const useInfinitePromoCodes = (searchStore: string = '', filter: 'all' | 'active' | 'expiring' | 'expired' = 'all') => {
   return useInfiniteQuery({
-    queryKey: promoCodeKeys.list(searchStore),
+    queryKey: promoCodeKeys.list(searchStore, filter),
     queryFn: ({ pageParam = 0 }) => 
       promoCodeService.getPaginated({
         offset: pageParam,
-        limit: 10,
-        searchStore
+        limit: 3,
+        searchStore: searchStore,
+        filter: filter,
       }),
     getNextPageParam: (lastPage: { data: PromoCodeWithMetadata[]; hasMore: boolean; total: number }, allPages: any[]) => {
       if (!lastPage.hasMore) return undefined;
-      return allPages.length * 10; // offset for next page
+      return allPages.length * 3; // offset for next page
+    },
+    initialPageParam: 0,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 5 * 60 * 1000, // 5 minutes
+  });
+};
+
+// Hook for fetching all promo codes for stats calculation (search-only, no status filter)
+export const usePromoCodesForStats = (searchStore: string = '') => {
+  return useInfiniteQuery({
+    queryKey: promoCodeKeys.stat(searchStore),
+    queryFn: ({ pageParam = 0 }) => 
+      promoCodeService.getPaginated({
+        offset: pageParam,
+        limit: 1000, // Large limit to get all codes for stats
+        searchStore: searchStore,
+        filter: 'all', // Always use 'all' for stats calculation
+      }),
+    getNextPageParam: (lastPage: { data: PromoCodeWithMetadata[]; hasMore: boolean; total: number }, allPages: any[]) => {
+      if (!lastPage.hasMore) return undefined;
+      return allPages.length * 1000; // offset for next page
     },
     initialPageParam: 0,
     staleTime: 2 * 60 * 1000, // 2 minutes

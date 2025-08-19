@@ -59,11 +59,13 @@ export const promoCodeService = {
   async getPaginated({
     offset = 0,
     limit = 10,
-    searchStore = ''
+    searchStore = '',
+    filter = 'all'
   }: {
     offset?: number;
     limit?: number;
     searchStore?: string;
+    filter?: 'all' | 'active' | 'expiring' | 'expired';
   } = {}): Promise<{ data: PromoCodeWithMetadata[]; hasMore: boolean; total: number }> {
     let query = supabase
       .from('promo_codes')
@@ -91,6 +93,23 @@ export const promoCodeService = {
     if (searchStore.trim()) {
       query = query.filter('promo_code_metadata.store', 'ilike', `%${searchStore.trim()}%`);
     }
+
+    // Add status filter based on expires date
+    const now = new Date().toISOString();
+    const thirtyDaysFromNow = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+    
+    if (filter === 'active') {
+      // Active: not expired (expires >= now)
+      query = query.filter('promo_code_metadata.expires', 'gte', now.split('T')[0]);
+    } else if (filter === 'expired') {
+      // Expired: expires < now
+      query = query.filter('promo_code_metadata.expires', 'lt', now.split('T')[0]);
+    } else if (filter === 'expiring') {
+      // Expiring soon: expires between now and 30 days from now
+      query = query.filter('promo_code_metadata.expires', 'gte', now.split('T')[0])
+                   .filter('promo_code_metadata.expires', 'lte', thirtyDaysFromNow.split('T')[0]);
+    }
+    // 'all' filter doesn't add any additional constraints
 
     const { data, error, count } = await query;
 

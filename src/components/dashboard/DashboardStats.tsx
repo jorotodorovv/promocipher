@@ -5,18 +5,20 @@ interface DashboardStatsProps {
   totalCodes: number;
   activeCodes: number;
   expiringSoon: number;
-  estimatedSavings: string;
+  expiredCodes: number;
+  onFilterChange: (filter: 'all' | 'active' | 'expiring' | 'expired') => void;
 }
 
 const DashboardStats: React.FC<DashboardStatsProps> = ({
   totalCodes,
   activeCodes,
   expiringSoon,
-  estimatedSavings
+  expiredCodes,
+  onFilterChange
 }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-      <Card className="text-center">
+      <Card className="text-center cursor-pointer hover:bg-neutral-light dark:hover:bg-neutral-dark transition-colors" onClick={() => onFilterChange('all')}>
         <div className="font-pixel text-h3 text-primary-bright mb-2">
           {totalCodes}
         </div>
@@ -24,7 +26,7 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({
           Total Codes
         </p>
       </Card>
-      <Card className="text-center">
+      <Card className="text-center cursor-pointer hover:bg-neutral-light dark:hover:bg-neutral-dark transition-colors" onClick={() => onFilterChange('active')}>
         <div className="font-pixel text-h3 text-accent-success mb-2">
           {activeCodes}
         </div>
@@ -32,7 +34,7 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({
           Active Codes
         </p>
       </Card>
-      <Card className="text-center">
+      <Card className="text-center cursor-pointer hover:bg-neutral-light dark:hover:bg-neutral-dark transition-colors" onClick={() => onFilterChange('expiring')}>
         <div className="font-pixel text-h3 text-accent-warning mb-2">
           {expiringSoon}
         </div>
@@ -40,12 +42,12 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({
           Expiring Soon
         </p>
       </Card>
-      <Card className="text-center">
-        <div className="font-pixel text-h3 text-neutral-dark dark:text-white mb-2">
-          {estimatedSavings}
+      <Card className="text-center cursor-pointer hover:bg-neutral-light dark:hover:bg-neutral-dark transition-colors" onClick={() => onFilterChange('expired')}>
+        <div className="font-pixel text-h3 text-accent-danger mb-2">
+          {expiredCodes}
         </div>
         <p className="font-sans text-small text-neutral-dark dark:text-neutral-medium">
-          Est. Savings
+          Expired Codes
         </p>
       </Card>
     </div>

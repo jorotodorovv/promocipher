@@ -3,8 +3,9 @@ import { Settings, LogOut, Loader2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useEncryption } from '../contexts/EncryptionContext';
 import { decrypt } from '../utils/crypto';
+import { calculateDashboardStats } from '../utils/dashboardStats';
 
-import { useInfinitePromoCodes, useCreatePromoCode, useUpdatePromoCode, useDeletePromoCode } from '../hooks/usePromoCodeQueries';
+import { useInfinitePromoCodes, usePromoCodesForStats, useCreatePromoCode, useUpdatePromoCode, useDeletePromoCode } from '../hooks/usePromoCodeQueries';
 import type { NewPromoCodeForm, DisplayPromoCode } from '../types/promoCode';
 import Button from '../components/ui/Button';
 import DashboardStats from '../components/dashboard/DashboardStats';
@@ -24,6 +25,7 @@ const DashboardPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [searchLoading, setSearchLoading] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'expiring' | 'expired'>('all');
   const [copiedCodeId, setCopiedCodeId] = useState<string | null>(null);
   const [revealedCodes, setRevealedCodes] = useState<Record<string, { decryptedCode: string; isDecrypting: boolean; decryptionError: string | null }>>({});
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -37,7 +39,13 @@ const DashboardPage: React.FC = () => {
     isFetchingNextPage,
     isLoading: isLoadingCodes,
     error: queryError
-  } = useInfinitePromoCodes(debouncedSearchTerm);
+  } = useInfinitePromoCodes(debouncedSearchTerm, statusFilter);
+
+  // Separate query for stats calculation (search-only, no status filter)
+  const {
+    data: statsData,
+    isLoading: isLoadingStats
+  } = usePromoCodesForStats(debouncedSearchTerm);
 
   const createPromoCodeMutation = useCreatePromoCode();
   const updatePromoCodeMutation = useUpdatePromoCode();
@@ -61,6 +69,13 @@ const DashboardPage: React.FC = () => {
 
   // Flatten all pages data
   const promoCodes = data?.pages.flatMap((page: { data: any[]; hasMore: boolean; total: number }) => page.data) || [];
+  
+  // Flatten stats data (search-only filtered) for dashboard stats calculation
+  const statsPromoCodes = statsData?.pages.flatMap((page: { data: any[]; hasMore: boolean; total: number }) => page.data) || [];
+  const totalCount = statsData?.pages[0]?.total || 0;
+
+  // Calculate dashboard stats using utility function from search-only filtered data
+  const dashboardStats = calculateDashboardStats(statsPromoCodes);
   const [showAddCodeModal, setShowAddCodeModal] = useState(false);
   const [isAddingCode, setIsAddingCode] = useState(false);
   const [addCodeError, setAddCodeError] = useState<string | null>(null);
@@ -385,10 +400,11 @@ const DashboardPage: React.FC = () => {
 
         <div className="space-y-6">
           <DashboardStats
-            totalCodes={promoCodes.length}
-            activeCodes={2}
-            expiringSoon={1}
-            estimatedSavings="$247"
+            totalCodes={totalCount}
+            activeCodes={dashboardStats.activeCodes}
+            expiringSoon={dashboardStats.expiringSoon}
+            expiredCodes={dashboardStats.expiredCodes}
+            onFilterChange={setStatusFilter}
           />
 
           {/* Success/Error Messages */}
@@ -456,7 +472,7 @@ const DashboardPage: React.FC = () => {
           />
 
           {/* Loading State */}
-          {isLoadingCodes || searchLoading ? (
+          {isLoadingCodes || isLoadingStats || searchLoading ? (
             <div className="text-center py-16">
               <div className="inline-flex items-center justify-center w-20 h-20 bg-primary-bright rounded-lg mb-6 animate-pulse-glow">
                 <Loader2 className="w-10 h-10 text-white animate-spin" />
