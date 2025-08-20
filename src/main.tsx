@@ -4,7 +4,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import App from './App.tsx';
 import { AuthProvider } from './contexts/AuthContext';
 import { EncryptionProvider } from './contexts/EncryptionContext';
-import { PromoCodeProvider } from './contexts/PromoCodeContext';
 import { initializeCrypto } from './utils/crypto';
 import './index.css';
 
@@ -43,9 +42,7 @@ initializeCrypto().then(() => {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <EncryptionProvider>
-            <PromoCodeProvider>
               <App />
-            </PromoCodeProvider>
           </EncryptionProvider>
         </AuthProvider>
       </QueryClientProvider>

@@ -2,7 +2,6 @@
 export interface PromoCodeData {
   id: string;
   code: string;    // This is the only field that gets encrypted
-  userId: string;  // Used as AAD (Authenticated Associated Data)
 }
 
 // Structure for unencrypted metadata

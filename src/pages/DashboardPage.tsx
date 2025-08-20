@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Settings, LogOut, Loader2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useEncryption } from '../contexts/EncryptionContext';
-import { decrypt } from '../utils/crypto';
+import { decrypt, encrypt } from '../utils/crypto';
 import { calculateDashboardStats } from '../utils/dashboardStats';
 
 import { useInfinitePromoCodes, usePromoCodesForStats, useCreatePromoCode, useUpdatePromoCode, useDeletePromoCode } from '../hooks/usePromoCodeQueries';
@@ -29,7 +29,6 @@ const DashboardPage: React.FC = () => {
   const [copiedCodeId, setCopiedCodeId] = useState<string | null>(null);
   const [revealedCodes, setRevealedCodes] = useState<Record<string, { decryptedCode: string; isDecrypting: boolean; decryptionError: string | null }>>({});
   const observerRef = useRef<IntersectionObserver | null>(null);
-  const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   // React Query hooks
   const {
@@ -38,7 +37,6 @@ const DashboardPage: React.FC = () => {
     hasNextPage,
     isFetchingNextPage,
     isLoading: isLoadingCodes,
-    error: queryError
   } = useInfinitePromoCodes(debouncedSearchTerm, statusFilter);
 
   // Separate query for stats calculation (search-only, no status filter)
@@ -56,12 +54,12 @@ const DashboardPage: React.FC = () => {
     if (searchTerm !== debouncedSearchTerm) {
       setSearchLoading(true);
     }
-    
+
     const timer = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
       setSearchLoading(false);
     }, 1000);
-    
+
     return () => {
       clearTimeout(timer);
     };
@@ -69,7 +67,7 @@ const DashboardPage: React.FC = () => {
 
   // Flatten all pages data
   const promoCodes = data?.pages.flatMap((page: { data: any[]; hasMore: boolean; total: number }) => page.data) || [];
-  
+
   // Flatten stats data (search-only filtered) for dashboard stats calculation
   const statsPromoCodes = statsData?.pages.flatMap((page: { data: any[]; hasMore: boolean; total: number }) => page.data) || [];
   const totalCount = statsData?.pages[0]?.total || 0;
@@ -98,13 +96,22 @@ const DashboardPage: React.FC = () => {
 
     const id = crypto.randomUUID();
     try {
+      if (!derivedKey) {
+        throw new Error('Encryption key not available');
+      }
+
+      const encryptedResult = await encrypt({
+        id,
+        code: newCode.code,
+      }, derivedKey, user?.id || '');
+
       await createPromoCodeMutation.mutateAsync({
         encryptedCode: {
           id,
           user_id: user?.id || '',
-          encrypted_data: '',
-          nonce: '',
-          tag: ''
+          encrypted_data: encryptedResult.encryptedData,
+          nonce: encryptedResult.nonce,
+          tag: encryptedResult.tag
         },
         metadata: {
           id,
@@ -186,7 +193,7 @@ const DashboardPage: React.FC = () => {
     }
 
     const currentRevealState = revealedCodes[codeId];
-    
+
     // If currently revealed, hide it
     if (currentRevealState?.decryptedCode) {
       setRevealedCodes(prev => {
@@ -493,7 +500,7 @@ const DashboardPage: React.FC = () => {
                     {promoCodes.map((code: any, index: number) => {
                       const isLast = index === promoCodes.length - 1;
                       const revealState = revealedCodes[code.id];
-                      
+
                       // Transform code to DisplayPromoCode format
                       const displayCode = {
                         ...code,
@@ -502,7 +509,7 @@ const DashboardPage: React.FC = () => {
                         isDecrypting: revealState?.isDecrypting || false,
                         decryptionError: revealState?.decryptionError || null
                       };
-                      
+
                       return (
                         <div
                           key={code.id}
@@ -535,9 +542,9 @@ const DashboardPage: React.FC = () => {
               ) : (
                 // Show different empty states based on search context
                 debouncedSearchTerm.trim() ? (
-                  <NoMatchesState 
-                    searchTerm={debouncedSearchTerm} 
-                    onClearSearch={() => setSearchTerm('')} 
+                  <NoMatchesState
+                    searchTerm={debouncedSearchTerm}
+                    onClearSearch={() => setSearchTerm('')}
                   />
                 ) : (
                   <EmptyState onAddCode={handleAddCodeModalOpen} />
