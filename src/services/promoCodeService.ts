@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import type { EncryptedPromoCode, PromoMetadata, PromoCodeWithMetadata } from '../types/promoCode';
+import type { EncryptedPromoCode, PromoMetadata, PromoCodeWithMetadata, PromoCodeData } from '../types/promoCode';
 
 // Database operations for encrypted promo codes
 export const promoCodeService = {

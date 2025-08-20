@@ -9,7 +9,9 @@ interface DeleteConfirmModalProps {
   onClose: () => void;
   onConfirm: () => Promise<void>;
   isLoading: boolean;
-  promoCode: DisplayPromoCode | null;
+  promoCode?: DisplayPromoCode | null;
+  isDeleteAll?: boolean;
+  totalCount?: number;
 }
 
 const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
@@ -17,7 +19,9 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
   onClose,
   onConfirm,
   isLoading,
-  promoCode
+  promoCode = null,
+  isDeleteAll = false,
+  totalCount = 0
 }) => {
   const handleConfirm = async () => {
     await onConfirm();
@@ -30,25 +34,42 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
           <AlertTriangle className="w-8 h-8 text-white" />
         </div>
         <h2 className="font-pixel text-h3 text-neutral-dark dark:text-white mb-2 uppercase tracking-wide">
-          Delete Promo Code
+          {isDeleteAll ? 'Delete All Promo Codes' : 'Delete Promo Code'}
         </h2>
         <p className="font-sans text-body text-neutral-dark dark:text-neutral-medium mb-4">
-          Are you sure you want to delete this promo code?
+          {isDeleteAll 
+            ? `Are you sure you want to delete all ${totalCount} promo codes?`
+            : 'Are you sure you want to delete this promo code?'
+          }
         </p>
-        {promoCode && (
+        {isDeleteAll ? (
           <div className="bg-neutral-light dark:bg-neutral-medium/20 rounded-lg p-4 mb-6">
             <div className="text-left">
               <h3 className="font-pixel text-small text-neutral-dark dark:text-white mb-2 uppercase tracking-wide">
-                {promoCode.store}
+                Warning: Complete Data Loss
               </h3>
-              <p className="font-sans text-small text-neutral-medium mb-1">
-                {promoCode.discount}
-              </p>
-              <p className="font-sans text-small text-neutral-medium">
-                Expires: {promoCode.expires}
-              </p>
+              <ul className="font-sans text-small text-neutral-medium space-y-1">
+                <li>• All encrypted data will be removed permanently</li>
+                <li>• Your dashboard will be cleared completely</li>
+              </ul>
             </div>
           </div>
+        ) : (
+          promoCode && (
+            <div className="bg-neutral-light dark:bg-neutral-medium/20 rounded-lg p-4 mb-6">
+              <div className="text-left">
+                <h3 className="font-pixel text-small text-neutral-dark dark:text-white mb-2 uppercase tracking-wide">
+                  {promoCode.store}
+                </h3>
+                <p className="font-sans text-small text-neutral-medium mb-1">
+                  {promoCode.discount}
+                </p>
+                <p className="font-sans text-small text-neutral-medium">
+                  Expires: {promoCode.expires}
+                </p>
+              </div>
+            </div>
+          )
         )}
         <p className="font-sans text-small text-accent-error">
           This action cannot be undone.
@@ -82,7 +103,7 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
           ) : (
             <>
               <Trash2 className="w-4 h-4 mr-2" />
-              Delete
+              {isDeleteAll ? 'Delete All' : 'Delete'}
             </>
           )}
         </Button>

@@ -5,7 +5,7 @@ import { useEncryption } from '../contexts/EncryptionContext';
 import { decrypt, encrypt } from '../utils/crypto';
 import { calculateDashboardStats } from '../utils/dashboardStats';
 
-import { useInfinitePromoCodes, usePromoCodesForStats, useCreatePromoCode, useUpdatePromoCode, useDeletePromoCode } from '../hooks/usePromoCodeQueries';
+import { useInfinitePromoCodes, usePromoCodesForStats, useCreatePromoCode, useUpdatePromoCode, useDeletePromoCode, useDeleteAllPromoCodes } from '../hooks/usePromoCodeQueries';
 import type { NewPromoCodeForm, DisplayPromoCode } from '../types/promoCode';
 import Button from '../components/ui/Button';
 import DashboardStats from '../components/dashboard/DashboardStats';
@@ -14,6 +14,7 @@ import PromoCodeCard from '../components/dashboard/PromoCodeCard';
 import AddCodeModal from '../components/dashboard/AddCodeModal';
 import EditCodeModal from '../components/dashboard/EditCodeModal';
 import DeleteConfirmModal from '../components/dashboard/DeleteConfirmModal';
+
 import EmptyState from '../components/dashboard/EmptyState';
 import NoMatchesState from '../components/dashboard/NoMatchesState';
 import SecurityNotice from '../components/dashboard/SecurityNotice';
@@ -48,6 +49,7 @@ const DashboardPage: React.FC = () => {
   const createPromoCodeMutation = useCreatePromoCode();
   const updatePromoCodeMutation = useUpdatePromoCode();
   const deletePromoCodeMutation = useDeletePromoCode();
+  const deleteAllPromoCodesMutation = useDeleteAllPromoCodes();
 
   // Debounce search term
   useEffect(() => {
@@ -84,6 +86,7 @@ const DashboardPage: React.FC = () => {
   const [importError, setImportError] = useState<string | null>(null);
   const [showEditCodeModal, setShowEditCodeModal] = useState(false);
   const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
+  const [showDeleteAllModal, setShowDeleteAllModal] = useState(false);
   const [selectedPromoCode, setSelectedPromoCode] = useState<DisplayPromoCode | null>(null);
   const [isEditingCode, setIsEditingCode] = useState(false);
   const [editCodeError, setEditCodeError] = useState<string | null>(null);
@@ -265,6 +268,19 @@ const DashboardPage: React.FC = () => {
   const handleAddCodeModalOpen = () => {
     setAddCodeError(null);
     setShowAddCodeModal(true);
+  };
+
+  const handleDeleteAllModalOpen = () => {
+    setShowDeleteAllModal(true);
+  };
+
+  const handleDeleteAllConfirm = async () => {
+    try {
+      await deleteAllPromoCodesMutation.mutateAsync();
+      setShowDeleteAllModal(false);
+    } catch (error) {
+      console.error('Failed to delete all promo codes:', error);
+    }
   };
 
   const handleExport = async () => {
@@ -473,9 +489,12 @@ const DashboardPage: React.FC = () => {
             onAddCode={handleAddCodeModalOpen}
             onExport={handleExport}
             onImport={handleImport}
+            onDeleteAll={handleDeleteAllModalOpen}
             isExporting={isExporting}
             isImporting={isImporting}
             searchLoading={searchLoading}
+            isDeleting={deleteAllPromoCodesMutation.isPending}
+            totalCount={totalCount}
           />
 
           {/* Loading State */}
@@ -584,6 +603,16 @@ const DashboardPage: React.FC = () => {
           isLoading={isDeletingCode}
           promoCode={selectedPromoCode}
         />
+
+        {/* Delete All Confirmation Modal */}
+        <DeleteConfirmModal
+        isOpen={showDeleteAllModal}
+        onClose={() => setShowDeleteAllModal(false)}
+        onConfirm={handleDeleteAllConfirm}
+        isLoading={deleteAllPromoCodesMutation.isPending}
+        isDeleteAll={true}
+        totalCount={totalCount}
+      />
       </div>
     </div>
   );
