@@ -23,7 +23,7 @@ const PromoCodeCard: React.FC<PromoCodeCardProps> = ({
   onDelete
 }) => {
   const [countdown, setCountdown] = useState<number | null>(null);
-  const isExpired = new Date(code.expires) <= new Date();
+  const isExpired = code.expires ? new Date(code.expires) <= new Date() : false;
 
   // Auto-hide timer effect
   useEffect(() => {
@@ -47,7 +47,7 @@ const PromoCodeCard: React.FC<PromoCodeCardProps> = ({
     } else {
       setCountdown(null);
     }
-  }, [code.isRevealed, code.isDecrypting, code.id]);
+  }, [code.isRevealed, code.isDecrypting, code.id, onToggleReveal]);
 
   const handleToggleReveal = useCallback(() => {
     onToggleReveal(code.id);
@@ -135,7 +135,7 @@ const PromoCodeCard: React.FC<PromoCodeCardProps> = ({
       <div className="space-y-3">
         <div className="flex items-center justify-between text-small">
           <span className="font-sans text-neutral-medium">
-            Expires: {code.expires}
+            Expires: {code.expires || 'No Expiry'}
           </span>
           {code.notes && (
             <span className="font-sans text-neutral-medium italic">

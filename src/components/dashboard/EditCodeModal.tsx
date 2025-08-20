@@ -8,7 +8,7 @@ import type { DisplayPromoCode } from '../../types/promoCode';
 interface EditCodeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (id: string, store: string, discount: string, expires: string, notes: string) => Promise<void>;
+  onSubmit: (id: string, store: string, discount: string, expires: string | null, notes: string) => Promise<void>;
   isLoading: boolean;
   error: string | null;
   promoCode: DisplayPromoCode | null;
@@ -35,7 +35,7 @@ const EditCodeModal: React.FC<EditCodeModalProps> = ({
       setFormData({
         store: promoCode.store,
         discount: promoCode.discount,
-        expires: promoCode.expires,
+        expires: promoCode.expires || '',
         notes: promoCode.notes
       });
     }
@@ -44,11 +44,12 @@ const EditCodeModal: React.FC<EditCodeModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (promoCode) {
+      const expiresValue = formData.expires.trim() === '' ? null : formData.expires;
       await onSubmit(
         promoCode.id,
         formData.store,
         formData.discount,
-        formData.expires,
+        expiresValue,
         formData.notes
       );
     }
@@ -112,10 +113,9 @@ const EditCodeModal: React.FC<EditCodeModalProps> = ({
         
         <Input
           type="date"
-          placeholder="Expiration date"
-          value={formData.expires}
+          placeholder="Expiration date (optional - leave empty for no expiry)"
+          value={formData.expires || ''}
           onChange={(e) => updateField('expires', e.target.value)}
-          required
         />
         
         <Input

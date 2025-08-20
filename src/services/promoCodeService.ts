@@ -46,7 +46,7 @@ export const promoCodeService = {
         updated_at: item.updated_at,
         store: metadata?.store || '',
         discount: metadata?.discount || '',
-        expires: metadata?.expires || '',
+        expires: metadata?.expires || null,
         notes: metadata?.notes || '',
         metadata_created_at: metadata?.created_at || '',
         metadata_updated_at: metadata?.updated_at || ''
@@ -99,13 +99,13 @@ export const promoCodeService = {
     const thirtyDaysFromNow = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
     
     if (filter === 'active') {
-      // Active: not expired (expires >= now)
-      query = query.filter('promo_code_metadata.expires', 'gte', now.split('T')[0]);
+      // Active: not expired (expires >= now OR expires is null)
+      query = query.or(`promo_code_metadata.expires.gte.${now.split('T')[0]},promo_code_metadata.expires.is.null`);
     } else if (filter === 'expired') {
-      // Expired: expires < now
+      // Expired: expires < now (excludes null expires)
       query = query.filter('promo_code_metadata.expires', 'lt', now.split('T')[0]);
     } else if (filter === 'expiring') {
-      // Expiring soon: expires between now and 30 days from now
+      // Expiring soon: expires between now and 30 days from now (excludes null expires)
       query = query.filter('promo_code_metadata.expires', 'gte', now.split('T')[0])
                    .filter('promo_code_metadata.expires', 'lte', thirtyDaysFromNow.split('T')[0]);
     }
@@ -133,7 +133,7 @@ export const promoCodeService = {
         updated_at: item.updated_at,
         store: metadata?.store || '',
         discount: metadata?.discount || '',
-        expires: metadata?.expires || '',
+        expires: metadata?.expires || null,
         notes: metadata?.notes || '',
         metadata_created_at: metadata?.created_at || '',
         metadata_updated_at: metadata?.updated_at || ''

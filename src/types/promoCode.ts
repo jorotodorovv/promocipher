@@ -9,7 +9,7 @@ export interface PromoMetadata {
   id: string;
   store: string;
   discount: string;
-  expires: string; // ISO date string
+  expires: string | null; // ISO date string or null for no expiry
   notes: string;
   created_at: string;
   updated_at: string;
@@ -39,7 +39,7 @@ export interface PromoCodeWithMetadata {
   // From promo_code_metadata table
   store: string;
   discount: string;
-  expires: string;
+  expires: string | null;
   notes: string;
   metadata_created_at: string;
   metadata_updated_at: string;
@@ -56,7 +56,7 @@ export interface DisplayPromoCode {
   // Metadata fields (always visible)
   store: string;
   discount: string;
-  expires: string;
+  expires: string | null;
   notes: string;
   created_at: string;
   updated_at: string;
@@ -79,6 +79,6 @@ export interface NewPromoCodeForm {
   code: string;
   store: string;
   discount: string;
-  expires: string;
+  expires: string | null;
   notes: string;
 }

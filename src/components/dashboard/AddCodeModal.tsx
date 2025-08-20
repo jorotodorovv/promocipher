@@ -30,7 +30,11 @@ const AddCodeModal: React.FC<AddCodeModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await onSubmit(formData);
+    const submitData = {
+      ...formData,
+      expires: formData.expires?.trim() === '' ? null : formData.expires
+    };
+    await onSubmit(submitData);
   };
 
   const handleClose = () => {
@@ -98,10 +102,9 @@ const AddCodeModal: React.FC<AddCodeModalProps> = ({
         
         <Input
           type="date"
-          placeholder="Expiration date"
-          value={formData.expires}
+          placeholder="Expiration date (optional - leave empty for no expiry)"
+          value={formData?.expires || ''}
           onChange={(e) => updateField('expires', e.target.value)}
-          required
         />
         
         <Input

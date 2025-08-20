@@ -13,6 +13,13 @@ export const calculateDashboardStats = (promoCodes: any[]): DashboardStatsData =
   let expiredCodes = 0;
   
   promoCodes.forEach((code: any) => {
+    // Handle null expires (no expiry date)
+    if (!code.expires) {
+      // Codes with no expiry are always active
+      activeCodes++;
+      return;
+    }
+    
     const expiryDate = new Date(code.expires);
     
     if (expiryDate >= now) {

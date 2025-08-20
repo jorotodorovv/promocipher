@@ -139,7 +139,7 @@ const DashboardPage: React.FC = () => {
     setEditCodeError(null);
   }, []);
 
-  const handleUpdatePromoCode = async (id: string, store: string, discount: string, expires: string, notes: string) => {
+  const handleUpdatePromoCode = async (id: string, store: string, discount: string, expires: string | null, notes: string) => {
     setIsEditingCode(true);
     setEditCodeError(null);
 
