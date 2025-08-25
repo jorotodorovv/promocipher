@@ -3,8 +3,6 @@ import { motion } from 'framer-motion';
 import { TagIcon, ArrowsPointingOutIcon, UserGroupIcon, ChartBarIcon, DocumentDuplicateIcon, ClockIcon } from '@heroicons/react/24/outline';
 import Card from './ui/Card';
 
-const MotionCard = motion(Card);
-
 const Features: React.FC = () => {
   const [activeTab, setActiveTab] = useState('personal');
 
@@ -77,25 +75,25 @@ const Features: React.FC = () => {
           className="grid grid-cols-1 md:grid-cols-3 gap-8"
           variants={containerVariants}
           initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.5 }}
+          animate="visible"
         >
           {(activeTab === 'personal' ? personalFeatures : businessFeatures).map((feature, index) => (
-            <MotionCard 
+            <motion.div
               key={`${activeTab}-${index}`}
-              className="text-center hover:shadow-hover-light dark:hover:shadow-hover-dark transform hover:scale-102 transition-all duration-300"
               variants={itemVariants}
             >
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-bright rounded-lg mb-6 shadow-light dark:shadow-dark">
-                <feature.icon className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="font-pixel text-h3 text-neutral-dark dark:text-white mb-4 uppercase tracking-wide">
-                {feature.title}
-              </h3>
-              <p className="font-sans text-body text-neutral-dark dark:text-neutral-medium leading-relaxed">
-                {feature.description}
-              </p>
-            </MotionCard>
+              <Card className="text-center hover:shadow-hover-light dark:hover:shadow-hover-dark transform hover:scale-102 transition-all duration-300 h-full">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-bright rounded-lg mb-6 shadow-light dark:shadow-dark">
+                  <feature.icon className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="font-pixel text-h3 text-neutral-dark dark:text-white mb-4 uppercase tracking-wide">
+                  {feature.title}
+                </h3>
+                <p className="font-sans text-body text-neutral-dark dark:text-neutral-medium leading-relaxed">
+                  {feature.description}
+                </p>
+              </Card>
+            </motion.div>
           ))}
         </motion.div>
       </div>

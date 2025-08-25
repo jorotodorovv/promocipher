@@ -23,14 +23,9 @@ const TerminalCode: React.FC<TerminalCodeProps> = ({ className = "" }) => {
   const [currentChar, setCurrentChar] = useState(0);
   const [progress, setProgress] = useState(0);
   
-  const prefersReducedMotion = useMemo(() => {
-    if (typeof window === "undefined" || !("matchMedia" in window)) return false;
-    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  }, []);
-  
-  const typingSpeed = prefersReducedMotion ? 80 : 28;
-  const linePause = prefersReducedMotion ? 420 : 180;
-  const loopPause = prefersReducedMotion ? 1400 : 1000;
+  const typingSpeed = 5;
+  const linePause = 210;
+  const loopPause = 700;
 
   const intervalRef = useRef<number | null>(null);
   const timeoutRef = useRef<number | null>(null);
@@ -62,8 +57,8 @@ const TerminalCode: React.FC<TerminalCodeProps> = ({ className = "" }) => {
 
     if (currentLineText === PROGRESS_MARK) {
       setProgress(0);
-      const progressStep = prefersReducedMotion ? 5 : 3;
-      const progressInterval = prefersReducedMotion ? 120 : 70;
+      const progressStep = 5;
+      const progressInterval = 60;
       
       intervalRef.current = window.setInterval(() => {
         setProgress((prevProgress) => {
@@ -98,7 +93,7 @@ const TerminalCode: React.FC<TerminalCodeProps> = ({ className = "" }) => {
     }, typingSpeed);
 
     return cleanup;
-  }, [currentLine, prefersReducedMotion, typingSpeed, linePause, loopPause]);
+  }, [currentLine, typingSpeed, linePause, loopPause]);
 
   const renderedLines = LINES.slice(0, Math.min(currentLine, LINES.length));
   const isProgressLine = currentLine < LINES.length && LINES[currentLine] === PROGRESS_MARK;
@@ -130,16 +125,31 @@ const TerminalCode: React.FC<TerminalCodeProps> = ({ className = "" }) => {
       {/* Terminal Content */}
       <div className="p-6 h-80 md:h-96 overflow-hidden">
         <pre className="font-code text-small leading-relaxed text-neutral-medium dark:text-white/90 whitespace-pre-wrap">
-          {renderedLines.map((line, index) => (
-            <div key={index} className="mb-1">
-              <span className="text-primary-bright">{">"}</span>
-              <span className="ml-2">{line}</span>
-            </div>
-          ))}
+          {renderedLines.map((line, index) => {
+            if (line === PROGRESS_MARK) {
+              const barLength = 12;
+              const progressBar = "#".repeat(barLength).padEnd(barLength, ".");
+              const progressLine = `chunk 4/4 (640B)  [${progressBar}] 100%`;
+              return (
+                <div key={index} className="mb-1">
+                  <span className="text-primary-bright">{">"}</span>
+                  <span className="ml-2">{progressLine}</span>
+                </div>
+              );
+            }
+            return (
+              <div key={index} className="mb-1">
+                <span className="text-primary-bright">{">"}</span>
+                <span className="ml-2">{line}</span>
+              </div>
+            );
+          })}
           <div className="mb-1">
             <span className="text-accent-success">{">"}</span>
             <span className="ml-2 text-neutral-dark dark:text-white/95">{currentDisplayLine}</span>
-            <span className="inline-block w-2 h-4 bg-primary-bright ml-1 animate-pulse" />
+            {currentLine < LINES.length && (
+              <span className="inline-block w-1 h-4 bg-primary-bright ml-2 animate-pulse align-middle" />
+            )}
           </div>
         </pre>
       </div>
