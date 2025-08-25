@@ -1,5 +1,4 @@
 import React from 'react';
-import { ShieldEllipsis } from 'lucide-react';
 import { ShieldCheckIcon, ArrowRightIcon, PlayIcon } from '@heroicons/react/24/solid';
 import Button from './ui/Button';
 
@@ -21,7 +20,7 @@ const LandingHero: React.FC<LandingHeroProps> = ({ onDashboardAccess }) => {
       <div className="max-w-7xl mx-auto relative">
         <div className="text-center mb-16 animate-fade-in">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-primary-bright rounded-lg mb-8 shadow-light dark:shadow-dark animate-pulse-glow">
-            <ShieldEllipsis className="w-10 h-10 text-white" />
+            <ShieldCheckIcon className="w-10 h-10 text-white" />
           </div>
           
           <h1 className="font-pixel text-h1 md:text-5xl text-neutral-dark dark:text-white mb-6 uppercase tracking-wide">

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Moon, Sun, Menu, X, LogOut, User, ShieldEllipsis } from 'lucide-react';
+import { MoonIcon, SunIcon, Bars3Icon, XMarkIcon, ArrowLeftOnRectangleIcon, UserIcon } from '@heroicons/react/24/solid';
 import { User as SupabaseUser } from '@supabase/supabase-js';
 import { useAuth } from '../contexts/AuthContext';
 import { smoothScrollTo } from '../utils/scrollUtils';
@@ -63,7 +63,7 @@ const Header: React.FC<HeaderProps> = ({ darkMode, onToggleDarkMode, user }) => 
             {user && (
               <div className="hidden md:flex items-center space-x-3">
                 <div className="flex items-center space-x-2 text-white">
-                  <User className="w-4 h-4" />
+                  <UserIcon className="w-4 h-4" />
                   <span className="font-sans text-small">
                     {user.email?.split('@')[0]}
                   </span>
@@ -73,7 +73,7 @@ const Header: React.FC<HeaderProps> = ({ darkMode, onToggleDarkMode, user }) => 
                   className="p-2 rounded hover:bg-white/10 transition-colors duration-200"
                   title="Sign out"
                 >
-                  <LogOut className="w-5 h-5 text-white" />
+                  <ArrowLeftOnRectangleIcon className="w-5 h-5 text-white" />
                 </button>
               </div>
             )}
@@ -83,9 +83,9 @@ const Header: React.FC<HeaderProps> = ({ darkMode, onToggleDarkMode, user }) => 
               className="p-2 rounded hover:bg-white/10 transition-colors duration-200"
             >
               {darkMode ? (
-                <Sun className="w-5 h-5 text-white" />
+                <SunIcon className="w-5 h-5 text-white" />
               ) : (
-                <Moon className="w-5 h-5 text-white" />
+                <MoonIcon className="w-5 h-5 text-white" />
               )}
             </button>
 
@@ -96,9 +96,9 @@ const Header: React.FC<HeaderProps> = ({ darkMode, onToggleDarkMode, user }) => 
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               >
                 {mobileMenuOpen ? (
-                  <X className="w-6 h-6 text-white" />
+                  <XMarkIcon className="w-6 h-6 text-white" />
                 ) : (
-                  <Menu className="w-6 h-6 text-white" />
+                  <Bars3Icon className="w-6 h-6 text-white" />
                 )}
               </button>
             )}

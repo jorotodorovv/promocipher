@@ -1,6 +1,5 @@
 import React from 'react';
-import { Shield } from 'lucide-react';
-import { LockClosedIcon, ArrowRightIcon, CloudArrowDownIcon, GlobeAltIcon, DevicePhoneMobileIcon } from '@heroicons/react/24/solid';
+import { ShieldCheckIcon, LockClosedIcon, ArrowRightIcon, CloudArrowDownIcon, GlobeAltIcon, DevicePhoneMobileIcon } from '@heroicons/react/24/solid';
 import Button from './ui/Button';
 import Card from './ui/Card';
 
@@ -30,7 +29,7 @@ const CTA: React.FC<CTAProps> = ({ onDashboardAccess }) => {
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
               <Button variant="secondary" size="large" className="w-full sm:w-auto bg-white text-primary-bright hover:bg-neutral-light border-white" onClick={onDashboardAccess}>
-                <Shield className="w-5 h-5 mr-2" />
+                <ShieldCheckIcon className="w-5 h-5 mr-2" />
                 Create Free Account
                 <ArrowRightIcon className="w-5 h-5 ml-2" />
               </Button>

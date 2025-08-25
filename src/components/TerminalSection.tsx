@@ -1,5 +1,5 @@
 import React from 'react';
-import { Terminal, Code2 } from 'lucide-react';
+import { CommandLineIcon, CodeBracketIcon } from '@heroicons/react/24/solid';
 import { ShieldExclamationIcon } from '@heroicons/react/24/solid';
 import TerminalCode from './TerminalCode';
 
@@ -11,7 +11,7 @@ const TerminalSection: React.FC = () => {
           {/* Left Content */}
           <div className="animate-slide-up">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-bright rounded-lg mb-8 shadow-light animate-pulse-glow">
-              <Terminal className="w-8 h-8 text-white" />
+              <CommandLineIcon className="w-8 h-8 text-white" />
             </div>
 
             <h2 className="font-pixel text-h2 text-neutral-dark dark:text-white mb-6 uppercase tracking-wide">
@@ -89,7 +89,7 @@ const TerminalSection: React.FC = () => {
             </div>
 
             <div className="bg-neutral-light dark:bg-white/5 border border-neutral-medium/20 dark:border-white/10 rounded-lg p-6 text-center">
-              <Code2 className="w-8 h-8 text-primary-bright mx-auto mb-4" />
+              <CodeBracketIcon className="w-8 h-8 text-primary-bright mx-auto mb-4" />
               <h4 className="font-pixel text-small text-neutral-dark dark:text-white mb-2 uppercase">
                 Encryption
               </h4>
@@ -99,7 +99,7 @@ const TerminalSection: React.FC = () => {
             </div>
 
             <div className="bg-neutral-light dark:bg-white/5 border border-neutral-medium/20 dark:border-white/10 rounded-lg p-6 text-center">
-              <Terminal className="w-8 h-8 text-primary-bright mx-auto mb-4" />
+              <CommandLineIcon className="w-8 h-8 text-primary-bright mx-auto mb-4" />
               <h4 className="font-pixel text-small text-neutral-dark dark:text-white mb-2 uppercase">
                 Nonce Size
               </h4>

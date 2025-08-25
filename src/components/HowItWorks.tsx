@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Monitor, Smartphone, Tablet } from 'lucide-react';
 import { DevicePhoneMobileIcon, ComputerDesktopIcon, DeviceTabletIcon } from '@heroicons/react/24/solid';
 import Card from './ui/Card';
 import PromoCodeCard from './dashboard/PromoCodeCard';

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Shield } from 'lucide-react';
+import { ShieldCheckIcon } from '@heroicons/react/24/solid';
 import { useTheme } from './hooks/useTheme';
 import { useAuth } from './contexts/AuthContext';
 import { useEncryption } from './contexts/EncryptionContext';
@@ -42,7 +42,7 @@ function App() {
         <div className="min-h-screen bg-background-light dark:bg-background-dark flex items-center justify-center">
           <div className="text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-bright rounded-lg mb-4 animate-pulse-glow">
-              <Shield className="w-8 h-8 text-white" />
+              <ShieldCheckIcon className="w-8 h-8 text-white" />
             </div>
             <p className="font-sans text-body text-neutral-dark dark:text-neutral-medium">
               Loading PromoCipher...
@@ -76,7 +76,7 @@ function App() {
               <div className="min-h-screen bg-background-light dark:bg-background-dark flex items-center justify-center">
                 <div className="text-center">
                   <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-bright rounded-lg mb-4 animate-pulse-glow">
-                    <Shield className="w-8 h-8 text-white" />
+                    <ShieldCheckIcon className="w-8 h-8 text-white" />
                   </div>
                   <p className="font-sans text-body text-neutral-dark dark:text-neutral-medium">
                     Checking for existing master password...
@@ -98,7 +98,7 @@ function App() {
             <div className="min-h-screen bg-background-light dark:bg-background-dark flex items-center justify-center">
               <div className="text-center">
                 <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-bright rounded-lg mb-4 animate-pulse-glow">
-                  <Shield className="w-8 h-8 text-white" />
+                  <ShieldCheckIcon className="w-8 h-8 text-white" />
                 </div>
                 <p className="font-sans text-body text-neutral-dark dark:text-neutral-medium">
                   Checking for stored credentials...

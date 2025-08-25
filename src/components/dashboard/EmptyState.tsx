@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shield, Plus } from 'lucide-react';
+import { ShieldCheckIcon, PlusIcon } from '@heroicons/react/24/outline';
 import Button from '../ui/Button';
 
 interface EmptyStateProps {
@@ -10,7 +10,7 @@ const EmptyState: React.FC<EmptyStateProps> = ({ onAddCode }) => {
   return (
     <div className="text-center py-16">
       <div className="inline-flex items-center justify-center w-20 h-20 bg-neutral-light dark:bg-neutral-medium/20 rounded-lg mb-6">
-        <Shield className="w-10 h-10 text-neutral-medium" />
+        <ShieldCheckIcon className="w-10 h-10 text-neutral-medium" />
       </div>
       <h3 className="font-pixel text-h3 text-neutral-dark dark:text-white mb-4 uppercase tracking-wide">
         No Promo Codes Yet
@@ -24,7 +24,7 @@ const EmptyState: React.FC<EmptyStateProps> = ({ onAddCode }) => {
         size="large"
         onClick={onAddCode}
       >
-        <Plus className="w-5 h-5 mr-2" />
+        <PlusIcon className="w-5 h-5 mr-2" />
         Add Your First Code
       </Button>
     </div>

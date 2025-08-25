@@ -1,10 +1,9 @@
 import React from 'react';
-import { DivideIcon as LucideIcon } from 'lucide-react';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'success' | 'danger' | 'warning';
   size?: 'small' | 'medium' | 'large';
-  icon?: LucideIcon;
+  icon?: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   children: React.ReactNode;
 }
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, Lock, AlertCircle, Eye, EyeOff, AlertTriangle as TriangleAlert, AlertTriangle } from 'lucide-react';
+import { ShieldCheckIcon, LockClosedIcon, ExclamationCircleIcon, EyeIcon, EyeSlashIcon, ExclamationTriangleIcon } from '@heroicons/react/24/solid';
 import Input from './ui/Input';
 import Card from './ui/Card';
 import Button from './ui/Button';
@@ -57,7 +57,7 @@ const MasterPasswordInput: React.FC<MasterPasswordInputProps> = ({
       <div className="max-w-md w-full">
         <Card className="text-center">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-primary-bright rounded-lg mb-8 shadow-light dark:shadow-dark animate-pulse-glow">
-            <Shield className="w-10 h-10 text-white" />
+            <ShieldCheckIcon className="w-10 h-10 text-white" />
           </div>
 
           <h2 className="font-pixel text-h2 text-neutral-dark dark:text-white mb-4 uppercase tracking-wide">
@@ -74,7 +74,7 @@ const MasterPasswordInput: React.FC<MasterPasswordInputProps> = ({
           {error && error !== 'INVALID_PASSWORD' && (
             <div className="mb-6 p-4 bg-accent-error/10 border border-accent-error/20 rounded-lg">
               <div className="flex items-center space-x-2">
-                <AlertCircle className="w-5 h-5 text-accent-error" />
+                <ExclamationCircleIcon className="w-5 h-5 text-accent-error" />
                 <span className="font-sans text-small text-accent-error">{error}</span>
               </div>
             </div>
@@ -87,7 +87,7 @@ const MasterPasswordInput: React.FC<MasterPasswordInputProps> = ({
                 placeholder="Enter your master password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                icon={<Lock className="w-5 h-5" />}
+                icon={<LockClosedIcon className="w-5 h-5" />}
                 required
                 minLength={8}
                 className="pr-12"
@@ -98,9 +98,9 @@ const MasterPasswordInput: React.FC<MasterPasswordInputProps> = ({
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 hover:bg-neutral-light dark:hover:bg-neutral-medium/20 rounded transition-colors duration-200"
               >
                 {showPassword ? (
-                  <EyeOff className="w-5 h-5 text-neutral-medium" />
+                  <EyeSlashIcon className="w-5 h-5 text-neutral-medium" />
                 ) : (
-                  <Eye className="w-5 h-5 text-neutral-medium" />
+                  <EyeIcon className="w-5 h-5 text-neutral-medium" />
                 )}
               </button>
             </div>
@@ -151,7 +151,7 @@ const MasterPasswordInput: React.FC<MasterPasswordInputProps> = ({
               {rememberMe && (
                 <div className="p-4 bg-accent-warning/10 border border-accent-warning/30 rounded-lg">
                   <div className="flex items-start space-x-3 mb-3">
-                    <TriangleAlert className="w-5 h-5 text-accent-warning mt-0.5 flex-shrink-0" />
+                    <ExclamationTriangleIcon className="w-5 h-5 text-accent-warning mt-0.5 flex-shrink-0" />
                     <div>
                       <h4 className="font-sans font-medium text-accent-warning mb-2">
                         Security Risk Warning
@@ -207,7 +207,7 @@ const MasterPasswordInput: React.FC<MasterPasswordInputProps> = ({
             <Card className="max-w-md w-full">
               <div className="text-center">
                 <div className="inline-flex items-center justify-center w-16 h-16 bg-accent-error/10 rounded-lg mb-6">
-                  <AlertTriangle className="w-8 h-8 text-accent-error" />
+                  <ExclamationTriangleIcon className="w-8 h-8 text-accent-error" />
                 </div>
                 
                 <h3 className="font-pixel text-h3 text-neutral-dark dark:text-white mb-4 uppercase tracking-wide">

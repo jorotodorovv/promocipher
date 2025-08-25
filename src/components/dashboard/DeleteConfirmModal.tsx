@@ -1,5 +1,5 @@
 import React from 'react';
-import { Trash2, AlertTriangle, Loader2 } from 'lucide-react';
+import { TrashIcon, ExclamationTriangleIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import Modal from '../ui/Modal';
 import Button from '../ui/Button';
 import type { DisplayPromoCode } from '../../types/promoCode';
@@ -31,7 +31,7 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="text-center mb-6">
         <div className="inline-flex items-center justify-center w-16 h-16 bg-accent-error rounded-lg mb-4 shadow-light dark:shadow-dark">
-          <AlertTriangle className="w-8 h-8 text-white" />
+          <ExclamationTriangleIcon className="w-8 h-8 text-white" />
         </div>
         <h2 className="font-pixel text-h3 text-neutral-dark dark:text-white mb-2 uppercase tracking-wide">
           {isDeleteAll ? 'Delete All Promo Codes' : 'Delete Promo Code'}
@@ -97,12 +97,12 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
         >
           {isLoading ? (
             <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              <ArrowPathIcon className="w-4 h-4 mr-2 animate-spin" />
               Deleting...
             </>
           ) : (
             <>
-              <Trash2 className="w-4 h-4 mr-2" />
+              <TrashIcon className="w-4 h-4 mr-2" />
               {isDeleteAll ? 'Delete All' : 'Delete'}
             </>
           )}

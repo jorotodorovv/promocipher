@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Settings, LogOut, Loader2 } from 'lucide-react';
+import { Cog6ToothIcon, ArrowLeftOnRectangleIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../contexts/AuthContext';
 import { useEncryption } from '../contexts/EncryptionContext';
 import { decrypt, encrypt } from '../utils/crypto';
@@ -409,11 +409,11 @@ const DashboardPage: React.FC = () => {
             </div>
             <div className="flex items-center space-x-3 mt-4 sm:mt-0">
               <Button variant="secondary" size="medium">
-                <Settings className="w-4 h-4 mr-2" />
+                <Cog6ToothIcon className="w-4 h-4 mr-2" />
                 Settings
               </Button>
               <Button variant="danger" size="medium" onClick={handleSignOut}>
-                <LogOut className="w-4 h-4 mr-2" />
+                <ArrowLeftOnRectangleIcon className="w-4 h-4 mr-2" />
                 Sign Out
               </Button>
             </div>
@@ -501,7 +501,7 @@ const DashboardPage: React.FC = () => {
           {isLoadingCodes || isLoadingStats || searchLoading ? (
             <div className="text-center py-16">
               <div className="inline-flex items-center justify-center w-20 h-20 bg-primary-bright rounded-lg mb-6 animate-pulse-glow">
-                <Loader2 className="w-10 h-10 text-white animate-spin" />
+                <ArrowPathIcon className="w-10 h-10 text-white animate-spin" />
               </div>
               <h3 className="font-pixel text-h3 text-neutral-dark dark:text-white mb-4 uppercase tracking-wide">
                 Loading Your Vault
@@ -551,7 +551,7 @@ const DashboardPage: React.FC = () => {
                   {/* Loading more indicator */}
                   {isFetchingNextPage && (
                     <div className="text-center py-8">
-                      <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary-bright" />
+                      <ArrowPathIcon className="w-8 h-8 animate-spin mx-auto text-primary-bright" />
                       <p className="mt-2 text-sm text-neutral-dark dark:text-neutral-medium">
                         Loading more codes...
                       </p>

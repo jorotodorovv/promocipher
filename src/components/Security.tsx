@@ -1,6 +1,5 @@
 import React from 'react';
-import { Shield } from 'lucide-react';
-import { LockClosedIcon, KeyIcon, ServerIcon, EyeSlashIcon } from '@heroicons/react/24/solid';
+import { ShieldCheckIcon, LockClosedIcon, KeyIcon, ServerIcon, EyeSlashIcon } from '@heroicons/react/24/solid';
 import Card from './ui/Card';
 
 const Security: React.FC = () => {
@@ -45,7 +44,7 @@ const Security: React.FC = () => {
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-primary-bright rounded-lg mb-8 shadow-light dark:shadow-dark animate-pulse-glow">
-            <Shield className="w-10 h-10 text-white" />
+            <ShieldCheckIcon className="w-10 h-10 text-white" />
           </div>
           <h2 className="font-pixel text-h2 text-neutral-dark dark:text-white mb-6 uppercase tracking-wide">
             Enterprise Security

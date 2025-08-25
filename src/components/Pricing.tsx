@@ -1,5 +1,5 @@
 import React from 'react';
-import { Check, Star, Zap } from 'lucide-react';
+import { CheckIcon, StarIcon, BoltIcon } from '@heroicons/react/24/solid';
 import Card from './ui/Card';
 import Button from './ui/Button';
 
@@ -85,7 +85,7 @@ const Pricing: React.FC = () => {
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                   <div className="bg-primary-bright text-white px-4 py-2 rounded-full shadow-light">
                     <div className="flex items-center space-x-1">
-                      <Star className="w-4 h-4" />
+                      <StarIcon className="w-4 h-4" />
                       <span className="font-sans text-small font-bold uppercase tracking-wider">
                         Most Popular
                       </span>
@@ -115,7 +115,7 @@ const Pricing: React.FC = () => {
                 <div className="space-y-4 mb-8">
                   {plan.features.map((feature, featureIndex) => (
                     <div key={featureIndex} className="flex items-center space-x-3">
-                      <Check className="w-5 h-5 text-accent-success flex-shrink-0" />
+                      <CheckIcon className="w-5 h-5 text-accent-success flex-shrink-0" />
                       <span className="font-sans text-body text-neutral-dark dark:text-neutral-medium text-left">
                         {feature}
                       </span>
@@ -128,7 +128,7 @@ const Pricing: React.FC = () => {
                   size="large" 
                   className="w-full"
                 >
-                  {plan.popular && <Zap className="w-5 h-5 mr-2" />}
+                  {plan.popular && <BoltIcon className="w-5 h-5 mr-2" />}
                   {plan.cta}
                 </Button>
               </div>
