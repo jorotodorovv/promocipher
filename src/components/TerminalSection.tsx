@@ -1,5 +1,6 @@
 import React from 'react';
-import { Terminal, Code2, Shield } from 'lucide-react';
+import { Terminal, Code2 } from 'lucide-react';
+import { ShieldExclamationIcon } from '@heroicons/react/24/solid';
 import TerminalCode from './TerminalCode';
 
 const TerminalSection: React.FC = () => {
@@ -78,7 +79,7 @@ const TerminalSection: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-neutral-light dark:bg-white/5 border border-neutral-medium/20 dark:border-white/10 rounded-lg p-6 text-center">
-              <Shield className="w-8 h-8 text-primary-bright mx-auto mb-4" />
+              <ShieldExclamationIcon className="w-8 h-8 text-primary-bright mx-auto mb-4" />
               <h4 className="font-pixel text-small text-neutral-dark dark:text-white mb-2 uppercase">
                 Key Derivation
               </h4>

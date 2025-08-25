@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shield, Lock, ShieldEllipsis } from 'lucide-react';
+import { LockClosedIcon, ShieldCheckIcon } from '@heroicons/react/24/solid';
 
 const Footer: React.FC = () => {
   return (
@@ -9,7 +9,6 @@ const Footer: React.FC = () => {
           {/* Brand */}
           <div className="md:col-span-2">
             <div className="flex items-center space-x-4 mb-4">
-              <ShieldEllipsis className="w-8 h-8 text-white" />
               <h3 className="font-pixel text-small text-white uppercase tracking-wider">
                 PromoCipher
               </h3>
@@ -65,11 +64,11 @@ const Footer: React.FC = () => {
           </p>
           <div className="flex items-center space-x-6">
             <div className="flex items-center space-x-2">
-              <Lock className="w-4 h-4 text-neutral-light/60" />
+              <LockClosedIcon className="w-4 h-4 text-neutral-light/60" />
               <span className="font-code text-small text-neutral-light/60">256-bit Encrypted</span>
             </div>
             <div className="flex items-center space-x-2">
-              <Shield className="w-4 h-4 text-neutral-light/60" />
+              <ShieldCheckIcon className="w-4 h-4 text-neutral-light/60" />
               <span className="font-code text-small text-neutral-light/60">SOC 2 Certified</span>
             </div>
           </div>

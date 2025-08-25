@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Smartphone, Monitor, Tablet } from 'lucide-react';
+import { Monitor, Smartphone, Tablet } from 'lucide-react';
+import { DevicePhoneMobileIcon, ComputerDesktopIcon, DeviceTabletIcon } from '@heroicons/react/24/solid';
 import Card from './ui/Card';
 import PromoCodeCard from './dashboard/PromoCodeCard';
 
@@ -104,7 +105,7 @@ const HowItWorks: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-20">
           <div className="text-center animate-slide-up" style={{ animationDelay: '0.1s' }}>
             <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-bright rounded-lg mb-6 shadow-light dark:shadow-dark">
-              <Monitor className="w-8 h-8 text-white" />
+              <ComputerDesktopIcon className="w-8 h-8 text-white" />
             </div>
             <h3 className="font-pixel text-h3 text-neutral-dark dark:text-white mb-4 uppercase tracking-wide">
               Desktop
@@ -116,7 +117,7 @@ const HowItWorks: React.FC = () => {
 
           <div className="text-center animate-slide-up" style={{ animationDelay: '0.2s' }}>
             <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-bright rounded-lg mb-6 shadow-light dark:shadow-dark">
-              <Smartphone className="w-8 h-8 text-white" />
+              <DevicePhoneMobileIcon className="w-8 h-8 text-white" />
             </div>
             <h3 className="font-pixel text-h3 text-neutral-dark dark:text-white mb-4 uppercase tracking-wide">
               Mobile
@@ -128,7 +129,7 @@ const HowItWorks: React.FC = () => {
 
           <div className="text-center animate-slide-up" style={{ animationDelay: '0.3s' }}>
             <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-bright rounded-lg mb-6 shadow-light dark:shadow-dark">
-              <Tablet className="w-8 h-8 text-white" />
+              <DeviceTabletIcon className="w-8 h-8 text-white" />
             </div>
             <h3 className="font-pixel text-h3 text-neutral-dark dark:text-white mb-4 uppercase tracking-wide">
               Tablet

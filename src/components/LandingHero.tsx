@@ -1,5 +1,6 @@
 import React from 'react';
-import { Shield, ArrowRight, Play, ShieldEllipsis } from 'lucide-react';
+import { ShieldEllipsis } from 'lucide-react';
+import { ShieldCheckIcon, ArrowRightIcon, PlayIcon } from '@heroicons/react/24/solid';
 import Button from './ui/Button';
 
 interface LandingHeroProps {
@@ -38,9 +39,9 @@ const LandingHero: React.FC<LandingHeroProps> = ({ onDashboardAccess }) => {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
             <Button variant="primary" size="large" className="w-full sm:w-auto" onClick={onDashboardAccess}>
-              <Shield className="w-5 h-5 mr-2" />
+              <ShieldCheckIcon className="w-5 h-5 mr-2" />
               Start Securing Codes
-              <ArrowRight className="w-5 h-5 ml-2" />
+              <ArrowRightIcon className="w-5 h-5 ml-2" />
             </Button>
           </div>
         </div>

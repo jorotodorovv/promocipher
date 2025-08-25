@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
-import { Tag, TrendingUp, Users, BarChart3, Copy, Eye } from 'lucide-react';
+import { TagIcon, ArrowsPointingOutIcon, UserGroupIcon, ChartBarIcon, DocumentDuplicateIcon, ClockIcon } from '@heroicons/react/24/outline';
 import Card from './ui/Card';
 
 const Features: React.FC = () => {
   const [activeTab, setActiveTab] = useState('personal');
 
   const personalFeatures = [
-    { icon: Tag, title: 'Smart Categories', description: 'Automatically categorize codes by store, type, or custom tags' },
-    { icon: Copy, title: 'Quick Copy', description: 'One-click copying with automatic clipboard management' },
-    { icon: Eye, title: 'Expiry Tracking', description: 'Never miss a deal with smart expiration notifications' }
+    { icon: TagIcon, title: 'Smart Categories', description: 'Automatically categorize codes by store, type, or custom tags' },
+    { icon: DocumentDuplicateIcon, title: 'Quick Copy', description: 'One-click copying with automatic clipboard management' },
+    { icon: ClockIcon, title: 'Expiry Tracking', description: 'Never miss a deal with smart expiration notifications' }
   ];
 
   const businessFeatures = [
-    { icon: Users, title: 'Team Sharing', description: 'Securely share promo codes across your organization' },
-    { icon: BarChart3, title: 'Usage Analytics', description: 'Track which codes save your business the most money' },
-    { icon: TrendingUp, title: 'Bulk Import', description: 'Import hundreds of codes from spreadsheets instantly' }
+    { icon: UserGroupIcon, title: 'Team Sharing', description: 'Securely share promo codes across your organization' },
+    { icon: ChartBarIcon, title: 'Usage Analytics', description: 'Track which codes save your business the most money' },
+    { icon: ArrowsPointingOutIcon, title: 'Bulk Import', description: 'Import hundreds of codes from spreadsheets instantly' }
   ];
 
   return (

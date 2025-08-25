@@ -1,29 +1,30 @@
 import React from 'react';
-import { Shield, Lock, Key, Server, Eye, CheckCircle } from 'lucide-react';
+import { Shield } from 'lucide-react';
+import { LockClosedIcon, KeyIcon, ServerIcon, EyeSlashIcon } from '@heroicons/react/24/solid';
 import Card from './ui/Card';
 
 const Security: React.FC = () => {
   const securityFeatures = [
     {
-      icon: Lock,
+      icon: LockClosedIcon,
       title: 'AES-256 Encryption',
       description: 'Military-grade encryption protects your data both in transit and at rest',
       technical: 'Advanced Encryption Standard with 256-bit keys'
     },
     {
-      icon: Key,
+      icon: KeyIcon,
       title: 'Zero-Knowledge Architecture',
       description: 'Your master password never leaves your device - we cannot see your data',
       technical: 'Client-side encryption with PBKDF2 key derivation'
     },
     {
-      icon: Server,
+      icon: ServerIcon,
       title: 'Secure Infrastructure',
       description: 'Hosted on enterprise-grade servers with 99.9% uptime guarantee',
       technical: 'AWS infrastructure with SOC 2 Type II compliance'
     },
     {
-      icon: Eye,
+      icon: EyeSlashIcon,
       title: 'Privacy First',
       description: 'No tracking, no ads, no data mining - your privacy is our priority',
       technical: 'GDPR compliant with minimal data collection'
