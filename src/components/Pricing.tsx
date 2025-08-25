@@ -11,7 +11,7 @@ const Pricing: React.FC = () => {
       period: 'Forever',
       description: 'Perfect for individual users who want to secure their promo codes',
       features: [
-        'Store up to 50 promo codes',
+        'Store up to 25 promo codes',
         'AES-256 encryption',
         'Cross-device sync',
         'Basic search & categories',
@@ -134,24 +134,6 @@ const Pricing: React.FC = () => {
               </div>
             </Card>
           ))}
-        </div>
-
-        {/* Money Back Guarantee */}
-        <div className="mt-16 text-center">
-          <Card className="bg-accent-success/10 border border-accent-success/20 max-w-2xl mx-auto">
-            <div className="flex items-center justify-center space-x-3 mb-4">
-              <div className="w-8 h-8 bg-accent-success rounded-full flex items-center justify-center">
-                <Check className="w-5 h-5 text-white" />
-              </div>
-              <h3 className="font-pixel text-h3 text-accent-success uppercase tracking-wide">
-                30-Day Guarantee
-              </h3>
-            </div>
-            <p className="font-sans text-body text-neutral-dark dark:text-neutral-medium leading-relaxed">
-              Not satisfied? Get a full refund within 30 days, no questions asked. 
-              We're confident you'll love PromoCipher.
-            </p>
-          </Card>
         </div>
       </div>
     </section>

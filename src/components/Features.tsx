@@ -76,33 +76,6 @@ const Features: React.FC = () => {
             </Card>
           ))}
         </div>
-
-        {/* Feature Highlight */}
-        <div className="mt-20">
-          <Card className="bg-gradient-to-r from-primary-bright to-primary-deep text-white max-w-4xl mx-auto text-center">
-            <h3 className="font-pixel text-h3 mb-6 uppercase tracking-wide">
-              Never Lose Money Again
-            </h3>
-            <p className="font-sans text-body mb-8 leading-relaxed opacity-90">
-              The average person loses $200+ per year in expired or forgotten promo codes. 
-              PromoCipher users save an average of $847 annually by never missing a discount.
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-              <div>
-                <div className="font-pixel text-h2 mb-2">$847</div>
-                <div className="font-sans text-small opacity-80">Average Annual Savings</div>
-              </div>
-              <div>
-                <div className="font-pixel text-h2 mb-2">95%</div>
-                <div className="font-sans text-small opacity-80">Code Success Rate</div>
-              </div>
-              <div>
-                <div className="font-pixel text-h2 mb-2">2.3s</div>
-                <div className="font-sans text-small opacity-80">Average Search Time</div>
-              </div>
-            </div>
-          </Card>
-        </div>
       </div>
     </section>
   );

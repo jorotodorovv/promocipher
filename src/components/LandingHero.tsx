@@ -42,10 +42,6 @@ const LandingHero: React.FC<LandingHeroProps> = ({ onDashboardAccess }) => {
               Start Securing Codes
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
-            <Button variant="secondary" size="large" className="w-full sm:w-auto">
-              <Play className="w-5 h-5 mr-2" />
-              Watch Demo
-            </Button>
           </div>
         </div>
 

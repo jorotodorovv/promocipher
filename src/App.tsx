@@ -115,7 +115,6 @@ function App() {
             <Features />
             <HowItWorks />
             <Security />
-            <Pricing />
             <CTA onDashboardAccess={handleDashboardAccess} />
             <Footer />
           </>

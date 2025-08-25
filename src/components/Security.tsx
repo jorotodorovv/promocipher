@@ -83,45 +83,6 @@ const Security: React.FC = () => {
             </Card>
           ))}
         </div>
-
-        {/* Security Certifications */}
-        <div className="text-center">
-          <h3 className="font-pixel text-h3 text-neutral-dark dark:text-white mb-8 uppercase tracking-wide">
-            Certifications & Compliance
-          </h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
-            {certifications.map((cert, index) => (
-              <div 
-                key={index}
-                className="flex items-center space-x-2 p-4 bg-accent-success/10 border border-accent-success/20 rounded-lg animate-slide-up"
-                style={{ animationDelay: `${index * 0.05}s` }}
-              >
-                <CheckCircle className="w-5 h-5 text-accent-success flex-shrink-0" />
-                <span className="font-sans text-small text-accent-success font-medium">
-                  {cert}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Security Guarantee */}
-        <div className="mt-16">
-          <Card className="bg-neutral-dark text-white max-w-3xl mx-auto text-center">
-            <h3 className="font-pixel text-h3 mb-6 uppercase tracking-wide text-primary-bright">
-              Security Guarantee
-            </h3>
-            <p className="font-sans text-body mb-6 leading-relaxed">
-              We're so confident in our security that we offer a <strong>$10,000 bug bounty</strong> for 
-              anyone who can compromise our encryption. Your data has never been safer.
-            </p>
-            <div className="bg-primary-bright/10 border border-primary-bright/20 rounded-lg p-4">
-              <code className="font-code text-small text-primary-bright">
-                Security Audit: Last performed December 2024 ✓
-              </code>
-            </div>
-          </Card>
-        </div>
       </div>
     </section>
   );

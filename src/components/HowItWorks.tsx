@@ -1,22 +1,91 @@
 import React, { useState } from 'react';
-import { Smartphone, Monitor, Tablet, Copy, Check } from 'lucide-react';
+import { Smartphone, Monitor, Tablet } from 'lucide-react';
 import Card from './ui/Card';
-import Button from './ui/Button';
+import PromoCodeCard from './dashboard/PromoCodeCard';
 
 const HowItWorks: React.FC = () => {
-  const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  // Sample promo codes that match the DisplayPromoCode interface
+  const sampleCodes = [
+    {
+      id: '1',
+      user_id: 'user1',
+      encrypted_data: 'encrypted1',
+      nonce: 'nonce1',
+      tag: 'tag1',
+      store: 'TechMart',
+      discount: '25% off electronics',
+      expires: '2024-03-15',
+      notes: 'Valid on all electronics',
+      created_at: '2023-01-01',
+      updated_at: '2023-01-01',
+      decryptedCode: 'TECH25',
+      isRevealed: false,
+      isDecrypting: false,
+      decryptionError: null
+    },
+    {
+      id: '2',
+      user_id: 'user1',
+      encrypted_data: 'encrypted2',
+      nonce: 'nonce2',
+      tag: 'tag2',
+      store: 'QuickBuy',
+      discount: 'Free shipping',
+      expires: '2024-04-01',
+      notes: 'Minimum order $50',
+      created_at: '2023-01-02',
+      updated_at: '2023-01-02',
+      decryptedCode: 'FREESHIP',
+      isRevealed: false,
+      isDecrypting: false,
+      decryptionError: null
+    },
+    {
+      id: '3',
+      user_id: 'user1',
+      encrypted_data: 'encrypted3',
+      nonce: 'nonce3',
+      tag: 'tag3',
+      store: 'StyleHub',
+      discount: '$10 off first order',
+      expires: '2024-12-31',
+      notes: 'New customers only',
+      created_at: '2023-01-03',
+      updated_at: '2023-01-03',
+      decryptedCode: 'NEWUSER10',
+      isRevealed: false,
+      isDecrypting: false,
+      decryptionError: null
+    }
+  ];
 
-  const handleCopyCode = (code: string) => {
-    navigator.clipboard.writeText(code);
-    setCopiedCode(code);
-    setTimeout(() => setCopiedCode(null), 2000);
+  const [copiedCodeId, setCopiedCodeId] = useState<string | null>(null);
+  const [revealedCodes, setRevealedCodes] = useState<Record<string, boolean>>({});
+
+  const handleToggleReveal = (codeId: string) => {
+    setRevealedCodes(prev => ({
+      ...prev,
+      [codeId]: !prev[codeId]
+    }));
   };
 
-  const sampleCodes = [
-    { code: 'TECH25', store: 'TechMart', discount: '25% off electronics', expires: '2024-03-15' },
-    { code: 'FREESHIP', store: 'QuickBuy', discount: 'Free shipping', expires: '2024-04-01' },
-    { code: 'NEWUSER10', store: 'StyleHub', discount: '$10 off first order', expires: '2024-12-31' }
-  ];
+  const handleCopy = async (codeText: string, codeId: string) => {
+    try {
+      await navigator.clipboard.writeText(codeText);
+      setCopiedCodeId(codeId);
+      setTimeout(() => setCopiedCodeId(null), 2000);
+    } catch (error) {
+      console.error('Failed to copy code:', error);
+    }
+  };
+
+  const handleEdit = () => {
+    // No-op for demo
+  };
+
+  const handleDelete = () => {
+    // No-op for demo
+  };
 
   return (
     <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white dark:bg-neutral-dark">
@@ -71,55 +140,33 @@ const HowItWorks: React.FC = () => {
         </div>
 
         {/* Interactive Demo */}
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <Card className="overflow-hidden">
             <div className="bg-gradient-to-r from-primary-deep to-primary-bright p-6 text-white">
               <h3 className="font-pixel text-h3 mb-2 uppercase tracking-wide">
                 Live Demo
               </h3>
               <p className="font-sans text-body opacity-90">
-                Try copying these sample promo codes
+                Try interacting with these sample promo codes
               </p>
             </div>
             
-            <div className="p-6 space-y-4">
-              {sampleCodes.map((item, index) => (
-                <div 
-                  key={index}
-                  className="flex items-center justify-between p-4 bg-background-light dark:bg-background-dark rounded-lg border border-neutral-medium/20 hover:border-primary-bright/30 transition-all duration-200"
-                >
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-3 mb-2">
-                      <code className="font-code text-code bg-primary-bright text-white px-3 py-1 rounded font-bold">
-                        {item.code}
-                      </code>
-                      <span className="font-sans text-small font-medium text-neutral-dark dark:text-white">
-                        {item.store}
-                      </span>
-                    </div>
-                    <p className="font-sans text-small text-neutral-medium">
-                      {item.discount} • Expires {item.expires}
-                    </p>
-                  </div>
-                  <Button
-                    variant={copiedCode === item.code ? 'success' : 'secondary'}
-                    size="small"
-                    onClick={() => handleCopyCode(item.code)}
-                    className="ml-4"
-                  >
-                    {copiedCode === item.code ? (
-                      <>
-                        <Check className="w-4 h-4 mr-2" />
-                        Copied!
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="w-4 h-4 mr-2" />
-                        Copy
-                      </>
-                    )}
-                  </Button>
-                </div>
+            <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {sampleCodes.map((code, index) => (
+                <PromoCodeCard
+                  key={code.id}
+                  code={{
+                    ...code,
+                    isRevealed: revealedCodes[code.id] || false,
+                    decryptedCode: revealedCodes[code.id] ? code.decryptedCode : null
+                  }}
+                  index={index}
+                  copiedCodeId={copiedCodeId}
+                  onToggleReveal={handleToggleReveal}
+                  onCopy={handleCopy}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                />
               ))}
             </div>
           </Card>

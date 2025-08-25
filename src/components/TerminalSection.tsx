@@ -55,18 +55,6 @@ const TerminalSection: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-primary-bright/10 border border-primary-bright/30 rounded-lg p-4">
-              <div className="flex items-center space-x-3 mb-2">
-                <Code2 className="w-5 h-5 text-primary-bright" />
-                <span className="font-pixel text-small text-primary-bright uppercase tracking-wide">
-                  Open Source
-                </span>
-              </div>
-              <p className="font-sans text-small text-neutral-dark dark:text-neutral-medium">
-                Our encryption implementation is open source and audited by security experts. 
-                Transparency builds trust.
-              </p>
-            </div>
           </div>
 
           {/* Right Terminal */}
