@@ -114,7 +114,6 @@ function App() {
             <TerminalSection />
             <Features />
             <HowItWorks />
-            <Security />
             <CTA onDashboardAccess={handleDashboardAccess} />
             <Footer />
           </>

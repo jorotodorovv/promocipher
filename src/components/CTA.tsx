@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shield, ArrowRight, Download, Globe,Smartphone } from 'lucide-react';
+import { Shield, ArrowRight, Download, Globe,Smartphone, Lock } from 'lucide-react';
 import Button from './ui/Button';
 import Card from './ui/Card';
 
@@ -15,7 +15,7 @@ const CTA: React.FC<CTAProps> = ({ onDashboardAccess }) => {
         <div className="text-center mb-20">
           <Card className="bg-gradient-to-r from-primary-bright to-primary-deep text-white max-w-4xl mx-auto">
             <div className="inline-flex items-center justify-center w-20 h-20 bg-white/20 rounded-lg mb-8">
-              <Shield className="w-10 h-10 text-white" />
+              <Lock className="w-10 h-10 text-white" />
             </div>
             
             <h2 className="font-pixel text-h2 mb-6 uppercase tracking-wide">
@@ -23,7 +23,7 @@ const CTA: React.FC<CTAProps> = ({ onDashboardAccess }) => {
             </h2>
             
             <p className="font-sans text-body mb-8 leading-relaxed opacity-90 max-w-2xl mx-auto">
-              Join thousands of smart shoppers who never miss a discount. Start your free account today 
+              Join the other smart shoppers who never miss a discount. Start your free account today 
               and experience the peace of mind that comes with secure promo code storage.
             </p>
 

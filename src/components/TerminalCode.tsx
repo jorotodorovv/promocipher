@@ -128,8 +128,8 @@ const TerminalCode: React.FC<TerminalCodeProps> = ({ className = "" }) => {
       </div>
       
       {/* Terminal Content */}
-      <div className="p-6 h-64 md:h-80 overflow-hidden">
-        <pre className="font-code text-small leading-relaxed text-neutral-dark/90 dark:text-white/90 whitespace-pre">
+      <div className="p-6 h-80 md:h-96 overflow-hidden">
+        <pre className="font-code text-small leading-relaxed text-neutral-medium dark:text-white/90 whitespace-pre-wrap">
           {renderedLines.map((line, index) => (
             <div key={index} className="mb-1">
               <span className="text-primary-bright">{">"}</span>
@@ -138,7 +138,7 @@ const TerminalCode: React.FC<TerminalCodeProps> = ({ className = "" }) => {
           ))}
           <div className="mb-1">
             <span className="text-accent-success">{">"}</span>
-            <span className="ml-2 text-neutral-dark/95 dark:text-white/95">{currentDisplayLine}</span>
+            <span className="ml-2 text-neutral-dark dark:text-white/95">{currentDisplayLine}</span>
             <span className="inline-block w-2 h-4 bg-primary-bright ml-1 animate-pulse" />
           </div>
         </pre>

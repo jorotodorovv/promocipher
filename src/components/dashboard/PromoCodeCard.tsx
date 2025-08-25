@@ -75,9 +75,9 @@ const PromoCodeCard: React.FC<PromoCodeCardProps> = ({
 
       <div className="mb-4">
         <div className="flex items-center justify-between mb-2">
-          <span className="font-sans text-small text-neutral-medium">Promo Code</span>
+          <span className="font-sans text-small text-neutral-dark/80 dark:text-neutral-medium">Promo Code</span>
           {code.isRevealed && countdown !== null && (
-            <div className="flex items-center space-x-1 text-xs text-neutral-medium">
+            <div className="flex items-center space-x-1 text-xs text-neutral-dark/80 dark:text-neutral-medium">
               <Clock className="w-3 h-3" />
               <span>Auto-hide in {countdown}s</span>
             </div>
@@ -134,11 +134,11 @@ const PromoCodeCard: React.FC<PromoCodeCardProps> = ({
 
       <div className="space-y-3">
         <div className="flex items-center justify-between text-small">
-          <span className="font-sans text-neutral-medium">
+          <span className="font-sans text-neutral-dark/80 dark:text-neutral-medium">
             Expires: {code.expires || 'No Expiry'}
           </span>
           {code.notes && (
-            <span className="font-sans text-neutral-medium italic">
+            <span className="font-sans text-neutral-dark/80 dark:text-neutral-medium italic">
               {code.notes.length > 20 ? `${code.notes.substring(0, 20)}...` : code.notes}
             </span>
           )}
@@ -151,14 +151,14 @@ const PromoCodeCard: React.FC<PromoCodeCardProps> = ({
             className="p-2 hover:bg-neutral-medium/20 rounded transition-colors duration-200 group"
             title="Edit promo code"
           >
-            <Edit className="w-4 h-4 text-neutral-medium group-hover:text-primary-bright" />
+            <Edit className="w-4 h-4 text-neutral-dark/80 dark:text-neutral-medium group-hover:text-primary-bright" />
           </button>
           <button
             onClick={() => onDelete(code)}
             className="p-2 hover:bg-accent-error/10 rounded transition-colors duration-200 group"
             title="Delete promo code"
           >
-            <Trash2 className="w-4 h-4 text-neutral-medium group-hover:text-accent-error" />
+            <Trash2 className="w-4 h-4 text-neutral-dark/80 dark:text-neutral-medium group-hover:text-accent-error" />
           </button>
         </div>
       </div>

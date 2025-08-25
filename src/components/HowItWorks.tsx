@@ -94,7 +94,7 @@ const HowItWorks: React.FC = () => {
           <h2 className="font-pixel text-h2 text-neutral-dark dark:text-white mb-6 uppercase tracking-wide">
             Your Codes, Everywhere
           </h2>
-          <p className="font-sans text-body text-neutral-dark dark:text-neutral-medium max-w-2xl mx-auto leading-relaxed">
+          <p className="font-sans text-body text-neutral-dark/90 dark:text-neutral-medium max-w-2xl mx-auto leading-relaxed">
             Access your encrypted promo codes seamlessly across all your devices. 
             Real-time sync keeps everything up to date.
           </p>
@@ -109,7 +109,7 @@ const HowItWorks: React.FC = () => {
             <h3 className="font-pixel text-h3 text-neutral-dark dark:text-white mb-4 uppercase tracking-wide">
               Desktop
             </h3>
-            <p className="font-sans text-body text-neutral-dark dark:text-neutral-medium leading-relaxed">
+            <p className="font-sans text-body text-neutral-dark/80 dark:text-neutral-medium leading-relaxed">
               Full-featured web app with keyboard shortcuts and bulk operations for power users.
             </p>
           </div>
@@ -121,7 +121,7 @@ const HowItWorks: React.FC = () => {
             <h3 className="font-pixel text-h3 text-neutral-dark dark:text-white mb-4 uppercase tracking-wide">
               Mobile
             </h3>
-            <p className="font-sans text-body text-neutral-dark dark:text-neutral-medium leading-relaxed">
+            <p className="font-sans text-body text-neutral-dark/80 dark:text-neutral-medium leading-relaxed">
               Native mobile apps with offline access and push notifications for expiring codes.
             </p>
           </div>
@@ -133,7 +133,7 @@ const HowItWorks: React.FC = () => {
             <h3 className="font-pixel text-h3 text-neutral-dark dark:text-white mb-4 uppercase tracking-wide">
               Tablet
             </h3>
-            <p className="font-sans text-body text-neutral-dark dark:text-neutral-medium leading-relaxed">
+            <p className="font-sans text-body text-neutral-dark/80 dark:text-neutral-medium leading-relaxed">
               Optimized tablet interface perfect for shopping sessions and code management.
             </p>
           </div>
