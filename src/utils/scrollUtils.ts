@@ -1,4 +1,4 @@
-import { animate } from "framer-motion";
+import { animate, AnimationPlaybackControls } from "framer-motion";
 
 /**
  * Smooth scroll to an element with the given ID using Framer Motion
@@ -10,11 +10,22 @@ export const smoothScrollTo = (elementId: string): void => {
     const headerOffset = 80; // Adjust this value to add padding from the top
     const elementPosition = element.offsetTop - headerOffset;
 
-    animate(window.scrollY, elementPosition, {
+    const controls: AnimationPlaybackControls = animate(window.scrollY, elementPosition, {
       type: "spring",
       stiffness: 100,
       damping: 30,
       onUpdate: (latest) => window.scrollTo(0, latest),
+      onComplete: () => {
+        window.removeEventListener("wheel", cancelOnUserScroll);
+        window.removeEventListener("touchmove", cancelOnUserScroll);
+      },
     });
+
+    const cancelOnUserScroll = () => {
+      controls.stop();
+    };
+
+    window.addEventListener("wheel", cancelOnUserScroll, { once: true });
+    window.addEventListener("touchmove", cancelOnUserScroll, { once: true });
   }
 };
