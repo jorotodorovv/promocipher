@@ -1,10 +1,22 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { LockClosedIcon, ShieldCheckIcon } from '@heroicons/react/24/solid';
 import { smoothScrollTo } from '../utils/scrollUtils';
 
 const Footer: React.FC = () => {
+  const sectionVariants = {
+    hidden: { opacity: 0, y: 50 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  };
+
   return (
-    <footer className="bg-primary-deep py-12 px-4 sm:px-6 lg:px-8">
+    <motion.footer 
+      className="bg-primary-deep py-12 px-4 sm:px-6 lg:px-8"
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.3 }}
+      variants={sectionVariants}
+    >
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
@@ -55,7 +67,7 @@ const Footer: React.FC = () => {
           </div>
         </div>
       </div>
-    </footer>
+    </motion.footer>
   );
 };
 

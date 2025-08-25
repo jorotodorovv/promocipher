@@ -1,19 +1,37 @@
 import React from 'react';
-import { ShieldCheckIcon, LockClosedIcon, ArrowRightIcon, CloudArrowDownIcon, GlobeAltIcon, DevicePhoneMobileIcon } from '@heroicons/react/24/solid';
+import { motion } from 'framer-motion';
+import { ShieldCheckIcon, LockClosedIcon, ArrowRightIcon } from '@heroicons/react/24/solid';
 import Button from './ui/Button';
 import Card from './ui/Card';
+
+const MotionCard = motion(Card);
 
 interface CTAProps {
   onDashboardAccess: () => void;
 }
 
 const CTA: React.FC<CTAProps> = ({ onDashboardAccess }) => {
+  const sectionVariants = {
+    hidden: { opacity: 0, y: 50 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  };
+
   return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8">
+    <motion.section 
+      className="py-20 px-4 sm:px-6 lg:px-8 dark:bg-neutral-dark"
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.5 }}
+      variants={sectionVariants}
+    >
       <div className="max-w-7xl mx-auto">
         {/* Main CTA */}
         <div className="text-center mb-20">
-          <Card className="bg-gradient-to-r from-primary-bright to-primary-deep text-white max-w-4xl mx-auto">
+          <MotionCard 
+            className="bg-gradient-to-r from-primary-bright to-primary-deep text-white max-w-4xl mx-auto"
+            whileHover={{ scale: 1.02 }}
+            transition={{ type: "spring", stiffness: 400, damping: 10 }}
+          >
             <div className="inline-flex items-center justify-center w-20 h-20 bg-white/20 rounded-lg mb-8">
               <LockClosedIcon className="w-10 h-10 text-white" />
             </div>
@@ -34,10 +52,10 @@ const CTA: React.FC<CTAProps> = ({ onDashboardAccess }) => {
                 <ArrowRightIcon className="w-5 h-5 ml-2" />
               </Button>
             </div>
-          </Card>
+          </MotionCard>
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 };
 

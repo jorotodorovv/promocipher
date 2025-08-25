@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { TagIcon, ArrowsPointingOutIcon, UserGroupIcon, ChartBarIcon, DocumentDuplicateIcon, ClockIcon } from '@heroicons/react/24/outline';
 import Card from './ui/Card';
+
+const MotionCard = motion(Card);
 
 const Features: React.FC = () => {
   const [activeTab, setActiveTab] = useState('personal');
@@ -16,6 +19,19 @@ const Features: React.FC = () => {
     { icon: ChartBarIcon, title: 'Usage Analytics', description: 'Track which codes save your business the most money' },
     { icon: ArrowsPointingOutIcon, title: 'Bulk Import', description: 'Import hundreds of codes from spreadsheets instantly' }
   ];
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1 }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { y: 0, opacity: 1 }
+  };
 
   return (
     <section id="features" className="py-20 px-4 sm:px-6 lg:px-8">
@@ -57,12 +73,18 @@ const Features: React.FC = () => {
         </div>
 
         {/* Feature Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-3 gap-8"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.5 }}
+        >
           {(activeTab === 'personal' ? personalFeatures : businessFeatures).map((feature, index) => (
-            <Card 
+            <MotionCard 
               key={`${activeTab}-${index}`}
-              className="text-center hover:shadow-hover-light dark:hover:shadow-hover-dark transform hover:scale-102 transition-all duration-300 animate-slide-up"
-              style={{ animationDelay: `${index * 0.1}s` }}
+              className="text-center hover:shadow-hover-light dark:hover:shadow-hover-dark transform hover:scale-102 transition-all duration-300"
+              variants={itemVariants}
             >
               <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-bright rounded-lg mb-6 shadow-light dark:shadow-dark">
                 <feature.icon className="w-8 h-8 text-white" />
@@ -73,9 +95,9 @@ const Features: React.FC = () => {
               <p className="font-sans text-body text-neutral-dark dark:text-neutral-medium leading-relaxed">
                 {feature.description}
               </p>
-            </Card>
+            </MotionCard>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

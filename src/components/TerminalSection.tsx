@@ -1,15 +1,28 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { CommandLineIcon, CodeBracketIcon } from '@heroicons/react/24/solid';
 import { ShieldExclamationIcon } from '@heroicons/react/24/solid';
 import TerminalCode from './TerminalCode';
 
 const TerminalSection: React.FC = () => {
+  const sectionVariants = {
+    hidden: { opacity: 0, y: 50 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  };
+
   return (
-    <section id="terminal" className="py-20 px-4 sm:px-6 lg:px-8 bg-background-light dark:bg-background-dark">
+    <motion.section 
+      id="terminal" 
+      className="py-20 px-4 sm:px-6 lg:px-8 bg-background-light dark:bg-background-dark"
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.3 }}
+      variants={sectionVariants}
+    >
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left Content */}
-          <div className="animate-slide-up">
+          <div>
             <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-bright rounded-lg mb-8 shadow-light animate-pulse-glow">
               <CommandLineIcon className="w-8 h-8 text-white" />
             </div>
@@ -59,7 +72,7 @@ const TerminalSection: React.FC = () => {
           </div>
 
           {/* Right Terminal */}
-          <div className="animate-slide-up" style={{ animationDelay: '0.2s' }}>
+          <div>
             <div className="mt-6 grid grid-cols-2 gap-4">
             </div>
             <TerminalCode className="w-full max-w-2xl xl:max-w-3xl mx-auto" />
@@ -67,7 +80,13 @@ const TerminalSection: React.FC = () => {
         </div>
 
         {/* Technical Specs */}
-        <div className="mt-20 max-w-4xl mx-auto">
+        <motion.div 
+          className="mt-20 max-w-4xl mx-auto"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.5 }}
+          variants={sectionVariants}
+        >
           <div className="text-center mb-12">
             <h3 className="font-pixel text-h3 text-neutral-dark dark:text-white mb-4 uppercase tracking-wide">
               Technical Specifications
@@ -108,9 +127,9 @@ const TerminalSection: React.FC = () => {
               </code>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
-    </section>
+    </motion.section>
   );
 };
 

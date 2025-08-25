@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { DevicePhoneMobileIcon, ComputerDesktopIcon, DeviceTabletIcon } from '@heroicons/react/24/solid';
 import Card from './ui/Card';
 import PromoCodeCard from './dashboard/PromoCodeCard';
@@ -87,6 +88,19 @@ const HowItWorks: React.FC = () => {
     // No-op for demo
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1 }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { y: 0, opacity: 1 }
+  };
+
   return (
     <section id="how-it-works" className="py-20 px-4 sm:px-6 lg:px-8 bg-white dark:bg-neutral-dark">
       <div className="max-w-7xl mx-auto">
@@ -101,8 +115,14 @@ const HowItWorks: React.FC = () => {
         </div>
 
         {/* Device Showcase */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-20">
-          <div className="text-center animate-slide-up" style={{ animationDelay: '0.1s' }}>
+        <motion.div 
+          className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-20"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.5 }}
+        >
+          <motion.div variants={itemVariants} className="text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-bright rounded-lg mb-6 shadow-light dark:shadow-dark">
               <ComputerDesktopIcon className="w-8 h-8 text-white" />
             </div>
@@ -112,9 +132,9 @@ const HowItWorks: React.FC = () => {
             <p className="font-sans text-body text-neutral-dark/80 dark:text-neutral-medium leading-relaxed">
               Full-featured web app with keyboard shortcuts and bulk operations for power users.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="text-center animate-slide-up" style={{ animationDelay: '0.2s' }}>
+          <motion.div variants={itemVariants} className="text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-bright rounded-lg mb-6 shadow-light dark:shadow-dark">
               <DevicePhoneMobileIcon className="w-8 h-8 text-white" />
             </div>
@@ -124,9 +144,9 @@ const HowItWorks: React.FC = () => {
             <p className="font-sans text-body text-neutral-dark/80 dark:text-neutral-medium leading-relaxed">
               Native mobile apps with offline access and push notifications for expiring codes.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="text-center animate-slide-up" style={{ animationDelay: '0.3s' }}>
+          <motion.div variants={itemVariants} className="text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-bright rounded-lg mb-6 shadow-light dark:shadow-dark">
               <DeviceTabletIcon className="w-8 h-8 text-white" />
             </div>
@@ -136,8 +156,8 @@ const HowItWorks: React.FC = () => {
             <p className="font-sans text-body text-neutral-dark/80 dark:text-neutral-medium leading-relaxed">
               Optimized tablet interface perfect for shopping sessions and code management.
             </p>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {/* Interactive Demo */}
         <div className="max-w-7xl mx-auto">
