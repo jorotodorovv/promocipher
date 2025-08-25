@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Shield, Chrome, AlertCircle, Github, Slack } from 'lucide-react';
 import Modal from './ui/Modal';
 import Button from './ui/Button';
 import { authService } from '../services/authService';
+import { BellAlertIcon, CodeBracketIcon, ComputerDesktopIcon, GlobeAltIcon, ShieldCheckIcon } from '@heroicons/react/24/solid';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -59,7 +59,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="text-center mb-8">
         <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-bright rounded-lg mb-6 shadow-light dark:shadow-dark animate-pulse-glow">
-          <Shield className="w-8 h-8 text-white" />
+          <ShieldCheckIcon className="w-8 h-8 text-white" />
         </div>
         <h2 className="font-pixel text-h3 text-neutral-dark dark:text-white mb-2 uppercase tracking-wide">
           Welcome
@@ -72,7 +72,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
       {error && (
         <div className="mb-6 p-4 bg-accent-error/10 border border-accent-error/20 rounded-lg">
           <div className="flex items-center space-x-2">
-            <AlertCircle className="w-5 h-5 text-accent-error" />
+            <BellAlertIcon className="w-5 h-5 text-accent-error" />
             <span className="font-sans text-small text-accent-error">{error}</span>
           </div>
         </div>
@@ -87,7 +87,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           onClick={handleGoogleSignIn}
           disabled={loading}
         >
-          <Chrome className="w-5 h-5 mr-3" />
+          <GlobeAltIcon className="w-5 h-5 mr-3" />
           Continue with Google
         </Button>
         <Button
@@ -97,7 +97,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           onClick={handleGitHubSignIn}
           disabled={loading}
         >
-          <Github className="w-5 h-5 mr-3" />
+          <ComputerDesktopIcon className="w-5 h-5 mr-3" />
           Continue with GitHub
         </Button>
         <Button
@@ -107,7 +107,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           onClick={handleSlackSignIn}
           disabled={loading}
         >
-          <Slack className="w-5 h-5 mr-3" />
+          <CodeBracketIcon className="w-5 h-5 mr-3" />
           Continue with Slack
         </Button>
       </div>
