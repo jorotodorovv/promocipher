@@ -13,25 +13,7 @@ export const authService = {
     }
   },
 
-  // Sign up with email and password
-  async signUp(email: string, password: string): Promise<{ user: User | null; error: AuthError | null }> {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
-
-    return { user: data.user, error };
-  },
-
-  // Sign in with email and password
-  async signIn(email: string, password: string): Promise<{ user: User | null; error: AuthError | null }> {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    return { user: data.user, error };
-  },
+  
 
   // Sign out
   async signOut(): Promise<{ error: AuthError | null }> {
