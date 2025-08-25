@@ -63,7 +63,7 @@ export const authService = {
   },
 
   // Sign in with OAuth provider
-  async signInWithOAuth(provider: 'google' | 'github' | 'discord', redirectTo?: string): Promise<{ error: AuthError | null }> {
+  async signInWithOAuth(provider: 'google' | 'github' | 'discord' | 'slack', redirectTo?: string): Promise<{ error: AuthError | null }> {
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {

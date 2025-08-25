@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Shield, Chrome, Mail, Lock, AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { Shield, Chrome, Mail, Lock, AlertCircle, Eye, EyeOff, Github, Slack } from 'lucide-react';
 import Modal from './ui/Modal';
 import Button from './ui/Button';
 import Input from './ui/Input';
@@ -29,6 +29,34 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
       if (error) throw error;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to sign in with Google');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGitHubSignIn = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const { error } = await authService.signInWithOAuth('github');
+      if (error) throw error;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to sign in with GitHub');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSlackSignIn = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const { error } = await authService.signInWithOAuth('slack');
+      if (error) throw error;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to sign in with Slack');
     } finally {
       setLoading(false);
     }
@@ -109,8 +137,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
         </div>
       )}
 
-      {/* Google OAuth Button */}
-      <div className="mb-6">
+      {/* OAuth Buttons */}
+      <div className="mb-6 space-y-3">
         <Button
           variant="secondary"
           size="large"
@@ -120,6 +148,26 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
         >
           <Chrome className="w-5 h-5 mr-3" />
           {isSignUp ? 'Sign up with Google' : 'Continue with Google'}
+        </Button>
+        <Button
+          variant="secondary"
+          size="large"
+          className="w-full border-2 border-neutral-medium hover:border-primary-bright"
+          onClick={handleGitHubSignIn}
+          disabled={loading}
+        >
+          <Github className="w-5 h-5 mr-3" />
+          {isSignUp ? 'Sign up with GitHub' : 'Continue with GitHub'}
+        </Button>
+        <Button
+          variant="secondary"
+          size="large"
+          className="w-full border-2 border-neutral-medium hover:border-primary-bright"
+          onClick={handleSlackSignIn}
+          disabled={loading}
+        >
+          <Slack className="w-5 h-5 mr-3" />
+          {isSignUp ? 'Sign up with Slack' : 'Continue with Slack'}
         </Button>
       </div>
 
