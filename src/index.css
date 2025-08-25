@@ -7,3 +7,8 @@
     @apply inline-block w-2 h-4 bg-primary-bright ml-1 animate-pulse;
   }
 }
+
+/* Add scroll padding to account for fixed header */
+section {
+  scroll-margin-top: 20px;
+}

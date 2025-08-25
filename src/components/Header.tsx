@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Moon, Sun, Menu, X, LogOut, User, ShieldEllipsis } from 'lucide-react';
 import { User as SupabaseUser } from '@supabase/supabase-js';
 import { useAuth } from '../contexts/AuthContext';
+import { smoothScrollTo } from '../utils/scrollUtils';
 
 interface HeaderProps {
   darkMode: boolean;
@@ -35,18 +36,24 @@ const Header: React.FC<HeaderProps> = ({ darkMode, onToggleDarkMode, user }) => 
           {/* Desktop Navigation - Only show when user is not logged in */}
           {!user && (
             <nav className="hidden md:flex items-center space-x-8">
-              <a href="#features" className="text-white hover:text-primary-bright transition-colors duration-200 font-sans font-medium">
-                Features
-              </a>
-              <a href="#security" className="text-white hover:text-primary-bright transition-colors duration-200 font-sans font-medium">
+              <button 
+                onClick={() => smoothScrollTo('terminal')} 
+                className="text-white hover:text-primary-bright transition-colors duration-200 font-sans font-medium"
+              >
                 Security
-              </a>
-              <a href="#pricing" className="text-white hover:text-primary-bright transition-colors duration-200 font-sans font-medium">
-                Pricing
-              </a>
-              <a href="#contact" className="text-white hover:text-primary-bright transition-colors duration-200 font-sans font-medium">
-                Contact
-              </a>
+              </button>
+              <button 
+                onClick={() => smoothScrollTo('features')} 
+                className="text-white hover:text-primary-bright transition-colors duration-200 font-sans font-medium"
+              >
+                Features
+              </button>
+              <button 
+                onClick={() => smoothScrollTo('how-it-works')} 
+                className="text-white hover:text-primary-bright transition-colors duration-200 font-sans font-medium"
+              >
+                How It Works
+              </button>
             </nav>
           )}
 
@@ -102,18 +109,24 @@ const Header: React.FC<HeaderProps> = ({ darkMode, onToggleDarkMode, user }) => 
         {mobileMenuOpen && !user && (
           <div className="md:hidden bg-primary-deep border-t border-white/20 animate-slide-up">
             <div className="px-2 pt-2 pb-3 space-y-1">
-              <a href="#features" className="block px-3 py-2 text-white hover:bg-white/10 rounded transition-colors duration-200">
+              <button 
+                onClick={() => { smoothScrollTo('terminal'); setMobileMenuOpen(false); }} 
+                className="block w-full text-left px-3 py-2 text-white hover:bg-white/10 rounded transition-colors duration-200"
+              >
+                Terminal
+              </button>
+              <button 
+                onClick={() => { smoothScrollTo('features'); setMobileMenuOpen(false); }} 
+                className="block w-full text-left px-3 py-2 text-white hover:bg-white/10 rounded transition-colors duration-200"
+              >
                 Features
-              </a>
-              <a href="#security" className="block px-3 py-2 text-white hover:bg-white/10 rounded transition-colors duration-200">
-                Security
-              </a>
-              <a href="#pricing" className="block px-3 py-2 text-white hover:bg-white/10 rounded transition-colors duration-200">
-                Pricing
-              </a>
-              <a href="#contact" className="block px-3 py-2 text-white hover:bg-white/10 rounded transition-colors duration-200">
-                Contact
-              </a>
+              </button>
+              <button 
+                onClick={() => { smoothScrollTo('how-it-works'); setMobileMenuOpen(false); }} 
+                className="block w-full text-left px-3 py-2 text-white hover:bg-white/10 rounded transition-colors duration-200"
+              >
+                How It Works
+              </button>
             </div>
           </div>
         )}

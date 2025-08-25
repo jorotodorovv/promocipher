@@ -1,5 +1,6 @@
 import React from 'react';
 import { LockClosedIcon, ShieldCheckIcon } from '@heroicons/react/24/solid';
+import { smoothScrollTo } from '../utils/scrollUtils';
 
 const Footer: React.FC = () => {
   return (
@@ -25,35 +26,15 @@ const Footer: React.FC = () => {
               Product
             </h4>
             <div className="space-y-2">
-              <a href="#features" className="block font-sans text-small text-neutral-light/80 hover:text-white transition-colors duration-200">
-                Features
-              </a>
-              <a href="#security" className="block font-sans text-small text-neutral-light/80 hover:text-white transition-colors duration-200">
+              <button onClick={() => smoothScrollTo('security')} className="block font-sans text-small text-neutral-light/80 hover:text-white transition-colors duration-200">
                 Security
-              </a>
-              <a href="#pricing" className="block font-sans text-small text-neutral-light/80 hover:text-white transition-colors duration-200">
-                Pricing
-              </a>
-            </div>
-          </div>
-
-          <div>
-            <h4 className="font-sans text-small font-bold text-white mb-4 uppercase tracking-wider">
-              Company
-            </h4>
-            <div className="space-y-2">
-              <a href="#about" className="block font-sans text-small text-neutral-light/80 hover:text-white transition-colors duration-200">
-                About Us
-              </a>
-              <a href="#blog" className="block font-sans text-small text-neutral-light/80 hover:text-white transition-colors duration-200">
-                Blog
-              </a>
-              <a href="#careers" className="block font-sans text-small text-neutral-light/80 hover:text-white transition-colors duration-200">
-                Careers
-              </a>
-              <a href="#contact" className="block font-sans text-small text-neutral-light/80 hover:text-white transition-colors duration-200">
-                Contact
-              </a>
+              </button>
+              <button onClick={() => smoothScrollTo('features')} className="block font-sans text-small text-neutral-light/80 hover:text-white transition-colors duration-200">
+                Features
+              </button>
+              <button onClick={() => smoothScrollTo('how-it-works')} className="block font-sans text-small text-neutral-light/80 hover:text-white transition-colors duration-200">
+                How It Works
+              </button>
             </div>
           </div>
         </div>

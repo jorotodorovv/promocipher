@@ -46,7 +46,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     setError(null);
     
     try {
-      const { error } = await authService.signInWithOAuth('slack');
+      const { error } = await authService.signInWithOAuth('slack_oidc');
       if (error) throw error;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to sign in with Slack');
