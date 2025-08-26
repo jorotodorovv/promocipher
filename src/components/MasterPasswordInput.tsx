@@ -25,7 +25,7 @@ const MasterPasswordInput: React.FC<MasterPasswordInputProps> = ({
   const [rememberMe, setRememberMe] = useState(false);
   const [agreeToRisks, setAgreeToRisks] = useState(false);
   const [showResetDialog, setShowResetDialog] = useState(false);
-  const [validationError, setValidationError] = useState<string | null>(null);
+  const [submitted, setSubmitted] = useState(false);
 
   // Show reset dialog when password validation fails
   useEffect(() => {
@@ -34,16 +34,16 @@ const MasterPasswordInput: React.FC<MasterPasswordInputProps> = ({
     }
   }, [error]);
 
-  useEffect(() => {
-    if (rememberMe && !agreeToRisks) {
-      setValidationError('Please acknowledge the security risks to proceed while "Remember me" is active.');
-    } else {
-      setValidationError(null);
-    }
-  }, [rememberMe, agreeToRisks]);
+  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitted(true);
+
+    if (rememberMe && !agreeToRisks) {
+      return;
+    }
+
     if (password.trim()) {
       await onPasswordSubmit(password, rememberMe);
     }
@@ -89,14 +89,7 @@ const MasterPasswordInput: React.FC<MasterPasswordInputProps> = ({
             </div>
           )}
 
-          {validationError && (
-            <div className="mb-6 p-4 bg-accent-error/10 border border-accent-error/20 rounded-lg">
-              <div className="flex items-center space-x-2">
-                <ExclamationCircleIcon className="w-6 h-6 text-accent-error" />
-                <span className="font-sans text-small text-accent-error">{validationError}</span>
-              </div>
-            </div>
-          )}
+          
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="relative">
@@ -194,6 +187,12 @@ const MasterPasswordInput: React.FC<MasterPasswordInputProps> = ({
                             <strong>I understand and acknowledge these security risks.</strong>
                           </label>
                         </div>
+                        {submitted && rememberMe && !agreeToRisks && (
+                          <p className="mt-3 font-sans text-small text-accent-error flex items-center">
+                            <ExclamationCircleIcon className="w-5 h-5 mr-2" />
+                            Please acknowledge the risks to proceed.
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -205,11 +204,7 @@ const MasterPasswordInput: React.FC<MasterPasswordInputProps> = ({
               size="large"
               className="w-full"
               type="submit"
-              disabled={
-                isLoading || 
-                password.length < 8 || 
-                (rememberMe && !agreeToRisks)
-              }
+              disabled={isLoading || password.length < 8}
             >
               {isLoading ? (
                 'Deriving encryption key...'
