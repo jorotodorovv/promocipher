@@ -124,7 +124,7 @@ const HowItWorks: React.FC = () => {
         >
           <motion.div variants={itemVariants} className="text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-bright rounded-lg mb-6 shadow-light dark:shadow-dark">
-              <ComputerDesktopIcon className="w-8 h-8 text-white" />
+              <ComputerDesktopIcon className="w-9 h-9 text-white" />
             </div>
             <h3 className="font-pixel text-h3 text-neutral-dark dark:text-white mb-4 uppercase tracking-wide">
               Desktop
@@ -136,7 +136,7 @@ const HowItWorks: React.FC = () => {
 
           <motion.div variants={itemVariants} className="text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-bright rounded-lg mb-6 shadow-light dark:shadow-dark">
-              <DevicePhoneMobileIcon className="w-8 h-8 text-white" />
+              <DevicePhoneMobileIcon className="w-9 h-9 text-white" />
             </div>
             <h3 className="font-pixel text-h3 text-neutral-dark dark:text-white mb-4 uppercase tracking-wide">
               Mobile
@@ -148,7 +148,7 @@ const HowItWorks: React.FC = () => {
 
           <motion.div variants={itemVariants} className="text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-bright rounded-lg mb-6 shadow-light dark:shadow-dark">
-              <DeviceTabletIcon className="w-8 h-8 text-white" />
+              <DeviceTabletIcon className="w-9 h-9 text-white" />
             </div>
             <h3 className="font-pixel text-h3 text-neutral-dark dark:text-white mb-4 uppercase tracking-wide">
               Tablet

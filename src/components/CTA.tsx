@@ -33,7 +33,7 @@ const CTA: React.FC<CTAProps> = ({ onDashboardAccess }) => {
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
           >
             <div className="inline-flex items-center justify-center w-20 h-20 bg-white/20 rounded-lg mb-8">
-              <LockClosedIcon className="w-10 h-10 text-white" />
+              <LockClosedIcon className="w-11 h-11 text-white" />
             </div>
 
             <h2 className="font-pixel text-h2 mb-6 uppercase tracking-wide">
@@ -47,9 +47,9 @@ const CTA: React.FC<CTAProps> = ({ onDashboardAccess }) => {
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
               <Button variant="secondary" size="large" className="w-full sm:w-auto bg-white text-primary-bright hover:bg-neutral-light border-white" onClick={onDashboardAccess}>
-                <ShieldCheckIcon className="w-5 h-5 mr-2" />
+                <ShieldCheckIcon className="w-6 h-6 mr-2" />
                 Create Free Account
-                <ArrowRightIcon className="w-5 h-5 ml-2" />
+                <ArrowRightIcon className="w-6 h-6 ml-2" />
               </Button>
             </div>
           </MotionCard>

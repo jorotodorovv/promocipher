@@ -86,7 +86,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="text-center mb-8">
         <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-bright rounded-lg mb-6 shadow-light dark:shadow-dark animate-pulse-glow">
-          <ShieldCheckIcon className="w-8 h-8 text-white" />
+          <ShieldCheckIcon className="w-9 h-9 text-white" />
         </div>
         <h2 className="font-pixel text-h3 text-neutral-dark dark:text-white mb-2 uppercase tracking-wide">
           Welcome
@@ -99,7 +99,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
       {error && (
         <div className="mb-6 p-4 bg-accent-error/10 border border-accent-error/20 rounded-lg">
           <div className="flex items-center space-x-2">
-            <BellAlertIcon className="w-5 h-5 text-accent-error" />
+            <BellAlertIcon className="w-6 h-6 text-accent-error" />
             <span className="font-sans text-small text-accent-error">{error}</span>
           </div>
         </div>

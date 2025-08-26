@@ -41,7 +41,7 @@ const LandingHero: React.FC<LandingHeroProps> = ({ onDashboardAccess }) => {
       >
         <div className="text-center mb-16">
           <motion.div variants={itemVariants} className="inline-flex items-center justify-center w-20 h-20 bg-primary-bright rounded-lg mb-8 shadow-light dark:shadow-dark animate-pulse-glow">
-            <ShieldCheckIcon className="w-10 h-10 text-white" />
+            <ShieldCheckIcon className="w-11 h-11 text-white" />
           </motion.div>
           
           <motion.h1 variants={itemVariants} className="font-pixel text-h1 md:text-5xl text-neutral-dark dark:text-white mb-6 uppercase tracking-wide">
@@ -59,9 +59,9 @@ const LandingHero: React.FC<LandingHeroProps> = ({ onDashboardAccess }) => {
 
           <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
             <Button variant="primary" size="large" className="w-full sm:w-auto" onClick={onDashboardAccess}>
-              <ShieldCheckIcon className="w-5 h-5 mr-2" />
+              <ShieldCheckIcon className="w-6 h-6 mr-2" />
               Start Securing Codes
-              <ArrowRightIcon className="w-5 h-5 ml-2" />
+              <ArrowRightIcon className="w-6 h-6 ml-2" />
             </Button>
           </motion.div>
         </div>

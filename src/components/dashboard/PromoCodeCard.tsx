@@ -78,7 +78,7 @@ const PromoCodeCard: React.FC<PromoCodeCardProps> = ({
           <span className="font-sans text-small text-neutral-dark/80 dark:text-neutral-medium">Promo Code</span>
           {code.isRevealed && countdown !== null && (
             <div className="flex items-center space-x-1 text-xs text-neutral-dark/80 dark:text-neutral-medium">
-              <ClockIcon className="w-3 h-3" />
+              <ClockIcon className="w-4 h-4" />
               <span>Auto-hide in {countdown}s</span>
             </div>
           )}
@@ -91,7 +91,7 @@ const PromoCodeCard: React.FC<PromoCodeCardProps> = ({
           </div>
           <div className="flex items-center space-x-2 ml-3">
             {code.isDecrypting ? (
-              <ArrowPathIcon className="w-4 h-4 text-primary-bright animate-spin" />
+              <ArrowPathIcon className="w-5 h-5 text-primary-bright animate-spin" />
             ) : (
               <button
                 onClick={handleToggleReveal}
@@ -99,9 +99,9 @@ const PromoCodeCard: React.FC<PromoCodeCardProps> = ({
                 title={code.isRevealed ? 'Hide code' : 'Reveal code'}
               >
                 {code.isRevealed ? (
-                  <EyeSlashIcon className="w-4 h-4 text-neutral-dark dark:text-neutral-medium" />
+                  <EyeSlashIcon className="w-5 h-5 text-neutral-dark dark:text-neutral-medium" />
                 ) : (
-                  <EyeIcon className="w-4 h-4 text-primary-bright" />
+                  <EyeIcon className="w-5 h-5 text-primary-bright" />
                 )}
               </button>
             )}
@@ -112,9 +112,9 @@ const PromoCodeCard: React.FC<PromoCodeCardProps> = ({
                 title="Copy code"
               >
                 {copiedCodeId === code.id ? (
-                  <CheckIcon className="w-4 h-4 text-accent-success" />
+                  <CheckIcon className="w-5 h-5 text-accent-success" />
                 ) : (
-                  <ClipboardDocumentIcon className="w-4 h-4 text-primary-bright" />
+                  <ClipboardDocumentIcon className="w-5 h-5 text-primary-bright" />
                 )}
               </button>
             )}
@@ -126,7 +126,7 @@ const PromoCodeCard: React.FC<PromoCodeCardProps> = ({
       {code.decryptionError && (
         <div className="mb-4 p-3 bg-accent-error/10 border border-accent-error/20 rounded-lg">
           <div className="flex items-center space-x-2">
-            <ExclamationCircleIcon className="w-4 h-4 text-accent-error" />
+            <ExclamationCircleIcon className="w-5 h-5 text-accent-error" />
             <span className="font-sans text-small text-accent-error">{code.decryptionError}</span>
           </div>
         </div>
@@ -151,14 +151,14 @@ const PromoCodeCard: React.FC<PromoCodeCardProps> = ({
             className="p-2 hover:bg-neutral-medium/20 rounded  group"
             title="Edit promo code"
           >
-            <PencilSquareIcon className="w-4 h-4 text-neutral-dark/80 dark:text-neutral-medium group-hover:text-primary-bright" />
+            <PencilSquareIcon className="w-5 h-5 text-neutral-dark/80 dark:text-neutral-medium group-hover:text-primary-bright" />
           </button>
           <button
             onClick={() => onDelete(code)}
             className="p-2 hover:bg-accent-error/10 rounded  group"
             title="Delete promo code"
           >
-            <TrashIcon className="w-4 h-4 text-neutral-dark/80 dark:text-neutral-medium group-hover:text-accent-error" />
+            <TrashIcon className="w-5 h-5 text-neutral-dark/80 dark:text-neutral-medium group-hover:text-accent-error" />
           </button>
         </div>
       </div>

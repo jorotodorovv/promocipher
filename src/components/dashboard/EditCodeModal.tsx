@@ -73,7 +73,7 @@ const EditCodeModal: React.FC<EditCodeModalProps> = ({
     <Modal isOpen={isOpen} onClose={handleClose}>
       <div className="text-center mb-6">
         <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-bright rounded-lg mb-4 shadow-light dark:shadow-dark">
-          <PencilSquareIcon className="w-8 h-8 text-white" />
+          <PencilSquareIcon className="w-9 h-9 text-white" />
         </div>
         <h2 className="font-pixel text-h3 text-neutral-dark dark:text-white mb-2 uppercase tracking-wide">
           Edit Promo Code Details
@@ -86,7 +86,7 @@ const EditCodeModal: React.FC<EditCodeModalProps> = ({
       {error && (
         <div className="mb-6 p-4 bg-accent-error/10 border border-accent-error/20 rounded-lg">
           <div className="flex items-center space-x-2">
-            <ExclamationCircleIcon className="w-5 h-5 text-accent-error" />
+            <ExclamationCircleIcon className="w-6 h-6 text-accent-error" />
             <span className="font-sans text-small text-accent-error">{error}</span>
           </div>
         </div>
@@ -145,12 +145,12 @@ const EditCodeModal: React.FC<EditCodeModalProps> = ({
           >
             {isLoading ? (
               <>
-                <ArrowPathIcon className="w-4 h-4 mr-2 animate-spin" />
+                <ArrowPathIcon className="w-5 h-5 mr-2 animate-spin" />
                 Updating...
               </>
             ) : (
               <>
-                <ShieldCheckIcon className="w-4 h-4 mr-2" />
+                <ShieldCheckIcon className="w-5 h-5 mr-2" />
                 Update Details
               </>
             )}

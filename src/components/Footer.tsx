@@ -57,11 +57,11 @@ const Footer: React.FC = () => {
           </p>
           <div className="flex items-center space-x-6">
             <div className="flex items-center space-x-2">
-              <LockClosedIcon className="w-4 h-4 text-neutral-light/60" />
+              <LockClosedIcon className="w-5 h-5 text-neutral-light/60" />
               <span className="font-code text-small text-neutral-light/60">256-bit Encrypted</span>
             </div>
             <div className="flex items-center space-x-2">
-              <ShieldCheckIcon className="w-4 h-4 text-neutral-light/60" />
+              <ShieldCheckIcon className="w-5 h-5 text-neutral-light/60" />
               <span className="font-code text-small text-neutral-light/60">SOC 2 Certified</span>
             </div>
           </div>

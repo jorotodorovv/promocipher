@@ -7,7 +7,7 @@ const SecurityNotice: React.FC = () => {
     <div className="mt-16">
       <Card className="bg-primary-bright/10 border border-primary-bright/20 max-w-2xl mx-auto text-center">
         <div className="flex items-center justify-center space-x-3 mb-4">
-          <ShieldCheckIcon className="w-6 h-6 text-primary-bright" />
+          <ShieldCheckIcon className="w-7 h-7 text-primary-bright" />
           <h3 className="font-pixel text-h3 text-primary-bright uppercase tracking-wide">
             Zero-Knowledge Security
           </h3>

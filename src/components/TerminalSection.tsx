@@ -24,7 +24,7 @@ const TerminalSection: React.FC = () => {
           {/* Left Content */}
           <div>
             <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-bright rounded-lg mb-8 shadow-light animate-pulse-glow">
-              <CommandLineIcon className="w-8 h-8 text-white" />
+              <CommandLineIcon className="w-9 h-9 text-white" />
             </div>
 
             <h2 className="font-pixel text-h2 text-neutral-dark dark:text-white mb-6 uppercase tracking-wide">
@@ -98,7 +98,7 @@ const TerminalSection: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-neutral-light dark:bg-white/5 border border-neutral-medium/20 dark:border-white/10 rounded-lg p-6 text-center">
-              <ShieldExclamationIcon className="w-8 h-8 text-primary-bright mx-auto mb-4" />
+              <ShieldExclamationIcon className="w-9 h-9 text-primary-bright mx-auto mb-4" />
               <h4 className="font-pixel text-small text-neutral-dark dark:text-white mb-2 uppercase">
                 Key Derivation
               </h4>
@@ -108,7 +108,7 @@ const TerminalSection: React.FC = () => {
             </div>
 
             <div className="bg-neutral-light dark:bg-white/5 border border-neutral-medium/20 dark:border-white/10 rounded-lg p-6 text-center">
-              <CodeBracketIcon className="w-8 h-8 text-primary-bright mx-auto mb-4" />
+              <CodeBracketIcon className="w-9 h-9 text-primary-bright mx-auto mb-4" />
               <h4 className="font-pixel text-small text-neutral-dark dark:text-white mb-2 uppercase">
                 Encryption
               </h4>
@@ -118,7 +118,7 @@ const TerminalSection: React.FC = () => {
             </div>
 
             <div className="bg-neutral-light dark:bg-white/5 border border-neutral-medium/20 dark:border-white/10 rounded-lg p-6 text-center">
-              <CommandLineIcon className="w-8 h-8 text-primary-bright mx-auto mb-4" />
+              <CommandLineIcon className="w-9 h-9 text-primary-bright mx-auto mb-4" />
               <h4 className="font-pixel text-small text-neutral-dark dark:text-white mb-2 uppercase">
                 Nonce Size
               </h4>

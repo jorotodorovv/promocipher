@@ -10,7 +10,7 @@ const EmptyState: React.FC<EmptyStateProps> = ({ onAddCode }) => {
   return (
     <div className="text-center py-16">
       <div className="inline-flex items-center justify-center w-20 h-20 bg-neutral-light dark:bg-neutral-medium/20 rounded-lg mb-6">
-        <ShieldCheckIcon className="w-10 h-10 text-neutral-medium" />
+        <ShieldCheckIcon className="w-11 h-11 text-neutral-medium" />
       </div>
       <h3 className="font-pixel text-h3 text-neutral-dark dark:text-white mb-4 uppercase tracking-wide">
         No Promo Codes Yet
@@ -24,7 +24,7 @@ const EmptyState: React.FC<EmptyStateProps> = ({ onAddCode }) => {
         size="large"
         onClick={onAddCode}
       >
-        <PlusIcon className="w-5 h-5 mr-2" />
+        <PlusIcon className="w-6 h-6 mr-2" />
         Add Your First Code
       </Button>
     </div>

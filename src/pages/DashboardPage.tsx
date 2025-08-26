@@ -508,7 +508,7 @@ const DashboardPage: React.FC = () => {
           {isLoadingCodes || isLoadingStats || searchLoading ? (
             <div className="text-center py-16">
               <div className="inline-flex items-center justify-center w-20 h-20 bg-primary-bright rounded-lg mb-6 animate-pulse-glow">
-                <ArrowPathIcon className="w-10 h-10 text-white animate-spin" />
+                <ArrowPathIcon className="w-11 h-11 text-white animate-spin" />
               </div>
               <h3 className="font-pixel text-h3 text-neutral-dark dark:text-white mb-4 uppercase tracking-wide">
                 Loading Your Vault
@@ -558,7 +558,7 @@ const DashboardPage: React.FC = () => {
                   {/* Loading more indicator */}
                   {isFetchingNextPage && (
                     <div className="text-center py-8">
-                      <ArrowPathIcon className="w-8 h-8 animate-spin mx-auto text-primary-bright" />
+                      <ArrowPathIcon className="w-9 h-9 animate-spin mx-auto text-primary-bright" />
                       <p className="mt-2 text-sm text-neutral-dark dark:text-neutral-medium">
                         Loading more codes...
                       </p>

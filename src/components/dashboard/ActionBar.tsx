@@ -51,7 +51,7 @@ const ActionBar: React.FC<ActionBarProps> = ({
             placeholder="Search promo codes..."
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
-            icon={searchLoading ? <ArrowPathIcon className="w-5 h-5 animate-spin" /> : <MagnifyingGlassIcon className="w-5 h-5" />}
+            icon={searchLoading ? <ArrowPathIcon className="w-6 h-6 animate-spin" /> : <MagnifyingGlassIcon className="w-6 h-6" />}
           />
         </div>
         {totalCount > 0 && (
@@ -62,14 +62,14 @@ const ActionBar: React.FC<ActionBarProps> = ({
             disabled={isDeleting}
             title="Delete all promo codes"
           >
-            <TrashIcon className="w-4 h-4 mr-2" />
+            <TrashIcon className="w-5 h-5 mr-2" />
             {isDeleting ? 'Deleting...' : 'Delete All'}
           </Button>
         )}
       </div>
       <div className="flex items-center space-x-3">
         <Button variant="secondary" size="medium">
-          <AdjustmentsHorizontalIcon className="w-4 h-4 mr-2" />
+          <AdjustmentsHorizontalIcon className="w-5 h-5 mr-2" />
           Filter
         </Button>
         <Button 
@@ -78,7 +78,7 @@ const ActionBar: React.FC<ActionBarProps> = ({
           onClick={handleImportClick}
           disabled={isImporting}
         >
-          <ArrowUpTrayIcon className="w-4 h-4 mr-2" />
+          <ArrowUpTrayIcon className="w-5 h-5 mr-2" />
           {isImporting ? 'Importing...' : 'Import'}
         </Button>
         <Button 
@@ -87,7 +87,7 @@ const ActionBar: React.FC<ActionBarProps> = ({
           onClick={onExport}
           disabled={isExporting}
         >
-          <ArrowDownTrayIcon className="w-4 h-4 mr-2" />
+          <ArrowDownTrayIcon className="w-5 h-5 mr-2" />
           {isExporting ? 'Exporting...' : 'Export'}
         </Button>
         <Button 
@@ -95,7 +95,7 @@ const ActionBar: React.FC<ActionBarProps> = ({
           size="medium"
           onClick={onAddCode}
         >
-          <PlusIcon className="w-4 h-4 mr-2" />
+          <PlusIcon className="w-5 h-5 mr-2" />
           Add Code
         </Button>
       </div>

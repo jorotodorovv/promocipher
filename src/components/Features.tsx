@@ -84,7 +84,7 @@ const Features: React.FC = () => {
             >
               <Card className="text-center hover:shadow-hover-light dark:hover:shadow-hover-dark transform hover:scale-102 h-full">
                 <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-bright rounded-lg mb-6 shadow-light dark:shadow-dark">
-                  <feature.icon className="w-8 h-8 text-white" />
+                  <feature.icon className="w-9 h-9 text-white" />
                 </div>
                 <h3 className="font-pixel text-h3 text-neutral-dark dark:text-white mb-4 uppercase tracking-wide">
                   {feature.title}

@@ -31,7 +31,7 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="text-center mb-6">
         <div className="inline-flex items-center justify-center w-16 h-16 bg-accent-error rounded-lg mb-4 shadow-light dark:shadow-dark">
-          <ExclamationTriangleIcon className="w-8 h-8 text-white" />
+          <ExclamationTriangleIcon className="w-9 h-9 text-white" />
         </div>
         <h2 className="font-pixel text-h3 text-neutral-dark dark:text-white mb-2 uppercase tracking-wide">
           {isDeleteAll ? 'Delete All Promo Codes' : 'Delete Promo Code'}
@@ -97,12 +97,12 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
         >
           {isLoading ? (
             <>
-              <ArrowPathIcon className="w-4 h-4 mr-2 animate-spin" />
+              <ArrowPathIcon className="w-5 h-5 mr-2 animate-spin" />
               Deleting...
             </>
           ) : (
             <>
-              <TrashIcon className="w-4 h-4 mr-2" />
+              <TrashIcon className="w-5 h-5 mr-2" />
               {isDeleteAll ? 'Delete All' : 'Delete'}
             </>
           )}

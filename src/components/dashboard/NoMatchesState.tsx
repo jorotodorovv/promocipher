@@ -11,7 +11,7 @@ const NoMatchesState: React.FC<NoMatchesStateProps> = ({ searchTerm, onClearSear
   return (
     <div className="text-center py-16">
       <div className="inline-flex items-center justify-center w-20 h-20 bg-neutral-light dark:bg-neutral-medium/20 rounded-lg mb-6">
-        <MagnifyingGlassIcon className="w-10 h-10 text-neutral-medium" />
+        <MagnifyingGlassIcon className="w-11 h-11 text-neutral-medium" />
       </div>
       <h3 className="font-pixel text-h3 text-neutral-dark dark:text-white mb-4 uppercase tracking-wide">
         No Matches Found
@@ -25,7 +25,7 @@ const NoMatchesState: React.FC<NoMatchesStateProps> = ({ searchTerm, onClearSear
         size="medium"
         onClick={onClearSearch}
       >
-        <XMarkIcon className="w-4 h-4 mr-2" />
+        <XMarkIcon className="w-5 h-5 mr-2" />
         Clear Search
       </Button>
     </div>
