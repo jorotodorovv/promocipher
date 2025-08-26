@@ -33,32 +33,32 @@ const Header: React.FC<HeaderProps> = ({ darkMode, onToggleDarkMode, user }) => 
             </h1>
           </div>
 
-          {/* Desktop Navigation - Only show when user is not logged in */}
-          {!user && (
-            <nav className="hidden md:flex items-center space-x-8">
-              <button 
-                onClick={() => smoothScrollTo('terminal')} 
-                className="text-white hover:text-primary-bright transition-colors duration-200 font-sans font-medium"
-              >
-                Security
-              </button>
-              <button 
-                onClick={() => smoothScrollTo('features')} 
-                className="text-white hover:text-primary-bright transition-colors duration-200 font-sans font-medium"
-              >
-                Features
-              </button>
-              <button 
-                onClick={() => smoothScrollTo('how-it-works')} 
-                className="text-white hover:text-primary-bright transition-colors duration-200 font-sans font-medium"
-              >
-                How It Works
-              </button>
-            </nav>
-          )}
-
           {/* Controls */}
           <div className="flex items-center space-x-4">
+            {/* Desktop Navigation - Only show when user is not logged in */}
+            {!user && (
+              <nav className="hidden md:flex items-center space-x-8">
+                <button 
+                  onClick={() => smoothScrollTo('terminal')} 
+                  className="text-white hover:text-primary-bright transition-colors duration-200 font-sans font-medium"
+                >
+                  Security
+                </button>
+                <button 
+                  onClick={() => smoothScrollTo('features')} 
+                  className="text-white hover:text-primary-bright transition-colors duration-200 font-sans font-medium"
+                >
+                  Features
+                </button>
+                <button 
+                  onClick={() => smoothScrollTo('how-it-works')} 
+                  className="text-white hover:text-primary-bright transition-colors duration-200 font-sans font-medium"
+                >
+                  How It Works
+                </button>
+              </nav>
+            )}
+
             {/* User Info & Logout */}
             {user && (
               <div className="hidden md:flex items-center space-x-3">
