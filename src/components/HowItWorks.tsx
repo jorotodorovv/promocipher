@@ -162,7 +162,7 @@ const HowItWorks: React.FC = () => {
         {/* Interactive Demo */}
         <div className="max-w-7xl mx-auto">
           <Card className="overflow-hidden">
-            <div className="bg-gradient-to-r from-primary-deep to-primary-bright p-6 text-white">
+            <div className="bg-gradient-to-r from-primary-deep to-primary-bright p-6 text-white rounded-lg">
               <h3 className="font-pixel text-h3 mb-2 uppercase tracking-wide">
                 Live Demo
               </h3>
