@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Cog6ToothIcon, ArrowLeftOnRectangleIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../contexts/AuthContext';
 import { useEncryption } from '../contexts/EncryptionContext';
@@ -67,11 +67,17 @@ const DashboardPage: React.FC = () => {
     };
   }, [searchTerm, debouncedSearchTerm]);
 
-  // Flatten all pages data
-  const promoCodes = data?.pages.flatMap((page: { data: any[]; hasMore: boolean; total: number }) => page.data) || [];
+  // Memoize the flattened promo codes to stabilize the reference
+  const promoCodes = useMemo(() => 
+    data?.pages.flatMap((page: { data: any[]; }) => page.data) || [], 
+    [data]
+  );
 
-  // Flatten stats data (search-only filtered) for dashboard stats calculation
-  const statsPromoCodes = statsData?.pages.flatMap((page: { data: any[]; hasMore: boolean; total: number }) => page.data) || [];
+  const statsPromoCodes = useMemo(() => 
+    statsData?.pages.flatMap((page: { data: any[]; }) => page.data) || [], 
+    [statsData]
+  );
+
   const totalCount = statsData?.pages[0]?.total || 0;
 
   // Calculate dashboard stats using utility function from search-only filtered data
@@ -93,7 +99,7 @@ const DashboardPage: React.FC = () => {
   const [isDeletingCode, setIsDeletingCode] = useState(false);
 
 
-  const handleAddPromoCode = async (newCode: NewPromoCodeForm) => {
+  const handleAddPromoCode = useCallback(async (newCode: NewPromoCodeForm) => {
     setIsAddingCode(true);
     setAddCodeError(null);
 
@@ -131,7 +137,7 @@ const DashboardPage: React.FC = () => {
     } finally {
       setIsAddingCode(false);
     }
-  };
+  }, [derivedKey, user, createPromoCodeMutation]);
 
   const handleEditPromoCode = useCallback((code: DisplayPromoCode) => {
     setSelectedPromoCode(code);
@@ -139,7 +145,7 @@ const DashboardPage: React.FC = () => {
     setEditCodeError(null);
   }, []);
 
-  const handleUpdatePromoCode = async (id: string, store: string, discount: string, expires: string | null, notes: string) => {
+  const handleUpdatePromoCode = useCallback(async (id: string, store: string, discount: string, expires: string | null, notes: string) => {
     setIsEditingCode(true);
     setEditCodeError(null);
 
@@ -156,14 +162,14 @@ const DashboardPage: React.FC = () => {
     } finally {
       setIsEditingCode(false);
     }
-  };
+  }, [updatePromoCodeMutation]);
 
   const handleDeletePromoCode = useCallback((code: DisplayPromoCode) => {
     setSelectedPromoCode(code);
     setShowDeleteConfirmModal(true);
   }, []);
 
-  const handleConfirmDelete = async () => {
+  const handleConfirmDelete = useCallback(async () => {
     if (!selectedPromoCode) return;
 
     setIsDeletingCode(true);
@@ -176,7 +182,7 @@ const DashboardPage: React.FC = () => {
     } finally {
       setIsDeletingCode(false);
     }
-  };
+  }, [selectedPromoCode, deletePromoCodeMutation]);
 
   const handleCloseEditModal = () => {
     setShowEditCodeModal(false);
@@ -195,57 +201,58 @@ const DashboardPage: React.FC = () => {
       return;
     }
 
-    const currentRevealState = revealedCodes[codeId];
+    setRevealedCodes(prev => {
+      const currentRevealState = prev[codeId];
 
-    // If currently revealed, hide it
-    if (currentRevealState?.decryptedCode) {
-      setRevealedCodes(prev => {
+      // If currently revealed, hide it
+      if (currentRevealState?.decryptedCode) {
         const newState = { ...prev };
         delete newState[codeId];
         return newState;
-      });
-      return;
-    }
+      }
 
-    // Find the code to decrypt
-    const codeToDecrypt = promoCodes.find(pc => pc.id === codeId);
-    if (!codeToDecrypt) {
-      console.error('Promo code not found.');
-      return;
-    }
+      // If it's already being decrypted, do nothing
+      if (currentRevealState?.isDecrypting) {
+        return prev;
+      }
 
-    // Set decrypting state
-    setRevealedCodes(prev => ({
-      ...prev,
-      [codeId]: { decryptedCode: '', isDecrypting: true, decryptionError: null }
-    }));
+      const codeToDecrypt = promoCodes.find(pc => pc.id === codeId);
+      if (!codeToDecrypt) {
+        console.error('Promo code not found.');
+        return prev;
+      }
 
-    try {
-      const decryptedCode = await decrypt(
+      // Decrypt asynchronously and then update state
+      decrypt(
         codeToDecrypt.encrypted_data,
         codeToDecrypt.nonce,
         codeToDecrypt.tag,
         codeToDecrypt.user_id,
         codeToDecrypt.id,
         derivedKey
-      );
+      ).then(decryptedCode => {
+        setRevealedCodes(current => ({
+          ...current,
+          [codeId]: { decryptedCode, isDecrypting: false, decryptionError: null }
+        }));
+      }).catch(decryptError => {
+        console.error('Failed to decrypt promo code:', decryptError);
+        const errorMessage = decryptError instanceof Error
+          ? decryptError.message
+          : 'Failed to decrypt promo code';
+        setRevealedCodes(current => ({
+          ...current,
+          [codeId]: { decryptedCode: '', isDecrypting: false, decryptionError: errorMessage }
+        }));
+      });
 
-      setRevealedCodes(prev => ({
+      // Return the state with the 'isDecrypting' flag set immediately
+      return {
         ...prev,
-        [codeId]: { decryptedCode, isDecrypting: false, decryptionError: null }
-      }));
-    } catch (decryptError) {
-      console.error('Failed to decrypt promo code:', decryptError);
-      const errorMessage = decryptError instanceof Error
-        ? decryptError.message
-        : 'Failed to decrypt promo code';
-
-      setRevealedCodes(prev => ({
-        ...prev,
-        [codeId]: { decryptedCode: '', isDecrypting: false, decryptionError: errorMessage }
-      }));
-    }
-  }, [user, derivedKey, revealedCodes, promoCodes]);
+        [codeId]: { decryptedCode: '', isDecrypting: true, decryptionError: null }
+      };
+    });
+  }, [user, derivedKey, promoCodes]);
 
   const handleCopy = useCallback(async (codeText: string, codeId: string) => {
     try {
@@ -274,16 +281,16 @@ const DashboardPage: React.FC = () => {
     setShowDeleteAllModal(true);
   };
 
-  const handleDeleteAllConfirm = async () => {
+  const handleDeleteAllConfirm = useCallback(async () => {
     try {
       await deleteAllPromoCodesMutation.mutateAsync();
       setShowDeleteAllModal(false);
     } catch (error) {
       console.error('Failed to delete all promo codes:', error);
     }
-  };
+  }, [deleteAllPromoCodesMutation]);
 
-  const handleExport = async () => {
+  const handleExport = useCallback(async () => {
     setIsExporting(true);
     setExportSuccess(false);
     try {
@@ -325,9 +332,9 @@ const DashboardPage: React.FC = () => {
     } finally {
       setIsExporting(false);
     }
-  };
+  }, [promoCodes]);
 
-  const handleImport = async (file: File) => {
+  const handleImport = useCallback(async (file: File) => {
     setIsImporting(true);
     setImportError(null);
     setImportSuccess(false);
@@ -379,7 +386,7 @@ const DashboardPage: React.FC = () => {
     } finally {
       setIsImporting(false);
     }
-  };
+  }, [createPromoCodeMutation]);
 
   // Infinite scroll observer
   const lastPromoCodeRef = useCallback((node: HTMLDivElement | null) => {
@@ -409,11 +416,11 @@ const DashboardPage: React.FC = () => {
             </div>
             <div className="flex items-center space-x-3 mt-4 sm:mt-0">
               <Button variant="secondary" size="medium">
-                <Cog6ToothIcon className="w-4 h-4 mr-2" />
+                <Cog6ToothIcon className="w-5 h-5 mr-2" />
                 Settings
               </Button>
               <Button variant="danger" size="medium" onClick={handleSignOut}>
-                <ArrowLeftOnRectangleIcon className="w-4 h-4 mr-2" />
+                <ArrowLeftOnRectangleIcon className="w-5 h-5 mr-2" />
                 Sign Out
               </Button>
             </div>
