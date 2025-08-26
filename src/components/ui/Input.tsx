@@ -13,7 +13,7 @@ const Input: React.FC<InputProps> = ({ icon, className = '', ...props }) => {
         </div>
       )}
       <input
-        className={`w-full px-4 py-3 bg-white dark:bg-neutral-dark border border-neutral-medium dark:border-neutral-medium/30 rounded focus:outline-none focus:border-primary-bright focus:ring-2 focus:ring-primary-bright/20 transition-all duration-200 font-sans text-body text-neutral-dark dark:text-white placeholder-neutral-medium ${icon ? 'pl-12' : ''} ${className}`}
+        className={`w-full px-4 py-3 bg-white dark:bg-neutral-dark border border-neutral-medium dark:border-neutral-medium/30 rounded focus:outline-none focus:border-primary-bright focus:ring-2 focus:ring-primary-bright/20 font-sans text-body text-neutral-dark dark:text-white placeholder-neutral-medium ${icon ? 'pl-12' : ''} ${className}`}
         {...props}
       />
     </div>

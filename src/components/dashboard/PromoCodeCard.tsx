@@ -55,7 +55,7 @@ const PromoCodeCard: React.FC<PromoCodeCardProps> = ({
 
   return (
     <Card 
-      className="hover:shadow-hover-light dark:hover:shadow-hover-dark transform hover:scale-102 transition-all duration-300 animate-slide-up"
+      className="hover:shadow-hover-light dark:hover:shadow-hover-dark transform hover:scale-102 animate-slide-up"
     >
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
@@ -95,7 +95,7 @@ const PromoCodeCard: React.FC<PromoCodeCardProps> = ({
             ) : (
               <button
                 onClick={handleToggleReveal}
-                className="p-1 hover:bg-neutral-medium/20 rounded transition-colors duration-200"
+                className="p-1 hover:bg-neutral-medium/20 rounded "
                 title={code.isRevealed ? 'Hide code' : 'Reveal code'}
               >
                 {code.isRevealed ? (
@@ -108,7 +108,7 @@ const PromoCodeCard: React.FC<PromoCodeCardProps> = ({
             {code.isRevealed && (
               <button
                 onClick={() => onCopy(code.decryptedCode || '', code.id)}
-                className="p-1 hover:bg-neutral-medium/20 rounded transition-colors duration-200"
+                className="p-1 hover:bg-neutral-medium/20 rounded "
                 title="Copy code"
               >
                 {copiedCodeId === code.id ? (
@@ -148,14 +148,14 @@ const PromoCodeCard: React.FC<PromoCodeCardProps> = ({
         <div className="flex items-center justify-end space-x-2 pt-2 border-t border-neutral-light dark:border-neutral-medium/20">
           <button
             onClick={() => onEdit(code)}
-            className="p-2 hover:bg-neutral-medium/20 rounded transition-colors duration-200 group"
+            className="p-2 hover:bg-neutral-medium/20 rounded  group"
             title="Edit promo code"
           >
             <PencilSquareIcon className="w-4 h-4 text-neutral-dark/80 dark:text-neutral-medium group-hover:text-primary-bright" />
           </button>
           <button
             onClick={() => onDelete(code)}
-            className="p-2 hover:bg-accent-error/10 rounded transition-colors duration-200 group"
+            className="p-2 hover:bg-accent-error/10 rounded  group"
             title="Delete promo code"
           >
             <TrashIcon className="w-4 h-4 text-neutral-dark/80 dark:text-neutral-medium group-hover:text-accent-error" />

@@ -58,7 +58,7 @@ function App() {
       {/* Authentication Modal - only show when user tries to access dashboard */}
       <AuthModal isOpen={showAuthModal && !user} onClose={closeAuthModal} />
       
-      <div className="min-h-screen bg-background-light dark:bg-background-dark transition-colors duration-500">
+      <div className="min-h-screen bg-background-light dark:bg-background-dark">
         {/* Only show header when user is fully authenticated and has derived key */}
         {user && derivedKey && (
           <Header darkMode={isDarkMode} onToggleDarkMode={toggleTheme} user={user} />

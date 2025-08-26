@@ -15,7 +15,7 @@ const Button: React.FC<ButtonProps> = ({
   className = '',
   ...props
 }) => {
-  const baseClasses = 'font-sans font-medium rounded transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 transform hover:scale-102 active:scale-98 inline-flex items-center justify-center';
+  const baseClasses = 'font-sans font-medium rounded focus:outline-none focus:ring-2 focus:ring-offset-2 transform hover:scale-102 active:scale-98 inline-flex items-center justify-center';
   
   const variantClasses = {
     primary: 'bg-primary-bright hover:bg-primary-deep text-white focus:ring-primary-bright shadow-light dark:shadow-dark hover:shadow-hover-light dark:hover:shadow-hover-dark',

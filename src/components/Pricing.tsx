@@ -76,7 +76,7 @@ const Pricing: React.FC = () => {
           {plans.map((plan, index) => (
             <Card 
               key={index}
-              className={`relative text-center hover:shadow-hover-light dark:hover:shadow-hover-dark transform hover:scale-105 transition-all duration-300 animate-slide-up ${
+              className={`relative text-center hover:shadow-hover-light dark:hover:shadow-hover-dark transform hover:scale-105 animate-slide-up ${
                 plan.popular ? 'ring-2 ring-primary-bright' : ''
               }`}
               style={{ animationDelay: `${index * 0.1}s` }}

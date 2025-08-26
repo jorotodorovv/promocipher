@@ -38,13 +38,13 @@ const Footer: React.FC = () => {
               Product
             </h4>
             <div className="space-y-2">
-              <button onClick={() => smoothScrollTo('security')} className="block font-sans text-small text-neutral-light/80 hover:text-white transition-colors duration-200">
+              <button onClick={() => smoothScrollTo('security')} className="block font-sans text-small text-neutral-light/80 hover:text-white ">
                 Security
               </button>
-              <button onClick={() => smoothScrollTo('features')} className="block font-sans text-small text-neutral-light/80 hover:text-white transition-colors duration-200">
+              <button onClick={() => smoothScrollTo('features')} className="block font-sans text-small text-neutral-light/80 hover:text-white ">
                 Features
               </button>
-              <button onClick={() => smoothScrollTo('how-it-works')} className="block font-sans text-small text-neutral-light/80 hover:text-white transition-colors duration-200">
+              <button onClick={() => smoothScrollTo('how-it-works')} className="block font-sans text-small text-neutral-light/80 hover:text-white ">
                 How It Works
               </button>
             </div>

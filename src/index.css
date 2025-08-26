@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  * {
+    transition-property: color, background-color, border-color;
+    transition-timing-function: ease-in-out;
+    transition-duration: 1000ms;
+  }
+}
+
 @layer utilities {
   .type-caret {
     @apply inline-block w-2 h-4 bg-primary-bright ml-1 animate-pulse;

@@ -40,19 +40,19 @@ const Header: React.FC<HeaderProps> = ({ darkMode, onToggleDarkMode, user }) => 
               <nav className="hidden md:flex items-center space-x-8">
                 <button 
                   onClick={() => smoothScrollTo('terminal')} 
-                  className="text-white hover:text-primary-bright transition-colors duration-200 font-sans font-medium"
+                  className="text-white hover:text-primary-bright font-sans font-medium"
                 >
                   Security
                 </button>
                 <button 
                   onClick={() => smoothScrollTo('features')} 
-                  className="text-white hover:text-primary-bright transition-colors duration-200 font-sans font-medium"
+                  className="text-white hover:text-primary-bright font-sans font-medium"
                 >
                   Features
                 </button>
                 <button 
                   onClick={() => smoothScrollTo('how-it-works')} 
-                  className="text-white hover:text-primary-bright transition-colors duration-200 font-sans font-medium"
+                  className="text-white hover:text-primary-bright font-sans font-medium"
                 >
                   How It Works
                 </button>
@@ -70,7 +70,7 @@ const Header: React.FC<HeaderProps> = ({ darkMode, onToggleDarkMode, user }) => 
                 </div>
                 <button
                   onClick={handleSignOut}
-                  className="p-2 rounded hover:bg-white/10 transition-colors duration-200"
+                  className="p-2 rounded hover:bg-white/10"
                   title="Sign out"
                 >
                   <ArrowLeftOnRectangleIcon className="w-5 h-5 text-white" />
@@ -80,7 +80,7 @@ const Header: React.FC<HeaderProps> = ({ darkMode, onToggleDarkMode, user }) => 
 
             <button
               onClick={onToggleDarkMode}
-              className="p-2 rounded hover:bg-white/10 transition-colors duration-200"
+              className="p-2 rounded hover:bg-white/10"
             >
               {darkMode ? (
                 <SunIcon className="w-5 h-5 text-white" />
@@ -92,7 +92,7 @@ const Header: React.FC<HeaderProps> = ({ darkMode, onToggleDarkMode, user }) => 
             {/* Mobile menu button - Only show when user is not logged in */}
             {!user && (
               <button
-                className="md:hidden p-2 rounded hover:bg-white/10 transition-colors duration-200"
+                className="md:hidden p-2 rounded hover:bg-white/10"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               >
                 {mobileMenuOpen ? (
@@ -111,19 +111,19 @@ const Header: React.FC<HeaderProps> = ({ darkMode, onToggleDarkMode, user }) => 
             <div className="px-2 pt-2 pb-3 space-y-1">
               <button 
                 onClick={() => { smoothScrollTo('terminal'); setMobileMenuOpen(false); }} 
-                className="block w-full text-left px-3 py-2 text-white hover:bg-white/10 rounded transition-colors duration-200"
+                className="block w-full text-left px-3 py-2 text-white hover:bg-white/10 rounded"
               >
                 Terminal
               </button>
               <button 
                 onClick={() => { smoothScrollTo('features'); setMobileMenuOpen(false); }} 
-                className="block w-full text-left px-3 py-2 text-white hover:bg-white/10 rounded transition-colors duration-200"
+                className="block w-full text-left px-3 py-2 text-white hover:bg-white/10 rounded"
               >
                 Features
               </button>
               <button 
                 onClick={() => { smoothScrollTo('how-it-works'); setMobileMenuOpen(false); }} 
-                className="block w-full text-left px-3 py-2 text-white hover:bg-white/10 rounded transition-colors duration-200"
+                className="block w-full text-left px-3 py-2 text-white hover:bg-white/10 rounded"
               >
                 How It Works
               </button>

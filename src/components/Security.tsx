@@ -59,7 +59,7 @@ const Security: React.FC = () => {
           {securityFeatures.map((feature, index) => (
             <Card 
               key={index}
-              className="hover:shadow-hover-light dark:hover:shadow-hover-dark transform hover:scale-102 transition-all duration-300 animate-slide-up"
+              className="hover:shadow-hover-light dark:hover:shadow-hover-dark transform hover:scale-102 animate-slide-up"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
               <div className="flex items-start space-x-4">

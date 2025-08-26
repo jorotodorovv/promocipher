@@ -113,7 +113,7 @@ const MasterPasswordInput: React.FC<MasterPasswordInputProps> = ({
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 hover:bg-neutral-light dark:hover:bg-neutral-medium/20 rounded transition-colors duration-200"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 hover:bg-neutral-light dark:hover:bg-neutral-medium/20 rounded"
               >
                 {showPassword ? (
                   <EyeSlashIcon className="w-5 h-5 text-neutral-medium" />

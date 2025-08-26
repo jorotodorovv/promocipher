@@ -40,7 +40,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
       <div className="relative bg-white dark:bg-neutral-dark rounded-lg shadow-hover-light dark:shadow-hover-dark p-6 max-w-md w-full mx-4 animate-slide-up">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-1 hover:bg-neutral-light dark:hover:bg-neutral-medium/20 rounded transition-colors duration-200"
+          className="absolute top-4 right-4 p-1 hover:bg-neutral-light dark:hover:bg-neutral-medium/20 rounded"
         >
           <XMarkIcon className="w-5 h-5 text-neutral-dark dark:text-neutral-medium" />
         </button>

@@ -49,7 +49,7 @@ const Features: React.FC = () => {
           <div className="bg-white dark:bg-neutral-dark rounded-lg p-2 shadow-light dark:shadow-dark">
             <button
               onClick={() => setActiveTab('personal')}
-              className={`px-6 py-3 rounded font-sans font-medium transition-all duration-200 ${
+              className={`px-6 py-3 rounded font-sans font-medium  ${
                 activeTab === 'personal'
                   ? 'bg-primary-bright text-white shadow-light'
                   : 'text-neutral-dark dark:text-neutral-medium hover:bg-neutral-light dark:hover:bg-neutral-medium/20'
@@ -59,7 +59,7 @@ const Features: React.FC = () => {
             </button>
             <button
               onClick={() => setActiveTab('business')}
-              className={`px-6 py-3 rounded font-sans font-medium transition-all duration-200 ${
+              className={`px-6 py-3 rounded font-sans font-medium  ${
                 activeTab === 'business'
                   ? 'bg-primary-bright text-white shadow-light'
                   : 'text-neutral-dark dark:text-neutral-medium hover:bg-neutral-light dark:hover:bg-neutral-medium/20'
@@ -82,7 +82,7 @@ const Features: React.FC = () => {
               key={`${activeTab}-${index}`}
               variants={itemVariants}
             >
-              <Card className="text-center hover:shadow-hover-light dark:hover:shadow-hover-dark transform hover:scale-102 transition-all duration-300 h-full">
+              <Card className="text-center hover:shadow-hover-light dark:hover:shadow-hover-dark transform hover:scale-102 h-full">
                 <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-bright rounded-lg mb-6 shadow-light dark:shadow-dark">
                   <feature.icon className="w-8 h-8 text-white" />
                 </div>
