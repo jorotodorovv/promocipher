@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Toaster } from 'react-hot-toast';
 import App from './App.tsx';
 import { AuthProvider } from './contexts/AuthContext';
 import { EncryptionProvider } from './contexts/EncryptionContext';
@@ -42,7 +43,8 @@ initializeCrypto().then(() => {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <EncryptionProvider>
-              <App />
+            <Toaster />
+            <App />
           </EncryptionProvider>
         </AuthProvider>
       </QueryClientProvider>
