@@ -25,6 +25,7 @@ const MasterPasswordInput: React.FC<MasterPasswordInputProps> = ({
   const [rememberMe, setRememberMe] = useState(false);
   const [agreeToRisks, setAgreeToRisks] = useState(false);
   const [showResetDialog, setShowResetDialog] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   // Show reset dialog when password validation fails
   useEffect(() => {
@@ -32,6 +33,14 @@ const MasterPasswordInput: React.FC<MasterPasswordInputProps> = ({
       setShowResetDialog(true);
     }
   }, [error]);
+
+  useEffect(() => {
+    if (rememberMe && !agreeToRisks) {
+      setValidationError('Please acknowledge the security risks to proceed while "Remember me" is active.');
+    } else {
+      setValidationError(null);
+    }
+  }, [rememberMe, agreeToRisks]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,6 +85,15 @@ const MasterPasswordInput: React.FC<MasterPasswordInputProps> = ({
               <div className="flex items-center space-x-2">
                 <ExclamationCircleIcon className="w-5 h-5 text-accent-error" />
                 <span className="font-sans text-small text-accent-error">{error}</span>
+              </div>
+            </div>
+          )}
+
+          {validationError && (
+            <div className="mb-6 p-4 bg-accent-error/10 border border-accent-error/20 rounded-lg">
+              <div className="flex items-center space-x-2">
+                <ExclamationCircleIcon className="w-5 h-5 text-accent-error" />
+                <span className="font-sans text-small text-accent-error">{validationError}</span>
               </div>
             </div>
           )}
@@ -128,58 +146,59 @@ const MasterPasswordInput: React.FC<MasterPasswordInputProps> = ({
             )}
 
             {/* Remember Me Option */}
-            <div className="space-y-4">
-              <div className="flex items-start space-x-3">
-                <input
-                  type="checkbox"
-                  id="rememberMe"
-                  checked={rememberMe}
-                  onChange={(e) => {
-                    setRememberMe(e.target.checked);
-                    if (!e.target.checked) {
-                      setAgreeToRisks(false);
-                    }
-                  }}
-                  className="mt-1 w-4 h-4 text-primary-bright bg-gray-100 border-gray-300 rounded focus:ring-primary-bright focus:ring-2"
-                />
-                <label htmlFor="rememberMe" className="font-sans text-small text-neutral-dark dark:text-neutral-medium">
-                  Remember me on this device
-                </label>
-              </div>
+            <div className="space-y-4 text-left">
+              <div className="p-4 border rounded-lg border-neutral-light dark:border-neutral-dark-stronk">
+                <div className="flex items-start space-x-3">
+                  <input
+                    type="checkbox"
+                    id="rememberMe"
+                    checked={rememberMe}
+                    onChange={(e) => {
+                      setRememberMe(e.target.checked);
+                      if (!e.target.checked) {
+                        setAgreeToRisks(false);
+                      }
+                    }}
+                    className="mt-1 w-4 h-4 text-primary-bright bg-gray-100 border-gray-300 rounded focus:ring-primary-bright focus:ring-2"
+                  />
+                  <label htmlFor="rememberMe" className="font-sans text-small text-neutral-dark dark:text-neutral-medium">
+                    Remember me on this device
+                  </label>
+                </div>
 
-              {/* Security Warning - Only show when Remember Me is checked */}
-              {rememberMe && (
-                <div className="p-4 bg-accent-warning/10 border border-accent-warning/30 rounded-lg">
-                  <div className="flex items-start space-x-3 mb-3">
-                    <ExclamationTriangleIcon className="w-5 h-5 text-accent-warning mt-0.5 flex-shrink-0" />
-                    <div>
-                      <h4 className="font-sans font-medium text-accent-warning mb-2">
-                        Security Risk Warning
-                      </h4>
-                      <ul className="space-y-1 font-sans text-small text-neutral-dark dark:text-neutral-medium">
-                        <li>• <strong>Compromises zero-knowledge security</strong> on this device</li>
-                        <li>• Your encryption key will be stored in browser's IndexedDB</li>
-                        <li>• Anyone with access to this browser can access your data</li>
-                        <li>• Potential exposure through browser vulnerabilities (XSS attacks)</li>
-                        <li>• Only use on trusted, personal devices</li>
-                      </ul>
+                {/* Security Warning - Only show when Remember Me is checked */}
+                {rememberMe && (
+                  <div className="mt-4 pt-4 border-t border-neutral-light dark:border-neutral-dark-stronk">
+                    <div className="flex items-start space-x-3">
+                      <ExclamationTriangleIcon className="w-6 h-6 text-neutral-dark dark:text-neutral-medium flex-shrink-0" />
+                      <div className="flex-1">
+                        <h4 className="font-sans font-bold text-base text-neutral-dark dark:text-white mb-2">
+                          Security Risk Warning
+                        </h4>
+                        <ul className="space-y-1.5 font-sans text-sm text-neutral-dark dark:text-neutral-medium list-disc list-inside">
+                          <li><strong>Compromises zero-knowledge security</strong> on this device.</li>
+                          <li>Your encryption key will be stored in the browser.</li>
+                          <li>Anyone with access to this browser can access your data.</li>
+                          <li>Potential exposure through browser vulnerabilities (XSS attacks).</li>
+                          <li>Only use on trusted, personal devices.</li>
+                        </ul>
+                        <div className="mt-4 flex items-start space-x-3">
+                          <input
+                            type="checkbox"
+                            id="agreeToRisks"
+                            checked={agreeToRisks}
+                            onChange={(e) => setAgreeToRisks(e.target.checked)}
+                            className="mt-1 w-4 h-4 text-primary-bright bg-gray-100 border-gray-300 rounded focus:ring-primary-bright focus:ring-2"
+                          />
+                          <label htmlFor="agreeToRisks" className="font-sans text-sm text-neutral-dark dark:text-neutral-medium">
+                            <strong>I understand and acknowledge these security risks.</strong>
+                          </label>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  
-                  <div className="flex items-start space-x-3">
-                    <input
-                      type="checkbox"
-                      id="agreeToRisks"
-                      checked={agreeToRisks}
-                      onChange={(e) => setAgreeToRisks(e.target.checked)}
-                      className="mt-1 w-4 h-4 text-accent-warning bg-gray-100 border-gray-300 rounded focus:ring-accent-warning focus:ring-2"
-                    />
-                    <label htmlFor="agreeToRisks" className="font-sans text-small text-neutral-dark dark:text-neutral-medium">
-                      <strong>I understand and acknowledge these security risks</strong>
-                    </label>
-                  </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
             <Button
               variant="primary"
