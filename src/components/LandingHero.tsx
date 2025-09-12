@@ -64,6 +64,36 @@ const LandingHero: React.FC<LandingHeroProps> = ({ onDashboardAccess }) => {
               <ArrowRightIcon className="w-6 h-6 ml-2" />
             </Button>
           </motion.div>
+
+          {/* Product Hunt Badges */}
+          <motion.div variants={itemVariants} className="flex flex-col items-center justify-center gap-4 mb-16">
+            <a 
+              href="https://www.producthunt.com/products/promocipher/reviews?utm_source=badge-product_review&utm_medium=badge&utm_source=badge-promocipher" 
+              target="_blank"
+              className="block dark:hidden"
+            >
+              <img 
+                src="https://api.producthunt.com/widgets/embed-image/v1/product_review.svg?product_id=1106857&theme=light" 
+                alt="PromoCipher - Never lose another discount code again | Product Hunt" 
+                style={{ width: '250px', height: '54px' }} 
+                width="250" 
+                height="54" 
+              />
+            </a>
+            <a 
+              href="https://www.producthunt.com/products/promocipher/reviews?utm_source=badge-product_review&utm_medium=badge&utm_source=badge-promocipher" 
+              target="_blank"
+              className="hidden dark:block"
+            >
+              <img 
+                src="https://api.producthunt.com/widgets/embed-image/v1/product_review.svg?product_id=1106857&theme=dark" 
+                alt="PromoCipher - Never lose another discount code again | Product Hunt" 
+                style={{ width: '250px', height: '54px' }} 
+                width="250" 
+                height="54" 
+              />
+            </a>
+          </motion.div>
         </div>
 
         {/* Stats */}
