@@ -19,6 +19,7 @@ import DeleteConfirmModal from '../components/dashboard/DeleteConfirmModal';
 import EmptyState from '../components/dashboard/EmptyState';
 import NoMatchesState from '../components/dashboard/NoMatchesState';
 import SecurityNotice from '../components/dashboard/SecurityNotice';
+import ProductHuntBanner from '../components/dashboard/ProductHuntBanner';
 
 const DashboardPage: React.FC = () => {
   const { user, signOut } = useAuth();
@@ -524,6 +525,9 @@ const DashboardPage: React.FC = () => {
 
           {/* Security Notice */}
           <SecurityNotice />
+          
+          {/* Product Hunt Banner */}
+          {user && <ProductHuntBanner userId={user.id} />}
         </div>
 
         {/* Add Code Modal */}
