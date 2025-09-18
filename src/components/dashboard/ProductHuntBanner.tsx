@@ -42,28 +42,28 @@ const ProductHuntBanner: React.FC<ProductHuntBannerProps> = ({ userId }) => {
         {/* Product Hunt Badges */}
         <div className="flex flex-col items-center justify-center gap-4">
           <a 
-            href="https://www.producthunt.com/products/promocipher?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-promocipher" 
+            href="https://www.producthunt.com/products/promocipher/reviews?utm_source=badge-product_review&utm_medium=badge&utm_source=badge-promocipher" 
             target="_blank"
             className="block dark:hidden"
             rel="noopener noreferrer"
           >
             <img 
-              src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1015026&theme=light&t=1758181842776" 
-              alt="PromoCipher - Never lose another discount code again | Product Hunt" 
+              src="https://api.producthunt.com/widgets/embed-image/v1/product_review.svg?product_id=1106857&theme=light" 
+              alt="Promocipher - Never lose another discount code again | Product Hunt" 
               style={{ width: '250px', height: '54px' }} 
               width="250" 
               height="54" 
             />
           </a>
           <a 
-            href="https://www.producthunt.com/products/promocipher?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-promocipher" 
+            href="https://www.producthunt.com/products/promocipher/reviews?utm_source=badge-product_review&utm_medium=badge&utm_source=badge-promocipher" 
             target="_blank"
             className="hidden dark:block"
             rel="noopener noreferrer"
           >
             <img 
-              src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1015026&theme=dark&t=1758181907663" 
-              alt="PromoCipher - Never lose another discount code again | Product Hunt" 
+              src="https://api.producthunt.com/widgets/embed-image/v1/product_review.svg?product_id=1106857&theme=dark" 
+              alt="Promocipher - Never lose another discount code again | Product Hunt" 
               style={{ width: '250px', height: '54px' }} 
               width="250" 
               height="54" 
