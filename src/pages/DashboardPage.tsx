@@ -1,36 +1,64 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { Cog6ToothIcon, ArrowLeftOnRectangleIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
-import toast from 'react-hot-toast';
-import { useAuth } from '../contexts/AuthContext';
-import { useEncryption } from '../contexts/EncryptionContext';
-import { decrypt, encrypt } from '../utils/crypto';
-import { calculateDashboardStats } from '../utils/dashboardStats';
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
+import {
+  Cog6ToothIcon,
+  ArrowLeftOnRectangleIcon,
+  ArrowPathIcon,
+} from "@heroicons/react/24/outline";
+import toast from "react-hot-toast";
+import { useAuth } from "../contexts/AuthContext";
+import { useEncryption } from "../contexts/EncryptionContext";
+import { decrypt, encrypt } from "../utils/crypto";
+import { calculateDashboardStats } from "../utils/dashboardStats";
 
-import { useInfinitePromoCodes, usePromoCodesForStats, useCreatePromoCode, useUpdatePromoCode, useDeletePromoCode, useDeleteAllPromoCodes } from '../hooks/usePromoCodeQueries';
-import type { NewPromoCodeForm, DisplayPromoCode } from '../types/promoCode';
-import Button from '../components/ui/Button';
-import DashboardStats from '../components/dashboard/DashboardStats';
-import ActionBar from '../components/dashboard/ActionBar';
-import PromoCodeCard from '../components/dashboard/PromoCodeCard';
-import AddCodeModal from '../components/dashboard/AddCodeModal';
-import EditCodeModal from '../components/dashboard/EditCodeModal';
-import DeleteConfirmModal from '../components/dashboard/DeleteConfirmModal';
+import {
+  useInfinitePromoCodes,
+  usePromoCodesForStats,
+  useCreatePromoCode,
+  useUpdatePromoCode,
+  useDeletePromoCode,
+  useDeleteAllPromoCodes,
+} from "../hooks/usePromoCodeQueries";
+import type { NewPromoCodeForm, DisplayPromoCode } from "../types/promoCode";
+import Button from "../components/ui/Button";
+import DashboardStats from "../components/dashboard/DashboardStats";
+import ActionBar from "../components/dashboard/ActionBar";
+import PromoCodeCard from "../components/dashboard/PromoCodeCard";
+import AddCodeModal from "../components/dashboard/AddCodeModal";
+import EditCodeModal from "../components/dashboard/EditCodeModal";
+import DeleteConfirmModal from "../components/dashboard/DeleteConfirmModal";
 
-import EmptyState from '../components/dashboard/EmptyState';
-import NoMatchesState from '../components/dashboard/NoMatchesState';
-import SecurityNotice from '../components/dashboard/SecurityNotice';
-import ProductHuntBanner from '../components/dashboard/ProductHuntBanner';
+import EmptyState from "../components/dashboard/EmptyState";
+import NoMatchesState from "../components/dashboard/NoMatchesState";
+import SecurityNotice from "../components/dashboard/SecurityNotice";
+import ProductHuntBanner from "../components/product-hunt/ProductHuntBanner";
 
 const DashboardPage: React.FC = () => {
   const { user, signOut } = useAuth();
   const { derivedKey } = useEncryption();
 
-  const [searchTerm, setSearchTerm] = useState('');
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [searchLoading, setSearchLoading] = useState(false);
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'expiring' | 'expired'>('all');
+  const [statusFilter, setStatusFilter] = useState<
+    "all" | "active" | "expiring" | "expired"
+  >("all");
   const [copiedCodeId, setCopiedCodeId] = useState<string | null>(null);
-  const [revealedCodes, setRevealedCodes] = useState<Record<string, { decryptedCode: string; isDecrypting: boolean; decryptionError: string | null }>>({});
+  const [revealedCodes, setRevealedCodes] = useState<
+    Record<
+      string,
+      {
+        decryptedCode: string;
+        isDecrypting: boolean;
+        decryptionError: string | null;
+      }
+    >
+  >({});
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   // React Query hooks
@@ -43,10 +71,8 @@ const DashboardPage: React.FC = () => {
   } = useInfinitePromoCodes(debouncedSearchTerm, statusFilter);
 
   // Separate query for stats calculation (search-only, no status filter)
-  const {
-    data: statsData,
-    isLoading: isLoadingStats
-  } = usePromoCodesForStats(debouncedSearchTerm);
+  const { data: statsData, isLoading: isLoadingStats } =
+    usePromoCodesForStats(debouncedSearchTerm);
 
   const createPromoCodeMutation = useCreatePromoCode();
   const updatePromoCodeMutation = useUpdatePromoCode();
@@ -70,14 +96,14 @@ const DashboardPage: React.FC = () => {
   }, [searchTerm, debouncedSearchTerm]);
 
   // Memoize the flattened promo codes to stabilize the reference
-  const promoCodes = useMemo(() => 
-    data?.pages.flatMap((page: { data: any[]; }) => page.data) || [], 
-    [data]
+  const promoCodes = useMemo(
+    () => data?.pages.flatMap((page: { data: any[] }) => page.data) || [],
+    [data],
   );
 
-  const statsPromoCodes = useMemo(() => 
-    statsData?.pages.flatMap((page: { data: any[]; }) => page.data) || [], 
-    [statsData]
+  const statsPromoCodes = useMemo(
+    () => statsData?.pages.flatMap((page: { data: any[] }) => page.data) || [],
+    [statsData],
   );
 
   const totalCount = statsData?.pages[0]?.total || 0;
@@ -92,51 +118,58 @@ const DashboardPage: React.FC = () => {
   const [showEditCodeModal, setShowEditCodeModal] = useState(false);
   const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
   const [showDeleteAllModal, setShowDeleteAllModal] = useState(false);
-  const [selectedPromoCode, setSelectedPromoCode] = useState<DisplayPromoCode | null>(null);
+  const [selectedPromoCode, setSelectedPromoCode] =
+    useState<DisplayPromoCode | null>(null);
   const [isEditingCode, setIsEditingCode] = useState(false);
   const [editCodeError, setEditCodeError] = useState<string | null>(null);
   const [isDeletingCode, setIsDeletingCode] = useState(false);
 
+  const handleAddPromoCode = useCallback(
+    async (newCode: NewPromoCodeForm) => {
+      setIsAddingCode(true);
+      setAddCodeError(null);
 
-  const handleAddPromoCode = useCallback(async (newCode: NewPromoCodeForm) => {
-    setIsAddingCode(true);
-    setAddCodeError(null);
+      const id = crypto.randomUUID();
+      try {
+        if (!derivedKey) {
+          throw new Error("Encryption key not available");
+        }
 
-    const id = crypto.randomUUID();
-    try {
-      if (!derivedKey) {
-        throw new Error('Encryption key not available');
+        const encryptedResult = await encrypt(
+          {
+            id,
+            code: newCode.code,
+          },
+          derivedKey,
+          user?.id || "",
+        );
+
+        await createPromoCodeMutation.mutateAsync({
+          encryptedCode: {
+            id,
+            user_id: user?.id || "",
+            encrypted_data: encryptedResult.encryptedData,
+            nonce: encryptedResult.nonce,
+            tag: encryptedResult.tag,
+          },
+          metadata: {
+            id,
+            store: newCode.store.trim(),
+            discount: newCode.discount.trim(),
+            expires: newCode.expires,
+            notes: newCode.notes.trim(),
+          },
+        });
+        setShowAddCodeModal(false);
+      } catch (error) {
+        console.error("Failed to add promo code:", error);
+        setAddCodeError("Failed to add promo code. Please try again.");
+      } finally {
+        setIsAddingCode(false);
       }
-
-      const encryptedResult = await encrypt({
-        id,
-        code: newCode.code,
-      }, derivedKey, user?.id || '');
-
-      await createPromoCodeMutation.mutateAsync({
-        encryptedCode: {
-          id,
-          user_id: user?.id || '',
-          encrypted_data: encryptedResult.encryptedData,
-          nonce: encryptedResult.nonce,
-          tag: encryptedResult.tag
-        },
-        metadata: {
-          id,
-          store: newCode.store.trim(),
-          discount: newCode.discount.trim(),
-          expires: newCode.expires,
-          notes: newCode.notes.trim()
-        },
-      });
-      setShowAddCodeModal(false);
-    } catch (error) {
-      console.error('Failed to add promo code:', error);
-      setAddCodeError('Failed to add promo code. Please try again.');
-    } finally {
-      setIsAddingCode(false);
-    }
-  }, [derivedKey, user, createPromoCodeMutation]);
+    },
+    [derivedKey, user, createPromoCodeMutation],
+  );
 
   const handleEditPromoCode = useCallback((code: DisplayPromoCode) => {
     setSelectedPromoCode(code);
@@ -144,24 +177,33 @@ const DashboardPage: React.FC = () => {
     setEditCodeError(null);
   }, []);
 
-  const handleUpdatePromoCode = useCallback(async (id: string, store: string, discount: string, expires: string | null, notes: string) => {
-    setIsEditingCode(true);
-    setEditCodeError(null);
+  const handleUpdatePromoCode = useCallback(
+    async (
+      id: string,
+      store: string,
+      discount: string,
+      expires: string | null,
+      notes: string,
+    ) => {
+      setIsEditingCode(true);
+      setEditCodeError(null);
 
-    try {
-      await updatePromoCodeMutation.mutateAsync({
-        id,
-        metadata: { store, discount, expires, notes }
-      });
-      setShowEditCodeModal(false);
-      setSelectedPromoCode(null);
-    } catch (error) {
-      console.error('Failed to update promo code:', error);
-      setEditCodeError('Failed to update promo code. Please try again.');
-    } finally {
-      setIsEditingCode(false);
-    }
-  }, [updatePromoCodeMutation]);
+      try {
+        await updatePromoCodeMutation.mutateAsync({
+          id,
+          metadata: { store, discount, expires, notes },
+        });
+        setShowEditCodeModal(false);
+        setSelectedPromoCode(null);
+      } catch (error) {
+        console.error("Failed to update promo code:", error);
+        setEditCodeError("Failed to update promo code. Please try again.");
+      } finally {
+        setIsEditingCode(false);
+      }
+    },
+    [updatePromoCodeMutation],
+  );
 
   const handleDeletePromoCode = useCallback((code: DisplayPromoCode) => {
     setSelectedPromoCode(code);
@@ -177,7 +219,7 @@ const DashboardPage: React.FC = () => {
       setShowDeleteConfirmModal(false);
       setSelectedPromoCode(null);
     } catch (error) {
-      console.error('Failed to delete promo code:', error);
+      console.error("Failed to delete promo code:", error);
     } finally {
       setIsDeletingCode(false);
     }
@@ -194,64 +236,82 @@ const DashboardPage: React.FC = () => {
     setSelectedPromoCode(null);
   };
 
-  const handleToggleReveal = useCallback(async (codeId: string) => {
-    if (!user || !derivedKey) {
-      console.error('User not authenticated or key not derived.');
-      return;
-    }
-
-    setRevealedCodes(prev => {
-      const currentRevealState = prev[codeId];
-
-      // If currently revealed, hide it
-      if (currentRevealState?.decryptedCode) {
-        const newState = { ...prev };
-        delete newState[codeId];
-        return newState;
+  const handleToggleReveal = useCallback(
+    async (codeId: string) => {
+      if (!user || !derivedKey) {
+        console.error("User not authenticated or key not derived.");
+        return;
       }
 
-      // If it's already being decrypted, do nothing
-      if (currentRevealState?.isDecrypting) {
-        return prev;
-      }
+      setRevealedCodes((prev) => {
+        const currentRevealState = prev[codeId];
 
-      const codeToDecrypt = promoCodes.find(pc => pc.id === codeId);
-      if (!codeToDecrypt) {
-        console.error('Promo code not found.');
-        return prev;
-      }
+        // If currently revealed, hide it
+        if (currentRevealState?.decryptedCode) {
+          const newState = { ...prev };
+          delete newState[codeId];
+          return newState;
+        }
 
-      // Decrypt asynchronously and then update state
-      decrypt(
-        codeToDecrypt.encrypted_data,
-        codeToDecrypt.nonce,
-        codeToDecrypt.tag,
-        codeToDecrypt.user_id,
-        codeToDecrypt.id,
-        derivedKey
-      ).then(decryptedCode => {
-        setRevealedCodes(current => ({
-          ...current,
-          [codeId]: { decryptedCode, isDecrypting: false, decryptionError: null }
-        }));
-      }).catch(decryptError => {
-        console.error('Failed to decrypt promo code:', decryptError);
-        const errorMessage = decryptError instanceof Error
-          ? decryptError.message
-          : 'Failed to decrypt promo code';
-        setRevealedCodes(current => ({
-          ...current,
-          [codeId]: { decryptedCode: '', isDecrypting: false, decryptionError: errorMessage }
-        }));
+        // If it's already being decrypted, do nothing
+        if (currentRevealState?.isDecrypting) {
+          return prev;
+        }
+
+        const codeToDecrypt = promoCodes.find((pc) => pc.id === codeId);
+        if (!codeToDecrypt) {
+          console.error("Promo code not found.");
+          return prev;
+        }
+
+        // Decrypt asynchronously and then update state
+        decrypt(
+          codeToDecrypt.encrypted_data,
+          codeToDecrypt.nonce,
+          codeToDecrypt.tag,
+          codeToDecrypt.user_id,
+          codeToDecrypt.id,
+          derivedKey,
+        )
+          .then((decryptedCode) => {
+            setRevealedCodes((current) => ({
+              ...current,
+              [codeId]: {
+                decryptedCode,
+                isDecrypting: false,
+                decryptionError: null,
+              },
+            }));
+          })
+          .catch((decryptError) => {
+            console.error("Failed to decrypt promo code:", decryptError);
+            const errorMessage =
+              decryptError instanceof Error
+                ? decryptError.message
+                : "Failed to decrypt promo code";
+            setRevealedCodes((current) => ({
+              ...current,
+              [codeId]: {
+                decryptedCode: "",
+                isDecrypting: false,
+                decryptionError: errorMessage,
+              },
+            }));
+          });
+
+        // Return the state with the 'isDecrypting' flag set immediately
+        return {
+          ...prev,
+          [codeId]: {
+            decryptedCode: "",
+            isDecrypting: true,
+            decryptionError: null,
+          },
+        };
       });
-
-      // Return the state with the 'isDecrypting' flag set immediately
-      return {
-        ...prev,
-        [codeId]: { decryptedCode: '', isDecrypting: true, decryptionError: null }
-      };
-    });
-  }, [user, derivedKey, promoCodes]);
+    },
+    [user, derivedKey, promoCodes],
+  );
 
   const handleCopy = useCallback(async (codeText: string, codeId: string) => {
     try {
@@ -259,7 +319,7 @@ const DashboardPage: React.FC = () => {
       setCopiedCodeId(codeId);
       setTimeout(() => setCopiedCodeId(null), 2000);
     } catch (error) {
-      console.error('Failed to copy code:', error);
+      console.error("Failed to copy code:", error);
     }
   }, []);
 
@@ -267,7 +327,7 @@ const DashboardPage: React.FC = () => {
     try {
       await signOut();
     } catch (error) {
-      console.error('Sign out error:', error);
+      console.error("Sign out error:", error);
     }
   };
 
@@ -285,7 +345,7 @@ const DashboardPage: React.FC = () => {
       await deleteAllPromoCodesMutation.mutateAsync();
       setShowDeleteAllModal(false);
     } catch (error) {
-      console.error('Failed to delete all promo codes:', error);
+      console.error("Failed to delete all promo codes:", error);
     }
   }, [deleteAllPromoCodesMutation]);
 
@@ -293,7 +353,7 @@ const DashboardPage: React.FC = () => {
     setIsExporting(true);
     try {
       const exportData = {
-        version: '1.0',
+        version: "1.0",
         exportDate: new Date().toISOString(),
         promoCodes: promoCodes.map((code: any) => ({
           id: code.id,
@@ -307,92 +367,104 @@ const DashboardPage: React.FC = () => {
           // Include encrypted data for complete backup
           encrypted_data: code.encrypted_data,
           nonce: code.nonce,
-          tag: code.tag
-        }))
+          tag: code.tag,
+        })),
       };
 
       const blob = new Blob([JSON.stringify(exportData, null, 2)], {
-        type: 'application/json'
+        type: "application/json",
       });
       const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
-      link.download = `promocipher-export-${new Date().toISOString().split('T')[0]}.json`;
+      link.download = `promocipher-export-${new Date().toISOString().split("T")[0]}.json`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
 
-      toast.success('Export completed successfully!');
+      toast.success("Export completed successfully!");
     } catch (error) {
-      console.error('Export failed:', error);
-      toast.error('Export failed. Please try again.');
+      console.error("Export failed:", error);
+      toast.error("Export failed. Please try again.");
     } finally {
       setIsExporting(false);
     }
   }, [promoCodes]);
 
-  const handleImport = useCallback(async (file: File) => {
-    setIsImporting(true);
+  const handleImport = useCallback(
+    async (file: File) => {
+      setIsImporting(true);
 
-    try {
-      const text = await file.text();
-      const importData = JSON.parse(text);
+      try {
+        const text = await file.text();
+        const importData = JSON.parse(text);
 
-      if (!importData.promoCodes || !Array.isArray(importData.promoCodes)) {
-        throw new Error('Invalid file format. Please select a valid PromoCipher export file.');
-      }
-
-      let importedCount = 0;
-      for (const code of importData.promoCodes as any[]) {
-        if (!code.store || !code.discount) {
-          continue; // Skip invalid entries
+        if (!importData.promoCodes || !Array.isArray(importData.promoCodes)) {
+          throw new Error(
+            "Invalid file format. Please select a valid PromoCipher export file.",
+          );
         }
 
-        try {
-          // Use createPromoCodeMutation for import (same as creation)
-          await createPromoCodeMutation.mutateAsync({
-            encryptedCode: {
-              id: code.id,
-              user_id: code.user_id,
-              encrypted_data: code.encrypted_data,
-              nonce: code.nonce,
-              tag: code.tag
-            },
-            metadata: {
-              id: code.id,
-              store: code.store,
-              discount: code.discount,
-              expires: code.expires || null,
-              notes: code.notes || ''
-            }
-          });
-          importedCount++;
-        } catch (error) {
-          console.error('Failed to import code:', error);
-        }
-      }
+        let importedCount = 0;
+        for (const code of importData.promoCodes as any[]) {
+          if (!code.store || !code.discount) {
+            continue; // Skip invalid entries
+          }
 
-      toast.success(`${importedCount} codes imported successfully!`);
-    } catch (error) {
-      console.error('Import failed:', error);
-      toast.error(error instanceof Error ? error.message : 'Import failed. Please check your file format.');
-    } finally {
-      setIsImporting(false);
-    }
-  }, [createPromoCodeMutation]);
+          try {
+            // Use createPromoCodeMutation for import (same as creation)
+            await createPromoCodeMutation.mutateAsync({
+              encryptedCode: {
+                id: code.id,
+                user_id: code.user_id,
+                encrypted_data: code.encrypted_data,
+                nonce: code.nonce,
+                tag: code.tag,
+              },
+              metadata: {
+                id: code.id,
+                store: code.store,
+                discount: code.discount,
+                expires: code.expires || null,
+                notes: code.notes || "",
+              },
+            });
+            importedCount++;
+          } catch (error) {
+            console.error("Failed to import code:", error);
+          }
+        }
+
+        toast.success(`${importedCount} codes imported successfully!`);
+      } catch (error) {
+        console.error("Import failed:", error);
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : "Import failed. Please check your file format.",
+        );
+      } finally {
+        setIsImporting(false);
+      }
+    },
+    [createPromoCodeMutation],
+  );
 
   // Infinite scroll observer
-  const lastPromoCodeRef = useCallback((node: HTMLDivElement | null) => {
-    if (isLoadingCodes) return;
-    if (observerRef.current) observerRef.current.disconnect();
-    observerRef.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
-        fetchNextPage();
-      }
-    });
-    if (node) observerRef.current.observe(node);
-  }, [isLoadingCodes, hasNextPage, isFetchingNextPage, fetchNextPage]);
+  const lastPromoCodeRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (isLoadingCodes) return;
+      if (observerRef.current) observerRef.current.disconnect();
+      observerRef.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      });
+      if (node) observerRef.current.observe(node);
+    },
+    [isLoadingCodes, hasNextPage, isFetchingNextPage, fetchNextPage],
+  );
 
   return (
     <div className="min-h-screen bg-background-light dark:bg-background-dark pt-20">
@@ -405,7 +477,8 @@ const DashboardPage: React.FC = () => {
                 Your Secure Vault
               </h1>
               <p className="font-sans text-body text-neutral-dark dark:text-neutral-medium">
-                Welcome back, {user?.email?.split('@')[0]}! Your promo codes are encrypted and ready.
+                Welcome back, {user?.email?.split("@")[0]}! Your promo codes are
+                encrypted and ready.
               </p>
             </div>
             <div className="flex items-center space-x-3 mt-4 sm:mt-0">
@@ -419,7 +492,6 @@ const DashboardPage: React.FC = () => {
               </Button>
             </div>
           </div>
-
         </div>
 
         <div className="space-y-6">
@@ -430,8 +502,6 @@ const DashboardPage: React.FC = () => {
             expiredCodes={dashboardStats.expiredCodes}
             onFilterChange={setStatusFilter}
           />
-
-          
 
           {/* Action Bar */}
           <ActionBar
@@ -477,7 +547,7 @@ const DashboardPage: React.FC = () => {
                         decryptedCode: revealState?.decryptedCode || null,
                         isRevealed: !!revealState?.decryptedCode,
                         isDecrypting: revealState?.isDecrypting || false,
-                        decryptionError: revealState?.decryptionError || null
+                        decryptionError: revealState?.decryptionError || null,
                       };
 
                       return (
@@ -509,23 +579,21 @@ const DashboardPage: React.FC = () => {
                     </div>
                   )}
                 </>
+              ) : // Show different empty states based on search context
+              debouncedSearchTerm.trim() ? (
+                <NoMatchesState
+                  searchTerm={debouncedSearchTerm}
+                  onClearSearch={() => setSearchTerm("")}
+                />
               ) : (
-                // Show different empty states based on search context
-                debouncedSearchTerm.trim() ? (
-                  <NoMatchesState
-                    searchTerm={debouncedSearchTerm}
-                    onClearSearch={() => setSearchTerm('')}
-                  />
-                ) : (
-                  <EmptyState onAddCode={handleAddCodeModalOpen} />
-                )
+                <EmptyState onAddCode={handleAddCodeModalOpen} />
               )}
             </>
           )}
 
           {/* Security Notice */}
           <SecurityNotice />
-          
+
           {/* Product Hunt Banner */}
           {user && <ProductHuntBanner userId={user.id} />}
         </div>
@@ -560,13 +628,13 @@ const DashboardPage: React.FC = () => {
 
         {/* Delete All Confirmation Modal */}
         <DeleteConfirmModal
-        isOpen={showDeleteAllModal}
-        onClose={() => setShowDeleteAllModal(false)}
-        onConfirm={handleDeleteAllConfirm}
-        isLoading={deleteAllPromoCodesMutation.isPending}
-        isDeleteAll={true}
-        totalCount={totalCount}
-      />
+          isOpen={showDeleteAllModal}
+          onClose={() => setShowDeleteAllModal(false)}
+          onConfirm={handleDeleteAllConfirm}
+          isLoading={deleteAllPromoCodesMutation.isPending}
+          isDeleteAll={true}
+          totalCount={totalCount}
+        />
       </div>
     </div>
   );
