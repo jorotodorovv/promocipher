@@ -1,7 +1,8 @@
-import React from "react";
-import { motion } from "framer-motion";
-import { ShieldCheckIcon, ArrowRightIcon } from "@heroicons/react/24/solid";
-import Button from "./ui/Button";
+import React from 'react';
+import { motion } from 'framer-motion';
+import { ShieldCheckIcon, ArrowRightIcon } from '@heroicons/react/24/solid';
+import Button from './ui/Button';
+import ProductHuntBadge from './product-hunt/ProductHuntBadge';
 
 interface LandingHeroProps {
   onDashboardAccess: () => void;
@@ -74,7 +75,7 @@ const LandingHero: React.FC<LandingHeroProps> = ({ onDashboardAccess }) => {
 
           <motion.div
             variants={itemVariants}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16"
+            className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-16"
           >
             <Button
               variant="primary"
@@ -86,32 +87,9 @@ const LandingHero: React.FC<LandingHeroProps> = ({ onDashboardAccess }) => {
               Start Securing Codes
               <ArrowRightIcon className="w-6 h-6 ml-2" />
             </Button>
-            <a
-              href="https://www.producthunt.com/products/promocipher?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-promocipher"
-              target="_blank"
-              className="block dark:hidden"
-            >
-              <img
-                src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1015026&theme=light&t=1758181842776"
-                alt="PromoCipher - Never lose another discount code again | Product Hunt"
-                style={{ width: "250px", height: "54px" }}
-                width="250"
-                height="54"
-              />
-            </a>
-            <a
-              href="https://www.producthunt.com/products/promocipher?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-promocipher"
-              target="_blank"
-              className="hidden dark:block"
-            >
-              <img
-                src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1015026&theme=dark&t=1758181907663"
-                alt="PromoCipher - Never lose another discount code again | Product Hunt"
-                style={{ width: "250px", height: "54px" }}
-                width="250"
-                height="54"
-              />
-            </a>
+            
+            {/* Product Hunt Follow Badge */}
+            <ProductHuntBadge type="follow" />
           </motion.div>
         </div>
 
